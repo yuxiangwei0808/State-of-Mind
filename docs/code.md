@@ -150,6 +150,8 @@ Stage 1 names a new run `checkpoints/<dataset>/<run name>` relative to the worki
 
 Checkpoints hold only tensors and plain values and load with `weights_only=True`. A world-model checkpoint stores the config, weights, optimizer and scheduler state, epoch, global step, history, best score, whether the encoder is frozen, and each process's random state. A readout checkpoint stores the SHA-256 of the world-model checkpoint it was trained on; `train/readout.py::load_readout` refuses a readout whose world model has changed.
 
+The project's finished runs keep their weights only: their optimizer and scheduler state was removed to save space (`$NEUROWORLD_OUTPUT/archive/cleanup-20261119/stripped.tsv`), so they load and score but cannot resume training. The readouts trained on them record the stripped files' SHA-256 (`refingerprinted.tsv` there).
+
 ### W&B logging
 
 Both stages log through Accelerate's W&B tracker from process zero. The `wandb` section sets `project`, `entity`, `name` (default `<run>-latent` or `<run>-readout`) and `mode` (`online`, `offline` or `disabled`); `WANDB_PROJECT`, `WANDB_ENTITY`, `WANDB_NAME` and `WANDB_MODE` override them. The bases use `online`; Spectator's configs and `scripts/spectator.sh` use `offline`.

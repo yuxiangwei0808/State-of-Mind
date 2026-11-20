@@ -35,7 +35,7 @@ Run folders are under `checkpoints/algonauts/wave2_20261102/` unless noted; each
 | NeuroWorld (k1, with history blocks) | `checkpoints/algonauts/neuroworld_history_20261112/k1-<L>s` (7.5 s: `$NEUROWORLD_EXTERNAL/NeuralWorld/checkpoints/...`); HCP: `checkpoints/hcp_movies/neuroworld_k1_20261115` | `NeuroWorld k1 <L>s (latent)`, `NeuroWorld-style k1 (latent)` at 7.5 s |
 | TRIBE v2 | the released model, zero-shot ([`eval/tribev2_reference.py`](../neuroworld/eval/tribev2_reference.py)); predictions in `$NEUROWORLD_DATA/<dataset>/derivatives/neuroworld-schaefer1000-v2-tribev2-predictions` | `TRIBEv2 zero-shot` |
 
-Every deleted run and file is listed in `archive/runs-20261112/removed-files.tsv` and `archive/cleanup-20261119/removed.tsv`; their scores stay in the stores.
+Every deleted run and file is listed in `archive/runs-20261112/removed-files.tsv` and `archive/cleanup-20261119/removed.tsv`; their scores stay in the stores. The kept checkpoints hold weights only (optimizer and scheduler state stripped, `archive/cleanup-20261119/stripped.tsv`): they load and score but cannot resume training.
 
 ## Main paper
 
