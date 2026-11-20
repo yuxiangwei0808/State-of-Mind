@@ -129,7 +129,8 @@ def updating_cells(dataset, splits, name):
     window = lambda b: 100 * (1 - se(b)[a:c].sum() / ref(b)[a:c].sum())
     last = max(k for k in U.schedule(hidden, "gap") if k < a)
     since = [last + int(round(s / GRIDS[dataset].tr)) for s in SINCE_SECONDS]
-    return {"value": skill(HEADLINE_BUDGET), "16": skill("16"), "curve": [skill(b) for b in CURVE_BUDGETS],
+    scored = lambda b: all(b in sums[s] for s in splits)  # rows scored before a budget was added lack it
+    return {"value": skill(HEADLINE_BUDGET), "16": skill("16"), "curve": [skill(b) if scored(b) else None for b in CURVE_BUDGETS],
             "gap": window("gap"),
             "gap none": window("0"), "since": [100 * (1 - se("gap")[k] / ref("gap")[k]) for k in since if k < c]}
 
@@ -181,7 +182,7 @@ def _pct(value):
 
 
 def _curve(values):
-    return "n/a" if not values else " → ".join(f"{v:.0f}" for v in values)
+    return "n/a" if not values else " → ".join("–" if v is None else f"{v:.0f}" for v in values)
 
 
 
