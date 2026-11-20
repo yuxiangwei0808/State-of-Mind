@@ -10,10 +10,11 @@ Spectator (ridge-jepa-180s-std-partial, its stored probe, as neuroworld/paper/ge
 s + S - 1 from the real fMRI of the 180 s before s + R and the movie. The forecasts are stored in the order of the training dataset's
 windows, with that order, so training can check it reads the same windows.
 
-Training (in a copy of the k1 code whose build_dataset calls wrap()): with NEUROWORLD_GENERATED_FUTURES=<out dir>, the training split
+Training (NeuroWorld's k1 training code, which is not part of this repository, with its build_dataset calling wrap()): with NEUROWORLD_GENERATED_FUTURES=<out dir>, the training split
 holds every real window and, after them, a copy of each whose last F frames are the forecast (twice the windows per epoch). The
 probe, the decoder and validation read real windows only.
 """
+import sys
 import json
 import os
 from pathlib import Path
@@ -123,6 +124,8 @@ def forecasts(config, out, device="cuda", teacher_arm="ridge-jepa-180s-std-parti
 
 
 if __name__ == "__main__":
+    if {"-h", "--help"} & set(sys.argv[1:]):  # this script parses no options: show its usage and run nothing
+        sys.exit(print(__doc__))
     import sys
     if sys.argv[1] != "forecasts":
         raise SystemExit(__doc__)

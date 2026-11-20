@@ -1,4 +1,4 @@
-"""IPSID baseline (docs/benchmark.md#what-it-tests), scored like any submission.
+"""IPSID baseline (docs/benchmark.md#tasks), scored like any submission.
 
 IPSID is an input-driven linear state-space model identified by subspace identification (Vahidi, Sani & Shanechi,
 PNAS 2024; the PSID package), without a behavioural signal (n1 = 0: the non-preferential input-driven case). One

@@ -30,12 +30,6 @@ from neuroworld.data.splits import content_key
 
 MAX_OTHERS = 24
 
-CAVEAT = ("Approximate, model-free references, not the actual ceiling of the model's score: "
-          "inter-subject correlation counts only the response shared across subjects, while the model "
-          "correlates each subject's fMRI with a signal reconstructed from the stimulus, its own brain "
-          "history and a per-subject readout, so the model can exceed them.")
-
-
 def stimulus_key(timeline_id):
     """Stimulus timeline shared by all subjects (its feature rows); Algonauts timelines carry a
     per-subject ``sub-XX:`` prefix. Repeated viewings keep separate timelines; see content_key."""

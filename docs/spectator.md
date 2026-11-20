@@ -2,7 +2,7 @@
 
 This page describes the paper's model, Spectator, end to end: what it is, its architecture, how it is trained and how it is scored. Its run folders and benchmark rows are named `ridge-jepa` (at 180 s: run `ridge-jepa-180s-std-partial`, row `ridge-jepa-180s-std-partial (latent)`). The paper's tables and the runs behind them are mapped in [reproduce](reproduce.md).
 
-**The model is frozen.** Its configs are in [`neuroworld/configs/spectator/`](../neuroworld/configs/spectator), its weights and every intermediate file in `$NEUROWORLD_OUTPUT/spectator-v1/` (with a README mapping each file to the run it came from), and its code at git tag `spectator-v1` of the original repository. [`tests/test_spectator.py`](../tests/test_spectator.py) checks that the configs keep their settings and that the code reproduces the frozen model's stored rollout.
+**The model is frozen.** Its configs are in [`neuroworld/configs/spectator/`](../neuroworld/configs/spectator), its weights and every intermediate file in `$NEUROWORLD_OUTPUT/spectator-v1/` (with a README mapping each file to the run it came from), and its code is in this repository. [`tests/test_spectator.py`](../tests/test_spectator.py) checks that the configs keep their settings and that the code reproduces the frozen model's stored rollout.
 
 ## In plain words
 
@@ -12,7 +12,7 @@ The model watches someone's brain while they watch a movie, and predicts what th
 2. **It steps that state forward with one matrix.** Each step adds a correction to the state, computed from the state itself and the movie's last 7.5 s. One step is one fMRI frame (1.49 s). The new state is fed back in, so 40 steps forecast a minute.
 3. **It reads brain activity off the state with a linear probe**, one per participant, only for scoring. The model itself never predicts brain regions directly.
 
-It is trained in four steps. Two train by gradient descent, and two are single regressions:
+It is trained in four steps (the detailed list below numbers six: it adds freezing the encoder and fitting the probe). Two train by gradient descent, and two are single regressions:
 - **Stage 0** learns the fast part by forecasting fMRI without the movie.
 - **The slow part's weights** come from one regression: which mix of the past best predicts the next 24 s.
 - **The JEPA phase** fine-tunes both parts so that the state's own future is easy to predict: the state is trained to forecast later states, which are given by a slowly updated copy of the model. This is the step that adds most.
@@ -82,7 +82,7 @@ All training uses Algonauts: Friends seasons 1–5 for training, and season 6 fo
    - It uses every moment whose window holds H of measured frames. It also uses moments with less history, whose window starts before the run, with those frames zero as at scoring. Each keeps at least 30 s inside the run, as every forecast start does. At 180 s that is 1,920,128 transitions (104,696 full and 15,312 partial windows).
    - The movie rows are the newest 5, standardized per feature, with no delay shift.
    - The penalty is 1e-3 times the mean diagonal of the Gram matrix. It is multiplied by 10 on the state block, and the constant is not penalized.
-   - On the movie block it is multiplied by a factor chosen on each dataset's test data: 100 on Algonauts, 10,000 on HCP. The Gram matrix grows with every transition, but the movie map learns only from distinct movie moments, and HCP's 148 participants all watched the same 45 minutes of movie, so HCP needs a much stronger penalty. Chosen on November 11, on all test data.
+   - On the movie block it is multiplied by a factor chosen on each dataset's test data: 100 on Algonauts, 10,000 on HCP. The Gram matrix grows with every transition, but the movie map learns only from distinct movie moments, and HCP's 148 participants all watched the same 45 minutes of movie, so HCP needs a much stronger penalty. Chosen on all test data.
    - The previous fit (layer-normalized rows, full windows only; run `D180-win5`) scored 0.3 lower on Forecast. The paper's ablations of the encoder and predictor are paired against it.
 6. **The probe, for scoring only.**
    - For each participant, a ridge map from predicted states to parcels, fitted on the model's own rollouts on the training recordings, under the benchmark's protocols.
@@ -123,4 +123,4 @@ The probe is pooled over participants, as for every HCP model, so new participan
 - **Predictor.** `ridge` is a closed-form matrix, `transformer` a Transformer trained by gradient, and `matrix` a matrix trained by gradient (the JEPA-phase runs).
 - **Encoder.** `jepa` means after the JEPA phase, `frozen` stage 0 only. `tfforecast` is a Transformer encoder trained by forecasting, and `linpath` adds a linear path to it.
 - **Changes.** `std`: standardized movie rows. `partial`: partial-history windows in the final fit. `m<N>`: N movie rows (on the final fit's own rows) or movie factor N. `nomovie`, `nofmri`: one input removed. `hcp-refit`: refitted on HCP.
-- Folders made before November 5 keep letter names: `D180` is the 180-s JEPA phase (`matrix-jepa-180s-m1-r40`), `D180-win5` is `ridge-jepa-180s` with the previous fit, and `D180-start-win5` is `ridge-frozen-180s`.
+- Older run folders keep letter names: `D180` is the 180-s JEPA phase (`matrix-jepa-180s-m1-r40`), `D180-win5` is `ridge-jepa-180s` with the previous fit, and `D180-start-win5` is `ridge-frozen-180s`.

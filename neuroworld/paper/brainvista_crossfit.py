@@ -9,7 +9,7 @@ halves of the 66 evaluation units (paper-analysis/extra-nov14/bv/bv_crossfit.py;
 The pooled Forecast, State and Updating (4 new frames) must equal bv_crossfit_<L>.json, which Table 2 reports.
 Output: paper-analysis/results-brainvista-crossfit.json and results-brainvista-steps-180s.npz.
 
-    PYTHONPATH=<NeuralWorld> python -m neuroworld.paper.brainvista_crossfit [--device cuda]
+    python -m neuroworld.paper.brainvista_crossfit [--device cuda]
 """
 import collections
 import json
@@ -147,4 +147,6 @@ def main():
 
 
 if __name__ == "__main__":
+    if {"-h", "--help"} & set(sys.argv[1:]):  # this script parses no options: show its usage and run nothing
+        sys.exit(print(__doc__))
     main()

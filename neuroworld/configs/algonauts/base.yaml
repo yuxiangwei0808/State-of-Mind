@@ -54,7 +54,7 @@ train:
   weight_decay: 0.001
   grad_clip: 1.0
   precision: bf16
-  sigreg_weight: 0.09  # used only by the joint world model (the only design that trains a latent encoder)
+  sigreg_weight: 0.09  # SIGReg on the encoded states, applied whenever the encoder trains (0 turns it off)
   sigreg_knots: 17
   sigreg_projections: 1024
   rollout_steps: 16  # 16-step rollout loss, used by every design

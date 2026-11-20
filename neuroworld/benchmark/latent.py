@@ -1,4 +1,4 @@
-"""Latent scores (docs/benchmark.md#latent-scores): a world model is judged by its predicted latent, not by its
+"""Latent scores (docs/benchmark.md#how-a-model-is-queried): a world model is judged by its predicted latent, not by its
 decoder. A model that exposes predict_states(batch) -> (its own forecast fMRI or None, [B, H, D] predicted states) is
 read out by a frozen linear probe and scored as an ordinary model on every task, beside its own decoder's row.
 

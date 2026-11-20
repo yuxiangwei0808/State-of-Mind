@@ -113,6 +113,8 @@ def report(args):
         (folder / "table.md").write_text(text + "\n")
         print(text)
         return
+    if args.split is None:
+        raise SystemExit("report: --split is required for the Forecast scorecard")
     folder = Path(args.output) / args.dataset / args.split
     results = {path.name: F.load(path) for path in sorted(folder.iterdir()) if (path / "results.json").is_file()}
     if not results:
@@ -202,34 +204,32 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
 
-    def command(name, help, dataset=True, splits=("val", "dev"), output=OUTPUT):
+    def command(name, help, splits=False):
+        """A task subcommand; splits=True adds --split for the Forecast and Updating splits."""
         p = sub.add_parser(name, help=help)
         p.add_argument("--model", required=True, help="See the module docstring for the model names")
         p.add_argument("--name", help="Result name for a single model (default: its own name)")
         p.add_argument("--device", default="cpu", help="cuda for trained models on a GPU")
-        p.add_argument("--output", default=output, required=output is None)
-        if dataset:
-            p.add_argument("--dataset", choices=sorted(CONFIGS), default="algonauts")
-            p.add_argument("--features", choices=("raw", "projections", "context"),
-                           help="Stimulus rows of the fitted references (default: raw on Algonauts, projections on HCP)")
-        p.add_argument("--config", required=not dataset, help="Dataset config overriding the default")
+        p.add_argument("--output", default=OUTPUT)
+        p.add_argument("--dataset", choices=sorted(CONFIGS), default="algonauts")
+        p.add_argument("--features", choices=("raw", "projections", "context"),
+                       help="Stimulus rows of the fitted references (default: raw on Algonauts, projections on HCP)")
+        p.add_argument("--config", help="Dataset config overriding the default")
         if splits:
-            p.add_argument("--split", nargs="+", default=None if splits == "evaluation" else list(splits),
-                           help="Default: the dataset's evaluation sets (Algonauts val dev; HCP heldout-adapt)"
-                           if splits == "evaluation" else None)
+            p.add_argument("--split", nargs="+", help="Default: every evaluation set of the dataset (EVALUATION)")
         return p
 
-    command("forecast", "Forecast task on one or more splits", splits="evaluation").add_argument(
+    command("forecast", "Forecast task on one or more splits", splits=True).add_argument(
         "--workers", type=int, default=1, help="Forked CPU workers (CPU models only)")
-    command("state", "State task on repeated viewings", splits=None).add_argument(
+    command("state", "State task on repeated viewings").add_argument(
         "--split", nargs="+", help="Default: dev (Algonauts: only Movie10 has repeats); heldout-adapt (HCP)")
-    command("updating", "Updating task: error against the number of revealed frames", splits="evaluation").add_argument(
+    command("updating", "Updating task: error against the number of revealed frames", splits=True).add_argument(
         "--own-fill", action="store_true", help="Fill the frames not shown with the model's own forecast")
-    command("nonanticipation", "Nonanticipation check", splits="evaluation")
-    s = command("suite", "Every real-data task for one model", splits=None)
+    command("nonanticipation", "Nonanticipation check (on one held-out set per dataset, NONANTICIPATION)")
+    s = command("suite", "Every real-data task for one model")
     s.add_argument("--tasks", nargs="+", choices=TASKS, default=list(TASKS))
     s.add_argument("--workers", type=int, default=1, help="Forked CPU workers for Forecast (CPU models only)")
-    s.add_argument("--split", nargs="+", help="Forecast and Updating splits (default: every non-locked split); State "
+    s.add_argument("--split", nargs="+", help="Forecast and Updating splits (default: every evaluation set); State "
                                              "uses its own groups")
     pr = sub.add_parser("profile", help="The card: every scored model's Forecast, State and Updating per panel")
     pr.add_argument("--output", default=OUTPUT)

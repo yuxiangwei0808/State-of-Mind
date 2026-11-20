@@ -1,4 +1,4 @@
-"""Forecast task (docs/benchmark.md#forecast): score one model's forecasts on one dataset split.
+"""Forecast task (docs/benchmark.md#tasks): score one model's forecasts on one dataset split.
 
 At every origin (each 3 s), the model gets the measured fMRI before it (up to two minutes, the last 30 s complete)
 and the movie, and forecasts the next minute. Per run and step, the drift-robust Pearson r and nMSE against the
@@ -45,13 +45,8 @@ def _meta(data, run):
             "exposure": run.exposure}
 
 
-def forecast_row(data, model, run):
-    """Per-step scores of the prefix on the run's forecast origins."""
-    return forecast_rows(data, [model], run)[0]
-
-
 def forecast_rows(data, models, run):
-    """forecast_row of several models on the same queries, one after the other: two readouts of one latent model
+    """The Forecast rows of one run for several models on the same queries, one after the other: two readouts of one latent model
     (its probe and its own decoder) then share its rollouts through the adapter's memory."""
     grid = data.grid
     origins = Q.forecast_origins(run, grid)

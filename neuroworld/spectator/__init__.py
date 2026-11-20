@@ -1,4 +1,4 @@
-"""Spectator, the model the paper reports (`ridge-jepa` in the docs and on disk), frozen on November 12, 2026.
+"""Spectator, the model the paper reports (`ridge-jepa` in the docs and on disk), frozen.
 
 A linear latent world model of a person watching a movie:
 

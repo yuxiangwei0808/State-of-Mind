@@ -8,8 +8,8 @@ prepare   read-only dry-run of the complete input inventory
 run       write or resume prepared data directly at --output
 ```
 
-Use `run --limit N` for a small manual smoke test. There is no build stage,
-validation command, or publish step. A full run writes to its final location
+Use `run --limit N` for a small manual smoke test. There is no build stage or
+publish step (`python -m neuroworld.nbs_data.validate_raw` checks an Algonauts raw index). A full run writes to its final location
 from the start.
 
 ## Code layout
@@ -159,14 +159,13 @@ for only those N runs.
   --output "${HCP_OUT}-smoke" --limit 3
 ```
 
-Inspect the smoke directory manually, or hand its path to Codex for a manual
-audit. This is deliberately not another pipeline command.
+Inspect the smoke directory manually. This is deliberately not another pipeline command.
 
 ## 3. Full run
 
 After `prepare` succeeds and the smoke output looks correct, write directly to
 the final roots. The worker counts below are the tested concurrent allocation
-for `arctrdcn017.rs.gsu.edu` (32 CPUs, 754 GiB RAM):
+for a host with 32 CPUs and 754 GiB of RAM:
 
 ```bash
 "$PYTHON" -m neuroworld.nbs_data.schaefer run \
@@ -209,7 +208,7 @@ arrays were bit-for-bit identical and the full bundle audit passed.
 Expected full inventories are 1,392 Algonauts runs (641,568 frames) and 725 HCP
 runs sharing eight feature timelines.
 
-The verified 2026-09-06 full run on `arctrdcn017` passed every reconciled audit.
+The paper's full run passed every reconciled audit.
 It contains four Algonauts runs with no stimulus-supported frames and no
 excluded HCP runs. Those four runs remain present in the canonical inventory
 but contribute zero training samples through `valid_time`.

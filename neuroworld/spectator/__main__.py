@@ -34,7 +34,7 @@ def main(argv=None):
     s.add_argument("--ahead", type=int, required=True, help="Target frames: 16 on Algonauts, 24 on HCP (24 s)")
     s.add_argument("--dataset-config", default="neuroworld/configs/algonauts/base.yaml")
 
-    s = steps.add_parser("matrix", help="Step 4 (and the JEPA phase's start): the closed-form matrix")
+    s = steps.add_parser("matrix", help="Step 5 (and the JEPA phase's start): the closed-form matrix")
     s.add_argument("config")
     s.add_argument("out")
     s.add_argument("--encoder", help="Encoder file (sets train.encoder_checkpoint)")

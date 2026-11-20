@@ -51,7 +51,7 @@ class Head:
 
 
 def latent_row(arm, name, seconds, store, data):
-    """The row panel_grid.py / panel_test.py score: the arm's world model through its stored probes."""
+    """A latent row: the arm's world model read through its stored probes."""
     G.HISTORY_SECONDS = float(seconds)
     cfg = load_config(R / arm / "config.yaml")
     model, _ = load_world_model(cfg, R / arm / "best.pt", device)
@@ -180,6 +180,8 @@ def collect(data, model, out):
 
 
 if __name__ == "__main__":
+    if {"-h", "--help"} & set(sys.argv[1:]):  # this script parses no options: show its usage and run nothing
+        sys.exit(print(__doc__))
     kind = sys.argv[1]
     if kind == "spectator":
         spectator(sys.argv[2], sys.argv[3], sys.argv[4])

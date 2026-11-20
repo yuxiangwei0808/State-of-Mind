@@ -16,7 +16,7 @@ from neuroworld.paths import DATA, OUTPUT
 A = OUTPUT / "paper-analysis"
 FIGS = A / "figs"
 TR, H = 1.49, 40
-# The benchmark result stores, searched in this order: references rescored on November 12; the test films (Bourne, Wolf)
+# The benchmark result stores, searched in this order: the references rescored on the final protocol; the test films (Bourne, Wolf)
 # and HCP run 4; Friends S6 and the first two Movie10 films; the linear forecaster at 120 s (history-length study).
 ROOTS = [OUTPUT / "benchmark-final", OUTPUT / "benchmark-test", OUTPUT / "benchmark-iter-overflow", OUTPUT / "benchmark-history-context"]
 ROWS = {"Spectator": "ridge-jepa-180s-std-partial (latent)", "Transformer counterpart": "transformer-tfforecast-linpath-jepa-180s-2x1024 (latent)",
@@ -388,5 +388,7 @@ def maps():
 
 
 if __name__ == "__main__":
+    if {"-h", "--help"} & set(sys.argv[1:]):  # this script parses no options: show its usage and run nothing
+        sys.exit(print(__doc__))
     FIGS.mkdir(parents=True, exist_ok=True)
     {"benchmark": benchmark, "collected": collected, "isc": isc, "maps": maps}[sys.argv[1]]()

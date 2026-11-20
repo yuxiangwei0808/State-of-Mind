@@ -1,4 +1,4 @@
-"""State task (docs/benchmark.md#state): does the observed past improve the forecast of this particular future?
+"""State task (docs/benchmark.md#tasks): does the observed past improve the forecast of this particular future?
 
 Two viewings of the same scene by the same participant share the future movie but not the brain state:
   Algonauts  the two viewings of each Movie10 part (development split; the same past movie)
@@ -227,7 +227,7 @@ def collect(data, model, runs, reference=None, log=None, keep=None):
                     s[f"se_{past}"] += np.where(ok, err, 0.0).sum(0)
                 s["count"] += ok.sum(0)
             both = measured["a"][1] & measured["b"][1]
-            # Raw viewing differences: every scored frame and parcel weighs the same (docs/benchmark.md#state).
+            # Raw viewing differences: every scored frame and parcel weighs the same (docs/benchmark.md#tasks).
             dy = measured["a"][0] - measured["b"][0]
             dp = forecast[("a", "own")] - forecast[("b", "own")]
             for b, steps in bands.items():

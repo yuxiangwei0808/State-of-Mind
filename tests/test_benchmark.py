@@ -6,7 +6,7 @@ import pytest
 from neuroworld.benchmark import grid as G, queries as Q
 from neuroworld.benchmark.data import BenchmarkData, Run, segments
 from neuroworld.benchmark.interface import Persistence, stimulus_source
-from neuroworld.benchmark.metrics import high_pass_basis, selection, step_scores
+from neuroworld.benchmark.metrics import high_pass_basis, step_scores
 from neuroworld.benchmark.report import Units
 
 
@@ -114,10 +114,6 @@ def test_step_scores_match_direct_computation():
     assert out["rows"].tolist() == [80, 80, 79, 80]
 
 
-def test_selection_counts_ties_at_expectation():
-    out = selection([1, 1, 0], [3, 1, 2])
-    assert out["selection_gap"] == 1.0 and out["top1"] == 0.5
-    assert out["random_gap"] == 1.0
 
 
 def test_unit_bootstrap_ratio_and_paired_zero():

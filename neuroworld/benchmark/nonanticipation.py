@@ -1,4 +1,4 @@
-"""Nonanticipation check (docs/benchmark.md#nonanticipation-check): a forecast must not depend on input that comes
+"""Nonanticipation check (docs/benchmark.md#tasks): a forecast must not depend on input that comes
 later than the forecast frame.
 
 Two queries share the origin, the fMRI prefix and the movie up to frame t0 + k; from t0 + k on, the second takes

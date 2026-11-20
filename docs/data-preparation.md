@@ -19,7 +19,7 @@ TRIBE v2's zero-shot predictions (the stimulus-only reference) are cached by [`e
 
 ## Workflow
 
-Run from the repository root:
+Install [`requirements-data.txt`](../neuroworld/requirements-data.txt), then run from the repository root:
 
 ```bash
 python -m neuroworld.nbs_data.schaefer --help

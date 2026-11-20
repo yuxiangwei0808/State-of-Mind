@@ -110,7 +110,7 @@ def paired(results_a, results_b):
     return out
 
 
-# Scorecard columns: drift-robust r and nMSE in B1 (0-7.5 s), B2 (7.5-30 s) and B3 (30-90 s), from the 30-s prefix.
+# Scorecard columns: drift-robust r and nMSE in B1 (0-7.5 s), B2 (7.5-30 s) and B3 (30-60 s), from the 30-s prefix.
 HEADLINE = [(f"{band} {label}", (LONGEST_PREFIX, band, metric)) for band in ("B1", "B2", "B3")
             for label, metric in (("r", "pearson_hp"), ("nMSE", "nmse_pooled"))]
 

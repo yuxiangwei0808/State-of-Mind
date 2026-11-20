@@ -5,11 +5,12 @@ and the same rows with Forecast split by seconds ahead (supplement).
                                               and writes paper-analysis/results-ablations.json
 
 Each row is one change from Spectator, all with 180 s of fMRI, paired against its twin on every Algonauts evaluation set the two
-share (val = Friends S6, dev and test = the four Movie10 movies; State on the Movie10 repeats). Twins: the rows retrained through
-the release recipe (random init, state size, fMRI window of 3 frames, no EMA, mean slow weights, the modality rows;
-checkpoints/algonauts/ablations_20261113, scores in benchmark-ablations) against the control run there, which is Spectator
-unchanged through the same scripts; the Transformer counterpart against Spectator; the other rows against the previous final
-fit of Spectator (D180-win5), unmarked in the table. Of the fMRI windows the table keeps only 4.5 s.
+share (val = Friends S6, dev and test = the four Movie10 movies; State on the Movie10 repeats). Twins: random init, the 3-frame fMRI
+window and the state sizes (retrained through the release recipe in checkpoints/algonauts/ablations_20261113, scores in
+benchmark-ablations) against the control run there, which is Spectator unchanged through the same scripts; no EMA, mean slow
+weights, the three modality rows (also in ablations_20261113) and the Transformer counterpart against Spectator; the other
+rows against the previous final fit of Spectator (D180-win5), unmarked in the table. Of the fMRI windows the table keeps
+only 4.5 s.
 Main table (the columns of the main table): Forecast over the minute, State, and Updating with 4 new fMRI frames, as paired
 differences in points, and the paired difference in Pearson r of the forecast (Table 2's r: per recording, mean over the 40
 frames ahead of the parcel-averaged correlation, averaged over recordings; as neuroworld/paper/history_table.py). Supplement:
@@ -32,14 +33,13 @@ SPLITS = ("val", "dev", "test")
 BANDS = {"0-7.5 s": (0, frames_within(7.5, TR)), "30-60 s": (frames_within(30.0, TR), frames_within(60.0, TR))}
 TWIN = "step2 D180-win5 q180 (latent)"
 SPECTATOR = "ridge-jepa-180s-std-partial (latent)"
-NEW = "ridge-jepa-180s-std-partial-{} (latent)"  # the November 13 runs and the reviewer controls (ablations_20261113)
-CONTROL = NEW.format("control")  # Spectator unchanged through the same script (run_variant4.sh): twin of the run_variant3/4 rows
+NEW = "ridge-jepa-180s-std-partial-{} (latent)"  # the runs of checkpoints/algonauts/ablations_20261113
+CONTROL = NEW.format("control")  # Spectator unchanged through the same scripts: the twin of the rows retrained there
 COUNTERPART = "transformer-tfforecast-linpath-jepa-180s-2x1024 (latent)"
 
 # (table title, [(row label, benchmark row, twin row)]): each row removes or replaces one part, and the default is in its label.
-# Rows run on November 13 (random init., fMRI window, state size; run_variant3.sh) are paired with the control run, the reviewer
-# controls (run_variant4.sh: no EMA and stop-gradient, mean slow weights) and the Transformer counterpart with Spectator, the rest
-# with the previous final fit (TWIN).
+# Random init., the fMRI window and the state sizes are paired with the control run (CONTROL); no EMA, mean slow weights, the
+# modality rows and the Transformer counterpart with Spectator; the rest with the previous final fit (TWIN).
 TABLES = [
     ("(a) Training", [("w/o pretraining (random init.)", NEW.format("randinit"), CONTROL),
                       ("Frozen pretrained encoder", "ridge-frozen-180s (latent)", TWIN),
@@ -179,9 +179,9 @@ def latex(blocks):
                                + "\n" + r"\end{minipage}")
     return "\n".join([
         r"\begin{table*}[t]", r"\centering", r"\footnotesize", r"\setlength{\tabcolsep}{3pt}",
-        "% Paired differences on all evaluation data (Friends S6 and the four movies). Twins: the November 13 runs (random init.,",
-        "% fMRI window, state size) against the control run (Spectator unchanged through the same script); the reviewer controls and",
-        "% the Transformer counterpart against Spectator; the other rows against the previous final fit (D180-win5).",
+        "% Paired differences on all evaluation data (Friends S6 and the four movies). Twins: random init., the fMRI window and",
+        "% the state sizes against the control run (Spectator unchanged through the same scripts); no EMA, mean slow weights, the",
+        "% modality rows and the Transformer counterpart against Spectator; the other rows against the previous final fit (D180-win5).",
         "% From neuroworld/paper/ablations.py; run folders in docs/reproduce.md.",
         col(blocks[0], blocks[2]) + r"\hfill", col(blocks[1], blocks[3]),
         r"\caption{\textbf{Ablations.} Change in each metric of \cref{tab:main} when one part of \method is removed or replaced, "
@@ -210,6 +210,8 @@ def latex_by_horizon(groups):
 
 
 if __name__ == "__main__":
+    if {"-h", "--help"} & set(sys.argv[1:]):  # this script parses no options: show its usage and run nothing
+        sys.exit(print(__doc__))
     blocks, groups, results = [], [], {}
     for title, rows in TABLES:
         done = []

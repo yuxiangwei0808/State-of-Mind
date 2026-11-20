@@ -1,6 +1,6 @@
 """Canonical identities and source contracts for the Algonauts S0 adapter.
 
-The challenge HDF5 keys, TRIBEv2 event tables, and NeuralWorld bundle use
+The challenge HDF5 keys, TRIBEv2 event tables, and the prepared bundle use
 slightly different labels for the same acquisition.  This module is the one
 place where those labels are translated.  It intentionally contains no HDF5,
 Torch, or TRIBEv2 imports so runtime loaders and preparation tools can share it.

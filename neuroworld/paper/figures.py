@@ -36,7 +36,7 @@ def curve(ax, label, x, y):
 
 # The models of Table 2, in its order, and one look each, read by the appendix figures' scripts (Figure 5: cvpr2027-paper/viz/history,
 # Figure 6: cvpr2027-paper/viz/properties), which draw them. Colour-blind-safe hues (Okabe-Ito / Paul Tol), a marker per model;
-# the models that receive no fMRI (TRIBE v2, MIRAGE) are dashed. Palette reviewed with GPT Astra, Nov 14.
+# the models that receive no fMRI (TRIBE v2, MIRAGE) are dashed.
 TABLE2 = ["Linear forecaster", "IPSID", "NeuroWorld", "BrainVista", "TRIBE v2", "MIRAGE", "Spectator"]
 LOOK = {"Linear forecaster": dict(color="#3B3B3B", marker="s"),
         "IPSID": dict(color="#4477AA", marker="v"),
@@ -46,7 +46,7 @@ LOOK = {"Linear forecaster": dict(color="#3B3B3B", marker="s"),
         "MIRAGE": dict(color="#C99A2E", marker=None, ls=(3.5, (4, 3))),
         "Spectator": dict(color="#C0392B", marker="o", lw=1.7, ms=3.4, alpha=1.0, zorder=5)}
 NO_FMRI = ("TRIBE v2", "MIRAGE")
-# Benchmark rows of the models at 180 s (Table 2); BrainVista comes from neuroworld/paper/brainvista_crossfit.py, MIRAGE from the external storess.
+# Benchmark rows of the models at 180 s (Table 2); BrainVista comes from neuroworld/paper/brainvista_crossfit.py, MIRAGE from the external stores.
 AT_180 = {"Linear forecaster": "linear [context] 180 s", "IPSID": "IPSID [context] 180 s", "NeuroWorld": "NeuroWorld k1 180s (latent)",
           "TRIBE v2": "TRIBEv2 zero-shot", "MIRAGE": "MIRAGE zero-shot", "Spectator": "ridge-jepa-180s-std-partial (latent)"}
 EXTERNAL_STORES = [EXTERNAL / "baselines/benchmark", EXTERNAL / "baselines/test-split/benchmark"]
@@ -159,6 +159,8 @@ def cortex():
 
 
 if __name__ == "__main__":
+    if {"-h", "--help"} & set(sys.argv[1:]):  # this script parses no options: show its usage and run nothing
+        sys.exit(print(__doc__))
     OUT.mkdir(parents=True, exist_ok=True)
     for f in (sys.argv[1:] or ["inputs", "inside", "cortex"]):
         globals()[f]()

@@ -1,4 +1,4 @@
-"""Step 4 of Spectator's training (and the JEPA phase's start matrix): the predictor's matrix, in closed form.
+"""Step 5 of Spectator's training (and the JEPA phase's start matrix): the predictor's matrix, in closed form.
 
 The predictor steps the state as s_{t+1} = s_t + [s_t ; m_t ; 1] C, with m_t the movie rows exactly as the model reads them
 (standardized per feature when model.stimulus_scaling is standardize; the statistics come from every training row, as

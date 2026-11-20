@@ -126,11 +126,11 @@ def _build(model, h, data, store):
         _, row = latent_row(W / f"ridge-jepa-{h[:-2]}s-std-partial", f"ridge-jepa-{h[:-2]}s-std-partial", seconds,
                             "algonauts", store, "cuda", log)
         return row
-    if model == "Linear forecaster":  # refitted for each length; queries carry 240 s, the model reads its last L (nov12h_linear.py)
+    if model == "Linear forecaster":  # refitted for each length; queries carry 240 s, the model reads its last L
         from neuroworld.experiments.history_length import LONGEST, models
         G.HISTORY_SECONDS = LONGEST
         return next(models("linear", data, [seconds], "cuda", log, "context", N / "benchmark-test"))[1]
-    if model == "IPSID":  # IPSID on the contextual rows, queries of <h> (with_history.py; 120 s is the CLI default)
+    if model == "IPSID":  # IPSID on the contextual rows, queries of <h> (120 s is the benchmark's default)
         G.HISTORY_SECONDS = seconds
         m = _models("ipsid", data, "cuda", str(store), "context")[0]
         m.name = row_name(model, h)

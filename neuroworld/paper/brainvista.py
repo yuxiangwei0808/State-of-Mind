@@ -141,6 +141,8 @@ def row(length):
 
 
 if __name__ == "__main__":
+    if {"-h", "--help"} & set(sys.argv[1:]):  # this script parses no options: show its usage and run nothing
+        sys.exit(print(__doc__))
     T.ROOTS = [*T.ROOTS, BV]
     out = A / "results-brainvista.json"
     results = json.loads(out.read_text()) if out.is_file() else {}

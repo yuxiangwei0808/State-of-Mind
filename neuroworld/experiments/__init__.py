@@ -1,1 +1,1 @@
-"""Reproducible follow-up experiments with frozen aligned representations."""
+"""Experiments on the benchmark's queries: the linear forecaster, IPSID and a running mean by history length."""

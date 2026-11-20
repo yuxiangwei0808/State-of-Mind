@@ -1,4 +1,4 @@
-"""Scores: per-step forecasting, pooled correlations, and the regret of choosing by prediction.
+"""Scores: per-step forecasting and pooled correlations.
 
 Per-step Pearson is the correlation across origins within a run, for each parcel, averaged over parcels;
 runs are averaged later. The drift-robust version first removes a DCT high-pass basis (cutoff 1/128 Hz,
@@ -78,19 +78,3 @@ def pooled_correlation(sums):
     vx, vy = sxx - sx ** 2 / np.maximum(n, 1), syy - sy ** 2 / np.maximum(n, 1)
     ok = (vx > 1e-12) & (vy > 1e-12)
     return float((cov[ok] / np.sqrt(vx[ok] * vy[ok])).mean()) if ok.any() else np.nan
-
-
-def selection(predicted, observed):
-    """Choosing the candidate with the largest prediction (larger is better), scored on the observed values:
-    the gap to the best candidate, against a random choice; ties at their expectation."""
-    p, y = np.asarray(predicted, dtype=float), np.asarray(observed, dtype=float)
-    chosen = np.flatnonzero(np.isclose(p, p.max(), rtol=0, atol=1e-12))
-    best = np.isclose(y, y.max(), rtol=0, atol=1e-12)
-    a, b = np.triu_indices(len(p), 1)
-    dp, dy = p[a] - p[b], y[a] - y[b]
-    comparable = np.abs(dy) > 1e-12
-    hits = np.where(np.abs(dp) <= 1e-12, 0.5, (dp * dy > 0).astype(float))
-    selected = float(y[chosen].mean())
-    return {"selection_gap": float(y.max() - selected), "random_gap": float(y.max() - y.mean()),
-            "top1": float(best[chosen].mean()), "random_top1": float(best.mean()),
-            "pairwise_hits": float(hits[comparable].sum()), "pairwise_count": int(comparable.sum())}

@@ -1,0 +1,7 @@
+# The paper's analyses (neuroworld/paper) and the benchmark's IPSID reference, on top of requirements.txt.
+-r requirements.txt
+scipy>=1.17
+scikit-learn>=1.8
+nibabel>=5.4
+nilearn>=0.12
+PSID==1.2.6   # IPSID (benchmark/baselines.py); or install with pip --target and set PSID_PYLIB

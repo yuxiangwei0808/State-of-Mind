@@ -31,7 +31,7 @@ python -m pip install -r neuroworld/requirements-dev.txt
 WANDB_MODE=offline CUDA_VISIBLE_DEVICES='' python -m pytest -q tests
 ```
 
-The tests build synthetic inputs; they need no dataset, weights or GPU (the Spectator reproduction test is skipped when the frozen weights are absent). The paper's analysis scripts also use scikit-learn, nibabel and nilearn.
+The tests build synthetic inputs; they need no dataset, weights or GPU (the Spectator reproduction test is skipped when the frozen weights are absent). The paper's analyses and the IPSID reference also need [`requirements-analysis.txt`](neuroworld/requirements-analysis.txt), and data preparation [`requirements-data.txt`](neuroworld/requirements-data.txt).
 
 **Data and outputs** are not included. Code finds them through three roots ([`neuroworld/paths.py`](neuroworld/paths.py)), each an environment variable or, if unset, a folder or symbolic link in the repository root:
 
@@ -41,7 +41,7 @@ The tests build synthetic inputs; they need no dataset, weights or GPU (the Spec
 | `NEUROWORLD_OUTPUT` | `outputs/` | runs, benchmark result stores, paper analyses, the frozen Spectator weights (`spectator-v1/`) |
 | `NEUROWORLD_EXTERNAL` | `external/` | other baselines' outputs (BrainVista, MIRAGE, the original NeuroWorld run), read only |
 
-Configs refer to them as `${NEUROWORLD_DATA}` and so on. Training runs are written to `checkpoints/<dataset>/` in the working directory; a `checkpoints` link to `$NEUROWORLD_OUTPUT/checkpoints` keeps them with the other outputs. Algonauts 2025 comes from the [Algonauts challenge](https://algonautsproject.com/) (CNeuroMod), HCP from the [Human Connectome Project](https://www.humanconnectome.org/) (7T movie runs).
+Configs refer to them as `${NEUROWORLD_DATA}` and so on. Three outputs go elsewhere by default: training runs to `checkpoints/<dataset>/` in the working directory (a `checkpoints` link to `$NEUROWORLD_OUTPUT/checkpoints` keeps them with the other outputs), benchmark results to `artifacts/benchmark/` (`--output` changes it), and the fitted reference models (IPSID, the linear forecaster) to `$NEUROWORLD_DATA/neuralworld-checkpoints/baselines/`, where they are reused. Algonauts 2025 comes from the [Algonauts challenge](https://algonautsproject.com/) (CNeuroMod), HCP from the [Human Connectome Project](https://www.humanconnectome.org/) (7T movie runs).
 
 ## Usage
 
@@ -57,6 +57,8 @@ python -m neuroworld.benchmark profile
 python -m neuroworld.paper.history_table
 ```
 
+`history_table` gives every row of the main table except BrainVista's and MIRAGE's (from `neuroworld.paper.brainvista` and the external stores) and the linear forecaster's Updating (scored with `updating --own-fill`); [docs/reproduce.md](docs/reproduce.md) has the details.
+
 ## Repository layout
 
 | Path | Contents |
@@ -70,6 +72,8 @@ python -m neuroworld.paper.history_table
 | [`neuroworld/paper/`](neuroworld/paper) | the paper's analyses |
 | [`neuroworld/eval/`](neuroworld/eval) | evaluation helpers and TRIBE v2's zero-shot predictions |
 | [`examples/`](examples), [`tests/`](tests), [`docs/`](docs) | an external-model example, tests, documentation |
+
+The Python package is named `neuroworld`; it is not the NeuroWorld baseline of the results table.
 
 ## Sources and licenses
 

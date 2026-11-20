@@ -10,6 +10,7 @@ Writes $NEUROWORLD_OUTPUT/paper-analysis/results-history-table.json.
 
     python -m neuroworld.paper.history_table
 """
+import sys
 import json
 
 import numpy as np
@@ -22,7 +23,7 @@ CURVE = ("7.5 s", "15 s", "30 s", "60 s", "90 s", "120 s", "180 s")  # the appen
 # Benchmark rows of each model at each history length (None: the model does not run at that length).
 ROWS = {
     "Linear forecaster": {h: f"linear [context] {h}" for h in CURVE},
-    # its Kalman filter; 15-90 s for the appendix figure (paper-analysis/ipsid-history, Nov 14), same model and fit
+    # its Kalman filter; 15-90 s for the appendix figure (paper-analysis/ipsid-history), same model and fit
     "IPSID": {"7.5 s": "IPSID [context] 7.5 s", **{f"{s} s": f"IPSID [context] {s} s" for s in (15, 30, 60, 90)},
               "120 s": "IPSID [context]", "180 s": "IPSID [context] 180 s"},
     # the one-frame implementation (reads 4.5 s); longer lengths add history blocks (checkpoints/algonauts/neuroworld_history_20261112)
@@ -149,4 +150,6 @@ def main():
 
 
 if __name__ == "__main__":
+    if {"-h", "--help"} & set(sys.argv[1:]):  # this script parses no options: show its usage and run nothing
+        sys.exit(print(__doc__))
     main()
