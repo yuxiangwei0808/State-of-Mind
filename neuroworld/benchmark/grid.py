@@ -1,4 +1,4 @@
-"""The benchmark's time grid (docs/benchmark.md#how-a-model-is-queried), fixed in seconds: the next minute is
+"""The benchmark's time grid, fixed in seconds: the next minute is
 forecast, every query supplies up to two minutes of history (at least the last 30 s complete), origins every 3 s.
 
 Step k is the target k*TR after the last observed frame; it belongs to band (a, b] when a < k*TR <= b.

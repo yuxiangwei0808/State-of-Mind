@@ -17,8 +17,10 @@ A = OUTPUT / "paper-analysis"
 FIGS = A / "figs"
 TR, H = 1.49, 40
 # The benchmark result stores, searched in this order: the references rescored on the final protocol; the test films (Bourne, Wolf)
-# and HCP run 4; Friends S6 and the first two Movie10 films; the linear forecaster at 120 s (history-length study).
-ROOTS = [OUTPUT / "benchmark-final", OUTPUT / "benchmark-test", OUTPUT / "benchmark-iter-overflow", OUTPUT / "benchmark-history-context"]
+# and HCP run 4; Friends S6 and the first two Movie10 films; the linear forecaster at 120 s (history-length study); last, the
+# released store (https://huggingface.co/stanjsx/Spectator), which merges the main table's rows of these stores.
+ROOTS = [OUTPUT / "benchmark-final", OUTPUT / "benchmark-test", OUTPUT / "benchmark-iter-overflow", OUTPUT / "benchmark-history-context",
+         OUTPUT / "benchmark-results"]
 ROWS = {"Spectator": "ridge-jepa-180s-std-partial (latent)", "Transformer counterpart": "transformer-tfforecast-linpath-jepa-180s-2x1024 (latent)",
         "Linear forecaster, 180 s": "linear [context] 180 s",
         "Linear forecaster, 7.5 s": "linear [context] 7.5 s", "No fMRI (movie only)": "ridge-jepa-180s-std-partial-nofmri (latent)",

@@ -27,7 +27,7 @@ data:
   num_workers: 4
   preload: true  # read the selected arrays into RAM once; NFS reads per window throttle the GPU
   # Rows for model.stimulus_features: tribev2_context, prepared by
-  # python -m neuroworld.nbs_data.stimuli.tribev2_context (see nbs_data/README.md).
+  # python -m neuroworld.nbs_data.stimuli.tribev2_context (see DATA.md).
   context_features: ${NEUROWORLD_DATA}/algonauts/derivatives/neuroworld-schaefer1000-v2-tribev2-context
 model:
   state_window_trs: 3

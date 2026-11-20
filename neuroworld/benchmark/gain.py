@@ -1,4 +1,4 @@
-"""Gain: how strongly a brain series follows the movie (the State task's gain readout, docs/benchmark.md#tasks).
+"""Gain: how strongly a brain series follows the movie (the State task's gain readout).
 
 The gain of a series in a window is sum(y * s~) / sum(s~^2) over a parcel set, where s~ is a fixed reference
 prediction (the stimulus-only ridge on TRIBEv2 projections, the own participant's weights) with its mean and linear

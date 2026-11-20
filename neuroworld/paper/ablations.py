@@ -15,7 +15,7 @@ Main table (the columns of the main table): Forecast over the minute, State, and
 differences in points, and the paired difference in Pearson r of the forecast (Table 2's r: per recording, mean over the 40
 frames ahead of the parcel-averaged correlation, averaged over recordings; as neuroworld/paper/history_table.py). Supplement:
 Forecast over the minute, its first 7.5 s and its last 30 s. Labels use the symbols and terms of Sec. 3 (fast state f_t, slow
-state u_t, windows in seconds). Run folders are in docs/reproduce.md.
+state u_t, windows in seconds).
 """
 import json
 import sys
@@ -182,7 +182,7 @@ def latex(blocks):
         "% Paired differences on all evaluation data (Friends S6 and the four movies). Twins: random init., the fMRI window and",
         "% the state sizes against the control run (Spectator unchanged through the same scripts); no EMA, mean slow weights, the",
         "% modality rows and the Transformer counterpart against Spectator; the other rows against the previous final fit (D180-win5).",
-        "% From neuroworld/paper/ablations.py; run folders in docs/reproduce.md.",
+        "% From neuroworld/paper/ablations.py.",
         col(blocks[0], blocks[2]) + r"\hfill", col(blocks[1], blocks[3]),
         r"\caption{\textbf{Ablations.} Change in each metric of \cref{tab:main} when one part of \method is removed or replaced, "
         r"in points for Forecast, State and Updating and as a difference for $r$. Negative values are below \method. "

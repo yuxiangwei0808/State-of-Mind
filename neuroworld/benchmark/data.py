@@ -17,7 +17,7 @@ from neuroworld.benchmark.grid import GRIDS
 from neuroworld.data.splits import SPLITS, check_splits, content_key, frame_ranges, split_runs
 from neuroworld.utils.config import load_config
 
-# Standard-split membership -> exposure tag for models trained with that split (docs/benchmark.md).
+# Standard-split membership -> exposure tag for models trained with that split.
 EXPOSURE = {"train": "seen in fitting", "val": "seen in selection", "dev": "seen in selection",
             "test": "unseen", "heldout": "unseen", "heldout-fit": "adaptation", "heldout-adapt": "unseen",
             "heldout-test": "unseen"}

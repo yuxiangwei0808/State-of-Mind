@@ -70,7 +70,8 @@ with_zwu25 = with_external  # the name the paper repository's figure scripts cal
 # (paper-analysis/linear-updating-ownfill, scored with `benchmark updating --own-fill`; the older stores fill them with the training
 # mean). Same model and fits.
 # budgets180: 180 s at every number of new frames (Figure 6); valdev, test: every length at 0, 4, 16 and gap (Figure 5, Table 2)
-OWNFILL = [A / "linear-updating-ownfill/budgets180", A / "linear-updating-ownfill/valdev", A / "linear-updating-ownfill/test"]
+OWNFILL = [A / "linear-updating-ownfill/budgets180", A / "linear-updating-ownfill/valdev", A / "linear-updating-ownfill/test",
+           A.parent / "benchmark-results-own-fill"]  # last, the released copy
 
 
 

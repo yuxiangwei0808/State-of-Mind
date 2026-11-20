@@ -1,4 +1,4 @@
-"""Declared adaptation for new participants (docs/benchmark.md#how-a-model-is-queried): fit only a linear readout head.
+"""Declared adaptation for new participants: fit only a linear readout head.
 
 Our readouts are a shared trunk plus one linear head per participant (models/readout.py). For a held-out
 participant, the world model and trunk stay frozen and a new head is fitted by ridge regression on that

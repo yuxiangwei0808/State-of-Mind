@@ -1,4 +1,4 @@
-"""Forecast task (docs/benchmark.md#tasks): score one model's forecasts on one dataset split.
+"""Forecast task: score one model's forecasts on one dataset split.
 
 At every origin (each 3 s), the model gets the measured fMRI before it (up to two minutes, the last 30 s complete)
 and the movie, and forecasts the next minute. Per run and step, the drift-robust Pearson r and nMSE against the

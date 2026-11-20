@@ -6,7 +6,7 @@ A linear latent world model of a person watching a movie:
     step       s_{t+1} = s_t + L s_t + W m_t + c           m_t: the movie's TRIBE v2 contextual rows of the newest 5 frames
     reading    parcels = s_t P_viewer + b_viewer           one linear probe per viewer, fitted for scoring only
 
-Training, in six steps as in docs/spectator.md (the configs are in neuroworld/configs/spectator/, the frozen weights in
+Training, in six steps (the configs are in neuroworld/configs/spectator/, the frozen weights in
 $NEUROWORLD_OUTPUT/spectator-v1/):
 
 1. Stage 0 (gradient descent): the fast map, by forecasting fMRI without the movie.

@@ -1,4 +1,4 @@
-"""Benchmark reference models (docs/benchmark.md#tasks), fitted on the training split.
+"""Benchmark reference models, fitted on the training split.
 
 stimulus-only ridge    fMRI at frame t from the stimulus rows at t - d for the dataset's delays; no brain input.
 direct linear          per prefix length and per step k, the stimulus-only prediction plus a ridge from the

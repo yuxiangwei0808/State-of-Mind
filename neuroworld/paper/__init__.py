@@ -1,6 +1,6 @@
 """The paper's analyses, on all Algonauts test data (Friends S6 and the four Movie10 films) unless noted. They read the
 benchmark result stores and runs under $NEUROWORLD_OUTPUT (neuroworld/paths.py) and write
-$NEUROWORLD_OUTPUT/paper-analysis/ (results-*.json, figs/). docs/reproduce.md maps each table and figure to its script.
+$NEUROWORLD_OUTPUT/paper-analysis/ (results-*.json, figs/).
 Run each from the repository root:
 
     python -m neuroworld.paper.history_table          main table by history length (7.5, 120, 180 s), paired differences, r

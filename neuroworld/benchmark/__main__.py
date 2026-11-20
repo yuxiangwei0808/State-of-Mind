@@ -1,4 +1,4 @@
-"""Benchmark command line (docs/benchmark.md).
+"""Benchmark command line (README.md, BrainStateBench).
 
     python -m neuroworld.benchmark forecast --dataset algonauts --split val dev --model run:<dir> --device cuda
     python -m neuroworld.benchmark report --dataset algonauts --split dev

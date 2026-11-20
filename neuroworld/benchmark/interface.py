@@ -1,4 +1,4 @@
-"""What a submission sees and returns (docs/benchmark.md#how-a-model-is-queried).
+"""What a submission sees and returns.
 
 A model receives a QueryBatch: for each query a run, subject, origin frame t0 (the first target, step 1),
 the observed prefix of brain frames before t0, and a horizon. It returns predicted Schaefer-1000 fMRI for

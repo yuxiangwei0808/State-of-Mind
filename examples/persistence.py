@@ -1,4 +1,4 @@
-"""An external model, scored through the benchmark's public interface only (docs/benchmark.md#adding-a-model).
+"""An external model, scored through the benchmark's public interface only (README.md, BrainStateBench).
 
 A model is any class with a ``name`` and ``predict(QueryBatch) -> [B, horizon, 1000]``, built as
 ``Class(dataset=..., device=...)``. This one forecasts every parcel by its last measured value, relaxing toward the

@@ -139,6 +139,7 @@ def main():
             if label != "Spectator" and (theirs := pearson_units(ROWS[label][h])):
                 d = paired_r(mine, theirs)
                 diffs.setdefault(label, {}).setdefault(h, {})["r"] = f"{d['value']:+.3f} [{d['low']:+.3f}, {d['high']:+.3f}]"
+    A.mkdir(parents=True, exist_ok=True)
     (A / "results-history-table.json").write_text(json.dumps({"table": table, "spectator_minus": diffs}, indent=1))
     cell = lambda x, t: "--" if x is None else f"{x:.3f}" if t == "r" else f"{x:.1f}"
     print("| Model | " + " | ".join(f"{h} {t}" for h in LENGTHS for t in (*TASKS, "r")) + " |")

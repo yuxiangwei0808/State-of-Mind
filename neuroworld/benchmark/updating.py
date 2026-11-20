@@ -1,4 +1,4 @@
-"""Updating task (docs/benchmark.md#tasks): can a few new measurements keep the state on track?
+"""Updating task: can a few new measurements keep the state on track?
 
 After a fully revealed history (up to two minutes, the last 30 s complete), the model runs through the next minute
 of the recorded movie with fMRI hidden. A schedule reveals B frames, evenly spaced. Between reveals the model

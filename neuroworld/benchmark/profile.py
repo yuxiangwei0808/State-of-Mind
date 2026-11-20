@@ -1,4 +1,4 @@
-"""The benchmark card (docs/benchmark.md) and the scoring helpers the paper's scripts use, read from the saved results.
+"""The benchmark card and the scoring helpers the paper's scripts use, read from the saved results.
 
 The card has one table per panel (Algonauts: Friends S6 and the four Movie10 films; HCP: known participants' held-out
 clips and run 4; HCP: new participants after run-1 calibration) with Forecast, State and Updating for every scored row,
