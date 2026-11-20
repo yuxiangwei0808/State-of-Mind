@@ -1,0 +1,27 @@
+# Published: source, tests, docs, the example and these settings. Everything else at the top level stays local
+# (data/, outputs/, external/, checkpoints/, artifacts/: links or folders for data and results).
+/*
+!/.gitignore
+!/README.md
+!/pytest.ini
+!/neuroworld/
+!/tests/
+!/docs/
+!/examples/
+
+# Generated files.
+wandb/
+.venv/
+.pytest_cache/
+.ipynb_checkpoints/
+**/__pycache__/
+*.py[cod]
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.tmp
+*.orig
+*.egg-info/
+build/
+dist/

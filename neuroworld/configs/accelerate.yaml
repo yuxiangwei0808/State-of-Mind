@@ -1,0 +1,10 @@
+# Single-machine defaults. The launch scripts set the number of visible GPUs.
+compute_environment: LOCAL_MACHINE
+distributed_type: 'NO'
+mixed_precision: 'no'
+num_processes: 1
+num_machines: 1
+machine_rank: 0
+use_cpu: false
+dynamo_config:
+  dynamo_backend: 'NO'

@@ -1,0 +1,155 @@
+# Spectator, step 3 (the JEPA phase): the whole encoder (fast map and lag weights, rate 5e-5 x 0.2 = 1e-5) trained against
+# its EMA copy (momentum 0.998), with a matrix predictor (rate 5e-5) from a closed-form start, one layer-normalized movie row
+# shifted 3 s, movie dropped from 30% of sequences, one-step + 40-step rollout latent losses. Stops after 10 epochs without a
+# better probe score on Friends S6. Run as D180 (kept epoch 58); frozen copy: ${NEUROWORLD_OUTPUT}/spectator-v1/algonauts/jepa.
+# Its encoder file is step 2's output and its start matrix comes from python -m neuroworld.spectator matrix (see __init__.py).
+# Frozen on November 12, 2026: a fully resolved configuration, so later changes to defaults do not change it.
+data:
+  batch_size: 1024
+  bundle_path: ${NEUROWORLD_DATA}/algonauts/derivatives/neuroworld-schaefer1000-v2
+  context_features: ${NEUROWORLD_DATA}/algonauts/derivatives/neuroworld-schaefer1000-v2-tribev2-context
+  dev_runs: []
+  epoch_steps: 0
+  extra_movie: null
+  extra_rest: []
+  extra_sd: 0.61
+  extra_windows: 0
+  heldout_subjects: []
+  history_fill: false
+  hrf_delay_seconds: 3.0
+  num_workers: 4
+  preload: true
+  rest_only: false
+  rest_store: null
+  sequence_states: 41
+  split_frames: {}
+  test_runs: []
+  tr_seconds: 1.49
+  train_runs:
+  - Algonauts2025/*/task-friends/s0[1-5]*/run-*
+  val_runs:
+  - Algonauts2025/*/task-friends/s06*/run-*
+  window_stride_trs: 3
+design: transformer_world_model_finetuned
+eval:
+  horizon_trs: 40
+  prefix_trs: 1
+  probe_ridge: 0.1
+  probe_windows: 4096
+  window_stride_trs: 20
+model:
+  attention_heads: 16
+  chunk_frames: 0
+  conditioning: input
+  context_states: 1
+  context_width: 2048
+  encoder_depth: 2
+  encoder_dropout: 0.1
+  encoder_heads: 8
+  encoder_hidden_dim: 0
+  encoder_kind: linear
+  encoder_linear_path: false
+  encoder_mlp_dim: 1024
+  encoder_output_norm: true
+  encoder_width: 512
+  fast_window_trs: 5
+  history_block_states: 10
+  history_blocks: 0
+  history_measured_only: false
+  history_spaced: false
+  measurement_token: false
+  mlp_depth: 0
+  mlp_hidden_dim: 2048
+  movie_rank: 0
+  movie_tokens: false
+  own_drive: false
+  predictor_depth: 6
+  predictor_dropout: 0.1
+  predictor_kind: mlp
+  predictor_mlp_dim: 2048
+  predictor_output_norm: true
+  predictor_width: 0
+  slow_extra_branches: 0
+  slow_per_dimension: true
+  state_dim: 2048
+  state_step: 1
+  state_tokens: 2
+  state_window_trs: 120
+  stimulus_context: none
+  stimulus_context_trs: 1
+  stimulus_features: tribev2_context
+  stimulus_scaling: layernorm
+  token_positions_file: null
+  tribev2_checkpoint: ${NEUROWORLD_DATA}/hub/models--facebook--tribev2/snapshots/f894e783020944dcd96e5568550afe2aa9743f9f/best.ckpt
+  zero_brain: false
+readout:
+  batch_size: 16
+  cache_rollouts: true
+  epochs: 200
+  hidden_dim: 1024
+  lr: 1.0e-05
+  patience: null
+  schedule: cosine
+  select_by: parcel_pearson
+  train_horizon_trs: 20
+  train_on: rollout
+  warmup_steps: 500
+  weight_decay: 0.001
+  window_stride_trs: 20
+seed: 0
+train:
+  accumulation_steps: 4
+  device: auto
+  encoder_checkpoint: ${NEUROWORLD_OUTPUT}/spectator-v1/algonauts/lags.pt
+  encoder_lr_factor: 0.2
+  epochs: 100
+  freeze_encoder: false
+  freeze_encoder_body: false
+  freeze_fast_encoder: false
+  grad_clip: 1.0
+  l1_scale: 1.0
+  latent_error: squared
+  log_every_steps: 100
+  lr: 5.0e-05
+  mask_blocks: 2
+  mask_lengths:
+  - 3
+  - 6
+  mask_suffix_probability: 0.5
+  masked_predictor_depth: 2
+  masked_target: latent
+  masked_target_norm: false
+  modality_dropout: 0.3
+  mode: stimulus
+  objective: latent
+  optimizer: adamw
+  output_dir: null
+  parcel_weight: 0.0
+  patience: 10
+  precision: bf16
+  prediction_weight: 1.0
+  predictor_checkpoint: ${NEUROWORLD_OUTPUT}/spectator-v1/algonauts/jepa-start-matrix.pt
+  predictor_checkpoint_movie: true
+  reveal_readout: null
+  rollout_detach_every: 0
+  rollout_schedule: null
+  rollout_step_weights: uniform
+  rollout_steps: 40
+  rollout_weight: 1.0
+  run_tag: null
+  schedule: cosine
+  sigreg_knots: 17
+  sigreg_projections: 1024
+  sigreg_ramp_epochs: 0
+  sigreg_scale_file: null
+  sigreg_weight: 0.0
+  slow_loss_weight: 1.0
+  target: ema
+  target_momentum: 0.998
+  warmup_fraction: 0.01
+  weight_decay: 0.001
+wandb:
+  entity: null
+  mode: offline
+  name: null
+  project: neuralworld

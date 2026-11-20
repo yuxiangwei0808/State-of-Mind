@@ -1,0 +1,4 @@
+# The joint world model: world model with a self-learned encoder. Encoder and predictor trained on
+# next-latent error plus SIGReg (stage 1), then the readout (stage 2).
+base: base.yaml
+design: joint_world_model

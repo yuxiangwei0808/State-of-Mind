@@ -1,0 +1,6 @@
+# The Transformer world model (reference): world model on the frozen encoder of the stage-0 run trained
+# from encoder_from. Stage 1 trains the predictor in latent space; stage 2 the readout.
+# The encoder is found automatically in that run's directory; train stage0_forecaster.yaml first.
+base: base.yaml
+design: transformer_world_model
+encoder_from: stage0_forecaster.yaml
