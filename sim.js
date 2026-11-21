@@ -251,11 +251,9 @@ function cutTo(i,auto){
   }
   pendingCut=null;clip=i;pos=0;pressClip(i);if(!auto)requestForecast();
 }
-$('simMovie').onclick=()=>{movie=!movie;setTog('simMovie',!movie);updateReadouts();requestForecast();};
-$('simScan').onclick=()=>scan(true);
-$('simSwap').onclick=swapMind;
-seg($('simMode'),['Updating (4/min)','Forecast (open)'],0,i=>{
-  autoScan=(i===0);
+function setMode(isAuto){
+  autoScan=!!isAuto;
+  pressSeg($('simMode'),autoScan?0:1);
   const lbl=$('simScoreLbl');
   if(lbl)lbl.textContent=autoScan?'Updating score (1 min)':'Forecast score (1 min)';
   const note=$('simModeNote');
@@ -263,13 +261,17 @@ seg($('simMode'),['Updating (4/min)','Forecast (open)'],0,i=>{
     ?'Auto-feeds 1 real fMRI scan every ~12 s (closed-loop)'
     :'No incoming scans — open-loop rollout from movie + initial state';
   updateReadouts();
-});
+}
+$('simMovie').onclick=()=>{movie=!movie;setTog('simMovie',!movie);updateReadouts();requestForecast();};
+$('simScan').onclick=()=>scan(true);
+$('simSwap').onclick=swapMind;
+seg($('simMode'),['Updating (4/min)','Forecast (open)'],0,i=>setMode(i===0));
 let speed=1,paused=false,visible=true;
 const speedSeg=$('simSpeed');
 seg(speedSeg,['1× real time','4×','10×'],0,i=>{speed=[1,4,10][i];});
 function togglePause(){paused=!paused;setTog('simPause',paused);$('simPause').textContent=paused?'Resume':'Pause';}
 $('simPause').onclick=togglePause;
-$('simReset').onclick=reset;
+$('simReset').onclick=()=>{reset();setMode(true);};
 let region='Visual';
 const regSeg=$('simRegion');
 function selectRegion(t,idx){
@@ -336,7 +338,7 @@ const canvas=$('simBrain');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
 renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(28,1,10,4000);camera.position.set(0,0,1250);
-scene.add(new THREE.AmbientLight(0xffffff,.6));const dl=new THREE.DirectionalLight(0xffffff,.6);dl.position.set(.2,.6,1);scene.add(dl);
+scene.add(new THREE.AmbientLight(0xffffff,.72));const dl=new THREE.DirectionalLight(0xffffff,.62);dl.position.set(.2,.6,1);scene.add(dl);
 const NV=M.nv,NVH=NV/2,sc=M.scale;
 function hemiGeom(h){const g=new THREE.BufferGeometry(),pos=new Float32Array(NVH*3);let cx=0,cy=0,cz=0;
   for(let v=0;v<NVH;v++){const i=(v+h*NVH)*3,x=POS[i]*sc,y=POS[i+1]*sc,z=POS[i+2]*sc;pos[v*3]=x;pos[v*3+1]=z;pos[v*3+2]=-y;cx+=x;cy+=z;cz+=-y;}
