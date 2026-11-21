@@ -1,11 +1,10 @@
-"""neuroworld/paper/history_table.py: the paper's main table by history length (7.5, 120 and 180 s; the appendix figure adds 15, 30, 60
-and 90 s, cvpr2027-paper/viz/history), on all Algonauts test data:
+"""neuroworld/paper/history_table.py: the paper's main table by history length (7.5, 120 and 180 s; Appendix Fig. 5 adds 15, 30, 60
+and 90 s), on all Algonauts test data:
 Forecast (Friends S6 and all four Movie10 movies), State (the Movie10 repeats) and Updating with 4 new fMRI frames, for every model
 at every length it runs at; and Spectator minus each model at the same length (paired, 95% interval over content units).
-Also Pearson r of the forecast, the metric of prior work: per recording, each parcel's correlation between forecast and measured
-fMRI across starting points at each frame ahead, averaged over parcels, the 40 frames and recordings (the definition of
-NeuroWorld's evaluation code; its steps 1-20 variant and NeuroWorld's other metrics are in
-neuroworld/paper/standard_metrics.py).
+Also Pearson r of the forecast: per recording, each parcel's correlation between forecast and measured fMRI across starting
+points at each frame ahead, averaged over parcels, the 40 frames and recordings (its steps 1-20 variant and other standard
+metrics are in neuroworld/paper/standard_metrics.py).
 Writes $NEUROWORLD_OUTPUT/paper-analysis/results-history-table.json.
 
     python -m neuroworld.paper.history_table
@@ -16,23 +15,19 @@ import json
 import numpy as np
 
 from neuroworld.benchmark import forecast as F, profile as P, report as R, updating as U
-from neuroworld.paper.analysis import A, ROOTS, SPLITS, find
+from neuroworld.paper.analysis import A, ROOTS, SPLITS, UPDATING_ROOTS, find
 
 LENGTHS = ("7.5 s", "120 s", "180 s")
-CURVE = ("7.5 s", "15 s", "30 s", "60 s", "90 s", "120 s", "180 s")  # the appendix figure
-# Benchmark rows of each model at each history length (None: the model does not run at that length).
+CURVE = ("7.5 s", "15 s", "30 s", "60 s", "90 s", "120 s", "180 s")  # Appendix Fig. 5
+# Benchmark rows of each model at each history length.
 ROWS = {
     "Linear forecaster": {h: f"linear [context] {h}" for h in CURVE},
-    # its Kalman filter; 15-90 s for the appendix figure (paper-analysis/ipsid-history), same model and fit
     "IPSID": {"7.5 s": "IPSID [context] 7.5 s", **{f"{s} s": f"IPSID [context] {s} s" for s in (15, 30, 60, 90)},
               "120 s": "IPSID [context]", "180 s": "IPSID [context] 180 s"},
-    # the one-frame implementation (reads 4.5 s); longer lengths add history blocks (checkpoints/algonauts/neuroworld_history_20261112)
     "NeuroWorld": {"7.5 s": "NeuroWorld-style k1 (latent)", **{h: f"NeuroWorld k1 {h[:-2]}s (latent)" for h in CURVE[1:]}},
     "TRIBE v2": {h: "TRIBEv2 zero-shot" for h in CURVE},  # reads no fMRI
     "Spectator": {h: f"ridge-jepa-{h[:-2]}s-std-partial (latent)" for h in CURVE},
 }
-# Beyond 30 s the linear forecaster reads the hidden frames of Updating as the training mean.
-NOT_VALID = {("Linear forecaster", h, "Updating") for h in ("60 s", "90 s", "120 s", "180 s")}
 TASKS = ("Forecast", "State", "Updating")
 
 
@@ -53,7 +48,7 @@ def updating_units(name):
     out = {}
     for split in SPLITS:
         got = None
-        for root in ROOTS:
+        for root in UPDATING_ROOTS:
             if (root / "algonauts/updating" / f"{name}.npz").is_file():
                 loaded = U.load(root / "algonauts/updating", name)
                 if split in loaded:
@@ -112,9 +107,9 @@ def skill(u):
 
 
 def unit_sums(lengths):
-    """{(model, length, task): per-unit (error, reference) sums, or None where the model does not run or is not valid}."""
+    """{(model, length, task): per-unit (error, reference) sums, or None where the model does not run}."""
     fns = {"Forecast": forecast_units, "State": state_units, "Updating": updating_units}
-    return {(label, h, task): None if (label, h, task) in NOT_VALID or h not in rows else fns[task](rows[h])
+    return {(label, h, task): None if h not in rows else fns[task](rows[h])
             for label, rows in ROWS.items() for h in lengths for task in TASKS}
 
 

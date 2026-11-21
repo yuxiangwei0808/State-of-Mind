@@ -1,22 +1,17 @@
-"""neuroworld/paper/long_horizon.py: Forecast up to 5 minutes ahead on all Algonauts test data (Friends S6 and the four Movie10
-films), item 4 of $NEUROWORLD_OUTPUT/paper-analysis/extra-nov13/synthetic-data-proposal.md ("Longer horizons").
+"""neuroworld/paper/long_horizon.py (Appendix C.2, Fig. 7): Forecast up to 5 minutes ahead on all Algonauts test data
+(Friends S6 and the four Movie10 films).
 
-    python -m neuroworld.paper.long_horizon run --part latent|ridge --out <dir>    per-unit error sums, one split at a time (restartable)
-    python -m neuroworld.paper.long_horizon report --out <dir>     table by horizon band, paired intervals, figure
+    python -m neuroworld.paper.long_horizon run --part latent --out <dir> [--transformer-dir <run>]
+    python -m neuroworld.paper.long_horizon run --part ridge --out <dir>
+    python -m neuroworld.paper.long_horizon report --out <dir>
 
 Queries: the benchmark's Forecast origins (every 2 frames, the last 30 s complete, 180 s of history supplied) whose next 5 minutes
-(HORIZON = 201 frames, 299.5 s) lie in one supported segment of the recording. Each query's skill is scored as Forecast scores it:
-squared error summed over parcels and scoreable targets, against predicting the recording's mean (queries.run_mean); skill = 1 -
-sum(err) / sum(ref), pooled over units (content parts, as the benchmark's bootstrap units). Models, none refitted:
-  Spectator          ridge-jepa-180s-std-partial, its stored probe (benchmark-test), with its exact split into the part carried by
-                     the inferred state and the part driven by the movie (collect.py): x_k = M^k x_0 + sum_j M^(k-1-j) (W u_j + c)
-  movie only         ridge-jepa-180s-std-partial-nofmri: Spectator run from empty frames (the paper's "movie only" row)
-  Transformer        transformer-tfforecast-linpath-jepa-180s-2x1024, the Transformer counterpart, its stored probe
+(HORIZON = 201 frames, 299.5 s) lie in one supported segment of the recording. Models, none refitted:
+  Spectator          outputs/spectator-v1/algonauts/model (with its shipped probe.npz) and its exact state/stimulus split
+  movie only         the same Spectator with model.zero_brain = True (empty fMRI history)
+  Transformer        optional Transformer counterpart passed via --transformer-dir (with probe.npz or --transformer-probe)
   TRIBE v2           the stimulus-only zero-shot predictions (references.SavedEncoder)
-  stimulus ridge     the linear forecaster's own stimulus part on the contextual rows (references.StimulusRidge): the limit the
-                     linear forecaster reaches far ahead, where its history weights vanish (its per-step penalties reach 1e6 by
-                     60 s); the linear forecaster itself is fitted to 60 s and is not refitted here
-check: Spectator on the benchmark's own 60-s queries, scored the same way, against its stored Forecast row.
+  stimulus ridge     the linear forecaster's own stimulus part on the contextual rows (references.StimulusRidge)
 """
 import argparse
 import json
@@ -28,11 +23,11 @@ from neuroworld.paths import OUTPUT
 
 TR, HORIZON, SPLITS = 1.49, 201, ("val", "dev", "test")
 BANDS = ((0, 60), (60, 120), (120, 180), (180, 300))
-ARMS = {"Spectator": "ridge-jepa-180s-std-partial", "Movie only (Spectator from empty frames)": "ridge-jepa-180s-std-partial-nofmri",
-        "Transformer counterpart": "transformer-tfforecast-linpath-jepa-180s-2x1024"}
+RELEASE = OUTPUT / "spectator-v1/algonauts/model"
+MOVIE_ONLY = "Movie only (Spectator from empty frames)"
+TRANSFORMER = "Transformer counterpart"
 TRIBE = "TRIBE v2 (stimulus only)"
 RIDGE = "Stimulus ridge (the linear forecaster's movie part)"
-STORE = OUTPUT / "benchmark-test"
 log = lambda text: print(text, flush=True)
 
 
@@ -143,9 +138,6 @@ def stimulus_ridge(data, out):
     from neuroworld.benchmark.references import DELAYS, StimulusRidge, StimulusRows, feature_tag
     out = Path(out)
     cache = out / "stimulus-rows-context.npz"
-    if not cache.is_file():
-        import shutil
-        shutil.copy(STORE / "algonauts" / "stimulus-rows-context.npz", cache)
     path = out / "stimulus-ridge.npz"
     if path.is_file():
         with np.load(path, allow_pickle=False) as saved:
@@ -173,8 +165,8 @@ def per_frame(predict_frames, run, origins, horizon):
 
 
 def run(args):
-    """part latent: Spectator (with its state/movie split and the 60-s check), movie only, the Transformer counterpart and TRIBE v2.
-    part ridge: the stimulus ridge (fitted first, about 45 minutes). Each writes <part>-<split>.npz."""
+    """part latent: Spectator (with its state/movie split and the 60-s check), movie only, optional Transformer counterpart, and TRIBE v2.
+    part ridge: the stimulus ridge. Each writes <part>-<split>.npz."""
     import torch
     from neuroworld.benchmark import queries as Q
     from neuroworld.benchmark.data import BenchmarkData
@@ -186,12 +178,20 @@ def run(args):
     data = BenchmarkData(base_config(out))
     grid, prefix = data.grid, frames_within(180.0, data.grid.tr)
     if args.part == "latent":
-        teachers = {label: Teacher(arm, 180.0, data, args.device) for label, arm in ARMS.items()}
+        model_dir = Path(args.model_dir)
+        teachers = {
+            "Spectator": Teacher("spectator", 180.0, data, args.device, run_dir=model_dir, probe_path=args.probe),
+            MOVIE_ONLY: Teacher("movie-only", 180.0, data, args.device, run_dir=model_dir, probe_path=args.probe, zero_brain=True),
+        }
+        if args.transformer_dir:
+            teachers[TRANSFORMER] = Teacher("transformer", 180.0, data, args.device,
+                                            run_dir=args.transformer_dir, probe_path=args.transformer_probe)
         for t in teachers.values():
             t.row.model.readout = GPUHead(t.row.probe, args.device)
         tribe = SavedEncoder(data)
         decomposed = Decomposed(teachers["Spectator"], args.device)
-        labels = list(ARMS) + [TRIBE]
+        extra_teachers = [k for k in teachers if k != "Spectator"]
+        labels = list(teachers) + [TRIBE]
     else:
         ridge = stimulus_ridge(data, out)
         labels = [RIDGE]
@@ -248,7 +248,7 @@ def run(args):
                             (out / "decomposition-check.json").write_text(json.dumps({"largest difference": diff, "TRIBE per-frame difference": tdiff,
                                                                                       "run": r.run_id}))
                             checked = True
-                        for label in list(ARMS)[1:]:
+                        for label in extra_teachers:
                             preds[label] = latent_forecast(teachers[label], batch)
                         preds[TRIBE] = tribe_all[sl]
                         ys64, ym64 = ys.astype(np.float64), ym.astype(np.float64)
@@ -278,13 +278,15 @@ def run(args):
 
 
 def _stored_check():
-    """Spectator's stored Forecast unit sums (paper Table 1), every split from the root that holds it."""
+    """Spectator's stored Forecast unit sums (paper Table 2), every split from the root that holds it."""
     from neuroworld.benchmark import forecast as F
     from neuroworld.paper.analysis import ROOTS
     out = {}
     for split in SPLITS:
-        path = next(r / "algonauts" / split / "ridge-jepa-180s-std-partial (latent)" for r in ROOTS
-                    if (r / "algonauts" / split / "ridge-jepa-180s-std-partial (latent)" / "results.json").is_file())
+        path = next((r / "algonauts" / split / "ridge-jepa-180s-std-partial (latent)" for r in ROOTS
+                     if (r / "algonauts" / split / "ridge-jepa-180s-std-partial (latent)" / "results.json").is_file()), None)
+        if path is None:
+            return None
         for row in F.load(path)["forecast"]:
             s = row["scores"]["P30"]
             a, b = out.get(row["unit"], (0.0, 0.0))
@@ -299,7 +301,8 @@ def report(args):
     from neuroworld.benchmark import profile as P
     out = Path(args.out)
     loaded = [np.load(out / f"latent-{split}.npz") for split in SPLITS]
-    parts = loaded + [np.load(out / f"ridge-{split}.npz") for split in SPLITS]
+    ridge_files = [out / f"ridge-{split}.npz" for split in SPLITS]
+    parts = loaded + ([np.load(p) for p in ridge_files] if all(p.is_file() for p in ridge_files) else [])
     labels = list(dict.fromkeys(str(x) for d in parts for x in d["labels"]))
     units = {label: {} for label in labels}
     for d in parts:
@@ -331,22 +334,24 @@ def report(args):
     mine = {str(u): (float(e), float(f)) for d in loaded for u, e, f in zip(d["check_units"], d["check_err"], d["check_ref"])}
     stored = _stored_check()
     sk = lambda u: 100 * (1 - sum(v[0] for v in u.values()) / sum(v[1] for v in u.values()))
-    res["check"] = {"Spectator Forecast, benchmark queries, recomputed": round(sk(mine), 3), "stored (Table 1)": round(sk(stored), 3),
-                    "largest relative unit difference": float(max(abs(mine[u][0] - stored[u][0]) / stored[u][0] for u in stored))}
+    res["check"] = {"Spectator Forecast, benchmark queries, recomputed": round(sk(mine), 3)}
+    if stored:
+        res["check"]["stored (Table 2)"] = round(sk(stored), 3)
+        res["check"]["largest relative unit difference"] = float(max(abs(mine[u][0] - stored[u][0]) / stored[u][0] for u in stored))
     if (out / "decomposition-check.json").is_file():
         res["check"]["decomposition"] = json.loads((out / "decomposition-check.json").read_text())
     (out / "results.json").write_text(json.dumps(res, indent=1))
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.7), gridspec_kw={"width_ratios": [1.5, 1]})
-    colors = {"Spectator": "#C0392B", "Movie only (Spectator from empty frames)": "#E67E22", "Transformer counterpart": "#2E86C1",
-              TRIBE: "#AAB7B8", RIDGE: "#555555"}
+    colors = {"Spectator": "#C0392B", MOVIE_ONLY: "#E67E22", TRANSFORMER: "#2E86C1", TRIBE: "#AAB7B8", RIDGE: "#555555"}
     for label in labels:
         axes[0].plot(seconds, res["by_step"][label], label=label, color=colors[label], lw=2 if label == "Spectator" else 1.1)
     axes[0].set_xlabel("seconds ahead"); axes[0].set_ylabel("Forecast skill (%)"); axes[0].axhline(0, color="#cccccc", lw=0.5)
     axes[0].set_ylim(-5, 30)
-    leaves = next(((k + 1) * TR for k, v in enumerate(res["by_step"]["Transformer counterpart"]) if v < -5), None)
-    if leaves:
-        axes[0].annotate(f"Transformer counterpart\nbelow -5 after {leaves:.0f} s", (leaves, -5), xytext=(leaves - 95, 3), fontsize=6,
-                         color=colors["Transformer counterpart"], arrowprops=dict(arrowstyle="-", color=colors["Transformer counterpart"], lw=0.6))
+    if TRANSFORMER in res["by_step"]:
+        leaves = next(((k + 1) * TR for k, v in enumerate(res["by_step"][TRANSFORMER]) if v < -5), None)
+        if leaves:
+            axes[0].annotate(f"Transformer counterpart\nbelow -5 after {leaves:.0f} s", (leaves, -5), xytext=(leaves - 95, 3), fontsize=6,
+                             color=colors[TRANSFORMER], arrowprops=dict(arrowstyle="-", color=colors[TRANSFORMER], lw=0.6))
     axes[0].legend(frameon=False, fontsize=6, loc="upper right")
     axes[1].plot(seconds, 100 * share, color=colors["Spectator"]); axes[1].set_ylim(0, 100)
     axes[1].set_xlabel("seconds ahead"); axes[1].set_ylabel("forecast variance from\nthe inferred state (%)")
@@ -365,6 +370,10 @@ if __name__ == "__main__":
     r.add_argument("--device", default="cuda")
     r.add_argument("--batch", type=int, default=128)
     r.add_argument("--part", choices=("latent", "ridge"), required=True)
+    r.add_argument("--model-dir", default=str(RELEASE), help="Spectator model folder (config.yaml, best.pt, probe.npz)")
+    r.add_argument("--probe", help="Optional probe .npz overriding <model-dir>/probe.npz")
+    r.add_argument("--transformer-dir", help="Optional Transformer counterpart model folder")
+    r.add_argument("--transformer-probe", help="Optional probe .npz for --transformer-dir")
     p = sub.add_parser("report")
     p.add_argument("--out", required=True)
     args = parser.parse_args()

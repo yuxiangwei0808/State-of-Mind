@@ -16,16 +16,17 @@ from neuroworld.paths import DATA, OUTPUT
 A = OUTPUT / "paper-analysis"
 FIGS = A / "figs"
 TR, H = 1.49, 40
-# The benchmark result stores, searched in this order: the references rescored on the final protocol; the test films (Bourne, Wolf)
-# and HCP run 4; Friends S6 and the first two Movie10 films; the linear forecaster at 120 s (history-length study); last, the
-# released store (https://huggingface.co/stanjsx/Spectator), which merges the main table's rows of these stores.
-ROOTS = [OUTPUT / "benchmark-final", OUTPUT / "benchmark-test", OUTPUT / "benchmark-iter-overflow", OUTPUT / "benchmark-history-context",
-         OUTPUT / "benchmark-results"]
-ROWS = {"Spectator": "ridge-jepa-180s-std-partial (latent)", "Transformer counterpart": "transformer-tfforecast-linpath-jepa-180s-2x1024 (latent)",
+# Benchmark result stores under $NEUROWORLD_OUTPUT (downloaded from https://huggingface.co/stanjsx/Spectator).
+# UPDATING_ROOTS searches benchmark-results-own-fill first so the linear forecaster's Updating uses own-forecast gap
+# filling (matching the paper) whether the own-fill files are separate or merged into benchmark-results/.
+ROOTS = [OUTPUT / "benchmark-results"]
+UPDATING_ROOTS = [OUTPUT / "benchmark-results-own-fill", *ROOTS]
+ROWS = {"Spectator": "ridge-jepa-180s-std-partial (latent)",
         "Linear forecaster, 180 s": "linear [context] 180 s",
-        "Linear forecaster, 7.5 s": "linear [context] 7.5 s", "No fMRI (movie only)": "ridge-jepa-180s-std-partial-nofmri (latent)",
-        "No movie (fMRI only)": "ridge-jepa-180s-std-partial-nomovie (latent)", "Stimulus only (TRIBE v2)": "TRIBEv2 zero-shot",
-        "Kalman filter": "IPSID [context] 180 s", "Prior latent world model": "NeuroWorld-style k1 (latent)"}
+        "Linear forecaster, 7.5 s": "linear [context] 7.5 s",
+        "Stimulus only (TRIBE v2)": "TRIBEv2 zero-shot",
+        "IPSID": "IPSID [context] 180 s",
+        "NeuroWorld": "NeuroWorld k1 180s (latent)"}
 SPLITS = ("val", "dev", "test")
 
 
@@ -67,7 +68,7 @@ def updating_budgets(name):
     out = {}
     for split in SPLITS:
         found = None
-        for r in ROOTS:
+        for r in UPDATING_ROOTS:
             if (r / "algonauts/updating" / f"{name}.npz").is_file():
                 loaded = U.load(r / "algonauts/updating", name)
                 if split in loaded:

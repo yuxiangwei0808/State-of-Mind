@@ -1,5 +1,5 @@
-"""neuroworld/paper/new_viewer.py: how much of a new viewer's fMRI Spectator needs on HCP (the synthetic-data proposal's "a new viewer
-with little data"). Spectator's encoder and predictor stay frozen; only the readout changes.
+"""neuroworld/paper/new_viewer.py (Appendix B.7): how much of an unseen HCP viewer's fMRI Spectator needs to calibrate
+its readout. Spectator's encoder and predictor stay frozen; only the linear readout changes.
 
     python -m neuroworld.paper.new_viewer select --out <dir>        the shrinkage, chosen on training participants
     python -m neuroworld.paper.new_viewer select-run1 --out <dir>   the shrinkage, chosen on the new viewers' run 1

@@ -136,24 +136,6 @@ def updating_cells(dataset, splits, name):
 
 
 
-def _merge(parts):
-    """{unit: {key: sum}} added over parts (a unit appearing in several parts adds up)."""
-    out = {}
-    for part in parts:
-        for unit, sums in part.items():
-            if unit in out:
-                out[unit] = {k: out[unit][k] + np.asarray(v, dtype=np.float64) for k, v in sums.items()}
-            else:
-                out[unit] = {k: np.asarray(v, dtype=np.float64) for k, v in sums.items()}
-    return out
-
-
-def _steps(dataset, seconds):
-    """0-based index of the last step at or before each time (at least the first step)."""
-    tr = GRIDS[dataset].tr
-    return [max(1, frames_within(s, tr)) - 1 for s in seconds]
-
-
 def nonanticipation(dataset, name):
     path = ROOT / dataset / "nonanticipation" / f"{name}.json"
     return json.loads(path.read_text())["pass"] if path.is_file() else None
@@ -345,8 +327,8 @@ def stamps():
 def _probe_mix(dataset, name):
     """The probe weight digests in a model's result files (None for a file without one) when they differ, else None:
     a row must come from one frozen probe."""
-    paths = [ROOT / dataset / split / name / "results.json" for split in ("train", "val", "dev", "heldout-fit",
-                                                                        "heldout-adapt")]
+    paths = [ROOT / dataset / split / name / "results.json" for split in ("train", "val", "dev", "test", "heldout-fit",
+                                                                          "heldout-adapt", "heldout-test")]
     paths += [ROOT / dataset / task / f"{name}.json" for task in ("state", "updating", "nonanticipation")]
     ids = {(json.loads(p.read_text()).get("stamp") or {}).get("readout", {}).get("weights sha256")
            for p in paths if p.is_file()}

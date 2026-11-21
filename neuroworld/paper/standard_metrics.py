@@ -1,20 +1,17 @@
-"""neuroworld/paper/standard_metrics.py: the metrics of prior work for the models of Table 2 (the paper's appendix), on all
-Algonauts test data, with NeuroWorld's definitions in the benchmark's Forecast setting (NeuroWorld's evaluation
-code): an origin every 3 s, forecasts of the next 40 frames.
+"""neuroworld/paper/standard_metrics.py (Appendix B.5): standard neural-prediction metrics for the models of Table 2
+on all Algonauts test data: an origin every 3 s, forecasts of the next 40 frames.
   Pearson    per recording and frame ahead, each parcel's correlation between forecast and measured fMRI across origins,
-             averaged over parcels; then over frames 1-20 (NeuroWorld's 20-frame horizon) or 1-40, then over recordings.
+             averaged over parcels; then over frames 1-20 or 1-40, then over recordings.
   global r   per recording and frame ahead, one correlation over all origins x parcels; averaged the same way.
   Cls@Top10  each origin's forecast of frames 1-20 (x 1000 parcels) is correlated with the measured frames 1-20 at every
              origin of the same viewer; a hit when its own measured segment ranks in the top 10 among segments of other
-             content (other episodes and movies; the other viewing of a Movie10 clip and the other half of an episode
-             are not candidates). Origins whose 20 frames are not all scoreable are left out. Chance is 10 / candidates.
+             content. Origins whose 20 frames are not all scoreable are left out. Chance is 10 / candidates.
 
-    PYTHONPATH=<code-v27> python standard_metrics.py save <model> <history>   forecasts of one row -> FORECASTS
-    PYTHONPATH=<code-v27> python standard_metrics.py compute [--device cuda]  every saved row -> results-standard-metrics.json
+    python -m neuroworld.paper.standard_metrics save <model> <history> [--run-dir <dir>] [--device cuda]
+    python -m neuroworld.paper.standard_metrics compute [--device cuda]
 
-`save` rebuilds each row as it was scored for Table 2 (same code, history and probe; the probe of each split is read from the
-store that holds that split's Table 2 result), reruns Forecast with every forecast saved, and checks that its per-frame
-Pearson equals the stored row's. Its result files go to a scratch store, never to the paper's stores.
+`save` rebuilds each row (reading Spectator weights and probes from $NEUROWORLD_OUTPUT/spectator-v1/), reruns Forecast
+with every forecast saved, and checks its per-frame Pearson against the stored row in benchmark-results/ when present.
 """
 import argparse
 import hashlib
@@ -24,19 +21,21 @@ import time
 from pathlib import Path
 
 import numpy as np
-from neuroworld.paths import EXTERNAL, OUTPUT
+from neuroworld.paths import OUTPUT
 from neuroworld.paper.analysis import ROOTS as STORES
 
 
 N = OUTPUT
-ROOTS = list(STORES)  # the benchmark result stores, as in analysis.py
+ROOTS = list(STORES)
 A = N / "paper-analysis" / "standard-metrics"
 FORECASTS = A / "forecasts"
 SCRATCH = A / "store"
-W = N / "checkpoints/algonauts/wave2_20261102"
-K1 = N / "checkpoints/algonauts/neuroworld_history_20261112"
-K1_ORIGINAL = Path(EXTERNAL / "NeuralWorld/checkpoints/algonauts/"
-                   "latent-stimulus_k1c3d1024l6_seq19_lag3_roll16w1_sig0.09_lr5e-05_bs1024_ep100_seed0")
+RELEASE = N / "spectator-v1"
+SPECTATOR_DIRS = {
+    "7.5 s": RELEASE / "algonauts-7.5s/model",
+    "120 s": RELEASE / "algonauts-120s/model",
+    "180 s": RELEASE / "algonauts/model",
+}
 SPLITS = ("val", "dev", "test")
 LENGTHS = ("7.5 s", "120 s", "180 s")
 SEG, K = 20, 10
@@ -66,10 +65,12 @@ def _store_for(root):
     """A scratch store that reads <root>'s probes and stimulus-row caches (links) and takes the result files."""
     store = SCRATCH / root.name
     (store / "algonauts" / "probes").mkdir(parents=True, exist_ok=True)
-    for f in (root / "algonauts" / "probes").glob("*.npz"):
-        _link(store / "algonauts" / "probes" / f.name, f)
-    for f in (root / "algonauts").glob("stimulus-rows-*.npz"):
-        _link(store / "algonauts" / f.name, f)
+    if (root / "algonauts" / "probes").is_dir():
+        for f in (root / "algonauts" / "probes").glob("*.npz"):
+            _link(store / "algonauts" / "probes" / f.name, f)
+    if (root / "algonauts").is_dir():
+        for f in (root / "algonauts").glob("stimulus-rows-*.npz"):
+            _link(store / "algonauts" / f.name, f)
     return store
 
 
@@ -116,37 +117,38 @@ def _patch(F, Q, current):
     F.forecast_rows = forecast_rows
 
 
-def _build(model, h, data, store):
-    """The row's model (named as in Table 2), built as it was scored, with its probe read from <store>."""
+def _build(model, h, data, store, *, run_dir=None, device="cuda"):
+    """The row's model (named as in Table 2), built with its shipped probe (Spectator) or store probe."""
     from neuroworld.benchmark import grid as G
     from neuroworld.benchmark.__main__ import _models
     seconds = float(h[:-2])
     if model == "Spectator":
-        from neuroworld.spectator.score import latent_row
-        _, row = latent_row(W / f"ridge-jepa-{h[:-2]}s-std-partial", f"ridge-jepa-{h[:-2]}s-std-partial", seconds,
-                            "algonauts", store, "cuda", log)
+        from neuroworld.paper.collect import latent_row
+        folder = Path(run_dir) if run_dir else SPECTATOR_DIRS[h]
+        _, _, row, _, _ = latent_row(folder, f"ridge-jepa-{h[:-2]}s-std-partial", seconds, store, data, device=device)
         return row
     if model == "Linear forecaster":  # refitted for each length; queries carry 240 s, the model reads its last L
         from neuroworld.experiments.history_length import LONGEST, models
         G.HISTORY_SECONDS = LONGEST
-        return next(models("linear", data, [seconds], "cuda", log, "context", N / "benchmark-test"))[1]
+        return next(models("linear", data, [seconds], device, log, "context", store))[1]
     if model == "IPSID":  # IPSID on the contextual rows, queries of <h> (120 s is the benchmark's default)
         G.HISTORY_SECONDS = seconds
-        m = _models("ipsid", data, "cuda", str(store), "context")[0]
+        m = _models("ipsid", data, device, str(store), "context")[0]
         m.name = row_name(model, h)
         return m
     if model == "TRIBE v2":
-        return _models("tribev2", data, "cuda", str(store))[0]
-    if model == "NeuroWorld":  # the original reads its own 4.5 s from the CLI's default 120-s queries
+        return _models("tribev2", data, device, str(store))[0]
+    if model == "NeuroWorld":
+        if not run_dir:
+            raise ValueError("Pass --run-dir pointing to a trained NeuroWorld run directory")
         G.HISTORY_SECONDS = 120.0 if h == "7.5 s" else seconds
-        run_dir = K1_ORIGINAL if h == "7.5 s" else K1 / f"k1-{h[:-2]}s"
-        m = _models(f"latent:run:{run_dir}", data, "cuda", str(store))[-1]  # the latent row (probe), not the own decoder
+        m = _models(f"latent:run:{run_dir}", data, device, str(store))[-1]
         m.name = row_name(model, h)
         return m
     raise ValueError(model)
 
 
-def save(model, h):
+def save(model, h, *, run_dir=None, device="cuda"):
     from neuroworld.benchmark import forecast as F, queries as Q
     from neuroworld.benchmark.adapt import calibrate
     from neuroworld.benchmark.data import BenchmarkData
@@ -156,13 +158,13 @@ def save(model, h):
     current = {"label": label, "split": None, "index": {}}
     _patch(F, Q, current)
     groups = {}
-    for split in SPLITS:  # each split with the store that holds its Table 2 result (its probe)
-        root = next(r for r in ROOTS if (r / "algonauts" / split / name / "results.json").is_file())
+    for split in SPLITS:
+        root = next((r for r in ROOTS if (r / "algonauts" / split / name / "results.json").is_file()), ROOTS[0])
         groups.setdefault(root, []).append(split)
     for root, splits in groups.items():
         store = _store_for(root)
         data = BenchmarkData(CONFIGS["algonauts"])
-        m = _build(model, h, data, store)
+        m = _build(model, h, data, store, run_dir=run_dir, device=device)
         for split in splits:
             if (FORECASTS / safe(label) / split / "index.json").is_file():
                 log(f"{label} {split}: already saved")
@@ -172,12 +174,16 @@ def save(model, h):
             started = time.time()
             F.run(data, m, split, output=store, log=log)
             index = {"model": name, "label": label, "split": split, "probe store": str(root), "runs": current["index"],
-                     "code": os.environ.get("PYTHONPATH", ""), "stamp": time.strftime("%F %T")}
-            check = _check(store / "algonauts" / split / m.name / "results.json", root / "algonauts" / split / name / "results.json")
-            index["matches table 2"] = check
+                     "stamp": time.strftime("%F %T")}
+            stored_ref = root / "algonauts" / split / name / "results.json"
+            if stored_ref.is_file():
+                check = _check(store / "algonauts" / split / m.name / "results.json", stored_ref)
+                index["matches table 2"] = check
+                msg = f"; largest per-frame Pearson difference from Table 2's row {check:.2e}"
+            else:
+                msg = ""
             (FORECASTS / safe(label) / split / "index.json").write_text(json.dumps(index, indent=1) + "\n")
-            log(f"{label} {split}: {len(current['index'])} recordings saved in {time.time() - started:.0f} s; "
-                f"largest per-frame Pearson difference from Table 2's row {check:.2e}")
+            log(f"{label} {split}: {len(current['index'])} recordings saved in {time.time() - started:.0f} s{msg}")
 
 
 def _check(new, old):
@@ -272,7 +278,9 @@ if __name__ == "__main__":
     s = steps.add_parser("save")
     s.add_argument("model", choices=("Linear forecaster", "IPSID", "NeuroWorld", "TRIBE v2", "Spectator"))
     s.add_argument("history", choices=LENGTHS)
+    s.add_argument("--run-dir", help="Model run directory (required for NeuroWorld; optional override for Spectator)")
+    s.add_argument("--device", default="cuda")
     c = steps.add_parser("compute")
     c.add_argument("--device", default="cuda")
     args = parser.parse_args()
-    save(args.model, args.history) if args.step == "save" else compute(args.device)
+    save(args.model, args.history, run_dir=args.run_dir, device=args.device) if args.step == "save" else compute(args.device)
