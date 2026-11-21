@@ -56,8 +56,6 @@ h1{font-size:clamp(34px,5.4vw,52px);line-height:1.1;font-weight:700;margin:0 aut
 .pill[aria-disabled="true"]{opacity:.72;cursor:default}
 .pill .soon{font-family:var(--mono);font-size:11px;opacity:.75;background:rgba(29,42,46,.08);padding:1px 6px;border-radius:999px}
 .pill svg{width:15px;height:15px;flex:none}
-.tldr{max-width:760px;margin:0 auto 10px;text-align:left;background:var(--panel);border:1px solid var(--panel-border);border-left:3.5px solid var(--state);border-radius:10px;padding:12px 18px;font-size:16.5px;line-height:1.5;color:var(--ink-2)}
-.tldr b{color:var(--ink)}
 
 /* contents bar */
 .toc{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--rule)}
@@ -249,23 +247,7 @@ ul.find li::marker{color:var(--state)}
 .sim-launch{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:999px;border:0;background:var(--state);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
 .sim-launch:hover{background:var(--state-d)}
 
-/* ablations */
-.abl{width:100%;border-collapse:collapse;font-size:16px}
-.abl td{padding:6px 6px;border-bottom:1px solid var(--rule);vertical-align:middle}
-.abl td.g{font-family:var(--mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding-top:16px}
-.abl .barcell{width:44%}
-.dbar{position:relative;height:13px}
-.dbar .mid{position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--faint)}
-.dbar .b{position:absolute;top:0;bottom:0;border-radius:3px;transition:all .45s ease}
-.abl .v{font-family:var(--mono);font-size:14px;text-align:right;white-space:nowrap;width:70px}
-
-/* faq, bib, footer */
-details{border-bottom:1px solid var(--rule);padding:12px 0}
-summary{cursor:pointer;font-weight:700;font-size:18px;list-style:none;display:flex;justify-content:space-between;gap:12px}
-summary::-webkit-details-marker{display:none}
-summary::after{content:"+";color:var(--muted);font-weight:400}
-details[open] summary::after{content:"−"}
-details p{margin:10px 0 2px;font-size:17px;color:var(--ink-2)}
+/* bib, footer */
 pre.bib{background:var(--panel);border:1px solid var(--panel-border);border-radius:10px;padding:16px 18px;overflow-x:auto;font:13.5px/1.55 var(--mono);margin:12px 0}
 .copy{border:1px solid var(--panel-border);background:#fff;border-radius:999px;padding:6px 16px;cursor:pointer;font-size:15px}
 footer{border-top:1px solid var(--rule);margin-top:56px;padding:26px 0 48px;color:var(--muted);font-size:15px}
@@ -287,7 +269,6 @@ footer a{color:var(--muted)}
       <a class="pill" href="https://huggingface.co/stanjsx/Spectator" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="3" width="11" height="10" rx="2"/><path d="M5.5 7h5M5.5 10h3.5"/></svg>Weights &amp; Scores</a>
       <a class="pill" href="#cite"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 4h4v4H5c0 1.5.7 2.5 2 3l-.6 1.2C4 11.4 3 9.8 3 7.5zm6 0h4v4h-2c0 1.5.7 2.5 2 3l-.6 1.2C10 11.4 9 9.8 9 7.5z"/></svg>BibTeX</a>
     </div>
-    <div class="tldr"><b>TL;DR:</b> Standard brain-encoding correlation rewards the shared stimulus response and hides whether a model tracks an individual's internal brain state. We introduce <b>BrainStateBench</b>—three frozen-probe tests of <em>State</em>, <em>Forecast</em>, and <em>Updating</em>—and <b>Spectator</b>, a two-timescale linear latent world model that beats nonlinear baselines on Algonauts 2025 and 184-subject HCP 7T, stays stable over 5-minute rollouts, and runs live in your browser.</div>
   </div>
 </header>
 
@@ -307,23 +288,19 @@ footer a{color:var(--muted)}
       <li><a href="#lab" data-sec="lab">Input Lab</a></li>
       <li><a href="#where" data-sec="where">Analysis</a></li>
       <li><a href="#live" data-sec="live">Live Demo</a></li>
-      <li><a href="#ablations" data-sec="ablations">Ablations</a></li>
-      <li><a href="#faq" data-sec="faq">FAQ</a></li>
       <li><a href="#cite" data-sec="cite">Cite</a></li>
     </ul>
   </div>
   <ol id="tocList">
     <li><a href="#overview"><span>§1</span>Overview</a></li>
-    <li><a href="#problem"><span>§2</span>The problem</a></li>
+    <li><a href="#problem"><span>§2</span>Setup</a></li>
     <li><a href="#bench"><span>§3</span>BrainStateBench</a></li>
     <li><a href="#model"><span>§4</span>Spectator</a></li>
     <li><a href="#results"><span>§5</span>Results</a></li>
     <li><a href="#lab"><span>§6</span>Beyond correlation</a></li>
     <li><a href="#where"><span>§7</span>Where and when</a></li>
     <li><a href="#live"><span>§8</span>Live simulator</a></li>
-    <li><a href="#ablations"><span>§9</span>Ablations</a></li>
-    <li><a href="#faq"><span>§10</span>FAQ</a></li>
-    <li><a href="#cite"><span>§11</span>Citation</a></li>
+    <li><a href="#cite"><span>§9</span>Citation</a></li>
   </ol>
 </nav>
 
@@ -341,21 +318,18 @@ footer a{color:var(--muted)}
     <svg id="loop" viewBox="0 0 940 300" role="img" aria-label="Animated diagram: fMRI history is encoded into a fast and slow state, rolled forward under the movie, and corrected by new scans"></svg>
     <p class="loopnote" id="loopNote"></p>
   </div>
-  <p class="caption"><b>A world model of one person's brain.</b> Spectator infers a two-timescale state from three minutes of fMRI, rolls it forward under the movie with a linear predictor, and refreshes it when new scans arrive. <span id="heroData"></span></p>
+  <p class="caption"><b>A world model of one person's brain.</b> Spectator infers a two-timescale state from 3 minutes of fMRI, rolls it forward under the movie, and updates it when new scans arrive. <span id="heroData"></span></p>
 </div>
 
 <section id="overview">
   <div class="col">
     <div class="sec-label">§1 Overview</div>
-    <p>Watch the same movie twice and your brain responds differently each time: the stimulus is identical, your <b>state of mind</b> is not. A <b>world model</b> of the brain should capture that. It should <b>infer</b> a latent state from past fMRI, <b>predict</b> how the state evolves as the movie plays, and <b>update</b> it when new scans arrive. Standard metrics cannot tell whether a model does any of this, because a model that never looks at the brain can still match the shared, stimulus-driven response.</p>
-    <p>We introduce <b>BrainStateBench</b>, which scores a model's latent state through a frozen linear probe on whole-cortex movie fMRI, and <b>Spectator</b>, a linear latent world model trained with a joint-embedding predictive objective.</p>
-    <h3 style="margin-top:22px">What we find</h3>
+    <p>Watch the same movie twice and your brain responds differently each time: the stimulus is identical, your <b>state of mind</b> is not. Standard encoding metrics cannot tell whether a model tracks that state, because matching the shared stimulus response already scores high. We introduce <b>BrainStateBench</b>, which probes a model's latent state directly on movie fMRI, and <b>Spectator</b>, a two-timescale linear world model trained with a JEPA objective.</p>
     <ul class="find">
-      <li><b>Correlation hides the state.</b> A stimulus-only encoder reaches r = 0.320 without ever seeing the brain, yet scores 0% on State; prior brain world models reach at most 0.4%. <a class="jump" href="#lab">§6 Beyond correlation ↓</a></li>
-      <li><b>A linear world model wins on every task.</b> Spectator scores 5.5% on State, 16.0% on Forecast and 20.3% on Updating, ahead of all six baselines, and more than doubles the best baseline on State. <a class="jump" href="#results">§5 Results ↓</a></li>
-      <li><b>Minutes of history matter.</b> Going from 7.5 s to 180 s of fMRI raises State fivefold (1.1% → 5.5%) while baselines plateau. The learned slow state drives the gain. <a class="jump" href="#ablations">§9 Ablations ↓</a></li>
-      <li><b>State first, stimulus later.</b> The inferred state carries 95% of a forecast 1.5 s ahead and 13% at 60 s; it helps in every cortical parcel, most in association cortex. <a class="jump" href="#where">§7 Where and when ↓</a></li>
-      <li><b>Small, fast, and transferable.</b> 30 M parameters, a 60 s rollout in 5.4 ms, and transfer to 184 HCP participants on a different scanner. Fast enough to run live in your browser. <a class="jump" href="#live">§8 Live simulator ↓</a></li>
+      <li><b>Correlation hides the state.</b> Stimulus-only MIRAGE reaches r = 0.320 yet scores 0% on State. <a class="jump" href="#lab">§6 ↓</a></li>
+      <li><b>Linear dynamics win on every task.</b> Spectator leads all six baselines on Algonauts 2025 (5.5% State, 16.0% Forecast, 20.3% Updating) and 184-viewer HCP 7T, and stays stable over 5-minute rollouts. <a class="jump" href="#results">§5 ↓</a></li>
+      <li><b>State first, stimulus later.</b> Latent state drives 95% of near-term forecasts and association cortex; stimulus drives sensory cortex and longer horizons. <a class="jump" href="#where">§7 ↓</a></li>
+      <li><b>Fast enough for the browser.</b> 30 M parameters, 5.4 ms per 60 s rollout — try the real model live below. <a class="jump" href="#live">§8 ↓</a></li>
     </ul>
   </div>
   <div class="banner">A brain world model should be judged by its <b>state</b>, not only by its <b>output</b>.</div>
@@ -365,12 +339,11 @@ footer a{color:var(--muted)}
   <div class="col">
     <div class="sec-label">§2 Setup</div>
     <h2>Matching the output does not test the state</h2>
-    <p>Stimulus-only encoding models predict the response shared across viewers and keep no latent state. Prior brain world models forecast from a few seconds of fMRI or never revise their state when new data arrive. Both are judged by how well predicted fMRI matches measured fMRI, a score that mixes the shared stimulus response with the individual's internal dynamics.</p>
-    <p>World models are defined by what they do with state: infer it from observations, predict it under actions, and update it with new observations. For the brain, the <span class="sm">stimulus</span> plays the action, <span class="ob">fMRI</span> provides the observations, and the latent <span class="st">state</span> is the individual's brain state.</p>
+    <p>Stimulus-only encoders keep no brain state, while prior brain world models read only short histories or never update when new scans arrive. We cast naturalistic fMRI as a world-modeling loop: the <span class="sm">movie</span> is the action, <span class="ob">fMRI</span> is the observation, and the latent <span class="st">state</span> tracks the individual's internal dynamics.</p>
   </div>
   <div class="wide">
     <figure style="margin:22px 0 0"><img src="assets/fig1.webp" alt="Figure 1 of the paper: existing approaches versus Spectator and BrainStateBench" width="1600" height="461"></figure>
-    <p class="caption"><b>Figure 1. Modeling and evaluating individual brain states.</b> Left: stimulus-only models keep no latent state; prior brain world models use short histories or skip state updates. Right: Spectator infers, predicts and updates a two-timescale state, and BrainStateBench probes that state directly.</p>
+    <p class="caption"><b>Figure 1.</b> Prior encoders ignore state or skip updates (left). Spectator infers, predicts, and updates a two-timescale state, which BrainStateBench probes directly (right).</p>
   </div>
 </section>
 
@@ -378,7 +351,7 @@ footer a{color:var(--muted)}
   <div class="col">
     <div class="sec-label">§3 Benchmark</div>
     <h2>BrainStateBench: three tests of the latent state</h2>
-    <p>Each model's latent state is mapped to 1,000 cortical regions by a linear probe fitted on training data and then frozen, so architectures with very different latent spaces are scored on equal footing. Every task reports variance explained (%) over a 40-step, 60 s window, on Algonauts 2025: four people watching <i>Friends</i> and four films, about 66 hours of fMRI.</p>
+    <p>A frozen linear probe maps each model's latent state to 1,000 cortical parcels, scoring variance explained (%) over 60 s rollouts on Algonauts 2025 (~66 h of movie fMRI across four viewers).</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -400,7 +373,7 @@ footer a{color:var(--muted)}
         </div>
       </div>
     </div>
-    <p class="try">Try each task, switch the model and the network. Every curve is measured fMRI or a model's saved forecast for one held-out query, picked as the median query by score.</p>
+    <p class="try">Switch tasks, models, and networks — every curve is real held-out fMRI and saved forecasts from the median-scoring query.</p>
   </div>
 </section>
 
@@ -408,13 +381,13 @@ footer a{color:var(--muted)}
   <div class="col">
     <div class="sec-label">§4 Model</div>
     <h2>Spectator: a linear latent world model</h2>
-    <p>The encoder maps the last 7.5 s of fMRI to a 1,024-d <span class="st">fast state</span> f<sub>t</sub>, then aggregates three minutes of fast states into a 1,024-d <span class="st">slow state</span> u<sub>t</sub> with learned per-channel lag weights. A linear predictor advances s<sub>t</sub> = [f<sub>t</sub>; u<sub>t</sub>] under video, audio and transcript features:</p>
+    <p>The encoder turns the last 7.5 s of fMRI into a 1,024-d <span class="st">fast state</span> f<sub>t</sub> and pools 3 minutes of fast states into a 1,024-d <span class="st">slow state</span> u<sub>t</sub> via learned lag weights; a linear predictor advances s<sub>t</sub> = [f<sub>t</sub>; u<sub>t</sub>] under multimodal movie features:</p>
     <div class="eq-stack" role="group" aria-label="Spectator equations">
       <div class="eq-row"><code>f<sub>t</sub> = W<sub>f</sub> [x<sub>t−4</sub>; …; x<sub>t</sub>] + b<sub>f</sub></code><span>fast state (last 7.5 s)</span></div>
       <div class="eq-row"><code>u<sub>t,i</sub> = Σ<sub>ℓ</sub> w<sub>iℓ</sub> f<sub>t−ℓ,i</sub></code><span>slow state (180 s learned lags)</span></div>
       <div class="eq-row"><code>ŝ<sub>t+1</sub> = ŝ<sub>t</sub> + W [ŝ<sub>t</sub>; ā<sub>t+1</sub>; 1]</code><span>linear latent rollout</span></div>
     </div>
-    <p>Training has two stages. The encoder is pretrained on fMRI alone; then encoder and predictor are trained with a multi-step JEPA loss, matching 40-step rollouts to targets from an EMA copy of the encoder. Finally the encoder is frozen and W is solved in closed form by ridge regression.</p>
+    <p>We pretrain the encoder on fMRI, train both components with a 40-step EMA-target JEPA loss, then freeze the encoder and solve W in closed form via ridge regression.</p>
   </div>
   <div class="wide">
     <div class="grid2" style="align-items:center;margin-top:18px">
@@ -427,7 +400,7 @@ footer a{color:var(--muted)}
         <div class="legend" style="margin-top:8px"><span><i style="background:var(--obs)"></i>measured</span><span><i style="background:var(--state)"></i>state term</span><span><i style="background:var(--stim)"></i>stimulus term</span><span><i style="background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 7px)"></i>sum = forecast</span></div>
       </div>
     </div>
-    <p class="caption"><b>Linear dynamics make every forecast an exact sum.</b> A k-step forecast is M<sup>k</sup>s<sub>t</sub> (the inferred state carried forward) plus the accumulated stimulus drive. The curves are the two terms of the same real forecast as the hero figure (sub-01, read through the frozen probe; the probe's offset sits in the stimulus term). The shares in the bar are measured over all held-out Algonauts recordings (Fig. 3a).</p>
+    <p class="caption"><b>Exact linear decomposition.</b> Every k-step forecast equals M<sup>k</sup>s<sub>t</sub> (carried-forward state) plus accumulated stimulus drive. Bar shares span all held-out Algonauts recordings.</p>
   </div>
 </section>
 
@@ -435,7 +408,7 @@ footer a{color:var(--muted)}
   <div class="col">
     <div class="sec-label">§5 Results</div>
     <h2>Spectator leads every baseline, and the lead grows with history</h2>
-    <p>We compare against six baselines in four families: stimulus-only encoders (TRIBE v2, MIRAGE), a per-lead linear forecaster, a state-space model with Kalman filtering (IPSID), and prior brain world and forecasting models (NeuroWorld, BrainVista).</p>
+    <p>Compared against six baselines across four families: stimulus-only encoders (TRIBE v2, MIRAGE), a per-lead linear forecaster, Kalman state-space modeling (IPSID), and prior brain world models (NeuroWorld, BrainVista).</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -454,10 +427,10 @@ footer a{color:var(--muted)}
       <div class="chart pre" id="lbChart" aria-live="polite"></div>
       <p class="callout" id="lbNote"></p>
     </div>
-    <p class="caption" id="lbCap"><b>Table 2 &amp; Tables 11–12, interactive.</b> Switch between Algonauts 2025 (7.5, 120, and 180 s history) and HCP 7T (184 viewers on a different 7T scanner, 180 s history; zero TRIBE v2 exposure).</p>
+    <p class="caption" id="lbCap"><b>Algonauts 2025 &amp; HCP 7T leaderboard.</b> Toggle dataset, metric, and history length (HCP 7T: 184 viewers, different 7T scanner, 180 s history).</p>
   </div>
   <div class="col">
-    <div class="takeaway"><b>Takeaway 1: History is where a world model earns its keep.</b>Extending history from 7.5 s to 180 s raises Spectator's State fivefold, while baselines plateau or decline beyond 120 s.</div>
+    <div class="takeaway"><b>History is where a world model earns its keep.</b>Extending fMRI history from 7.5 s to 180 s lifts Spectator's State fivefold (1.1% → 5.5%) while baselines plateau.</div>
   </div>
   <div class="wide">
     <div class="grid2">
@@ -471,7 +444,7 @@ footer a{color:var(--muted)}
         <div class="chart" id="leadChart"></div>
       </div>
     </div>
-    <p class="caption"><b>Updating and lead time.</b> Left: Updating score as measured frames are revealed during the 60 s rollout. Right: Forecast at a single lead time. Spectator leads at every budget and horizon (supplementary Sec. B.2).</p>
+    <p class="caption"><b>Updating budget &amp; forecast horizon.</b> Spectator leads at every scan rate and lead time.</p>
   </div>
   <div class="wide">
     <div class="grid2" style="margin-top:18px">
@@ -486,13 +459,13 @@ footer a{color:var(--muted)}
         <div class="legend" style="margin-top:6px"><span><i style="background:var(--state)"></i>Spectator</span><span><i style="background:var(--obs)"></i>Linear (Spectator targets)</span><span><i style="background:#9aa4a7"></i>Linear (real fMRI)</span></div>
       </div>
     </div>
-    <p class="caption"><b>Long-horizon stability and sample efficiency.</b> Left (App. C.2): open-loop Forecast skill over five minutes without new fMRI; Spectator stays above movie-only across the full 300 s, whereas its Transformer counterpart drops below stimulus-only at 67 s and diverges below 0% at 143 s (to −473% at 5 min). Right (App. E.1): trained on just 10% of the data (4.7 h per person), Spectator already beats the full-data linear forecaster on State and Updating.</p>
+    <p class="caption"><b>Stability &amp; data efficiency.</b> Left: Spectator stays above movie-only for 5 minutes while a Transformer counterpart diverges below 0% at 143 s. Right: 10% data (4.7 h) Spectator already beats 100%-data Linear on State and Updating.</p>
   </div>
   <div class="col">
     <div class="facts">
-      <div class="fact"><b>10%</b>of the training data (≈ 4.7 h per person) already beats the full-data linear forecaster on State (3.6 vs 2.6) and Updating (15.5 vs 12.7).</div>
-      <div class="fact"><b>184</b>HCP participants on a different scanner: 6.6 / 6.2 / 15.7 on Forecast / State / Updating, and 7.3 / 16.7 zero-shot on 36 unseen people.</div>
-      <div class="fact"><b>5.4 ms</b>for a 60 s rollout with 30 M parameters, over 20× faster than NeuroWorld and BrainVista.</div>
+      <div class="fact"><b>10% data</b>(4.7 h) beats full-data Linear on State &amp; Updating.</div>
+      <div class="fact"><b>184 HCP viewers</b>leads every task; 7.3% / 16.7% zero-shot on 36 unseen people.</div>
+      <div class="fact"><b>5.4 ms</b>per 60 s rollout (30 M params), &gt;20× faster than neural baselines.</div>
     </div>
   </div>
 </section>
@@ -501,7 +474,7 @@ footer a{color:var(--muted)}
   <div class="col">
     <div class="sec-label">§6 Beyond correlation</div>
     <h2>Break one input and watch which scores move</h2>
-    <p>We keep the fitted Spectator and its probes fixed and change one input at test time: drop the stimulus, zero the fMRI, or feed in the fMRI of another person watching the same scene. Each perturbation leaves a different fingerprint on the three tasks. Correlation r barely notices.</p>
+    <p>Keeping Spectator fixed, we perturb one input at test time: drop the stimulus, zero the fMRI, or swap in another viewer's fMRI from the same scene. Each perturbation leaves a distinct signature on BrainStateBench while correlation r barely changes.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -527,10 +500,10 @@ footer a{color:var(--muted)}
         </div>
       </div>
     </div>
-    <p class="caption"><b>Table 3 and Fig. 3b,c, interactive.</b> One input changed at a time; thin marks show the full-input score. Rows marked "not reported" were scored on Forecast only.</p>
+    <p class="caption"><b>Input perturbation lab (Table 3).</b> One input altered at a time; vertical marks show full-input scores.</p>
   </div>
   <div class="col">
-    <div class="takeaway"><b>Takeaway 2: BrainStateBench separates what correlation conflates.</b>Three perturbations land within 0.03 of each other on r (0.224–0.253), yet State ranges from +5.5% to −5.1%, and Updating from 13.7% to 1.2%.</div>
+    <div class="takeaway"><b>BrainStateBench separates what correlation conflates.</b>Three perturbations sit within 0.03 on r (0.224–0.253), yet State spans +5.5% to −5.1% and Updating spans 13.7% to 1.2%.</div>
   </div>
 </section>
 
@@ -538,7 +511,7 @@ footer a{color:var(--muted)}
   <div class="col">
     <div class="sec-label">§7 Analysis</div>
     <h2>Where and when state and stimulus matter</h2>
-    <p>Because each forecast is an exact sum of a state term and a stimulus term, we can ask where in cortex each one helps. The stimulus drives shared sensory and narrative regions, where people respond alike. The inferred state helps everywhere, most in prefrontal and parietal association cortex, where people differ.</p>
+    <p>Linearity splits every forecast into stimulus and state terms across cortex. The stimulus drives shared sensory and narrative regions; the inferred state helps everywhere, most in prefrontal and parietal association cortex where viewers diverge.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -556,14 +529,14 @@ footer a{color:var(--muted)}
         <div>
           <div class="fighead"><p class="figtitle">Gain by how much people agree</p><button class="replay" id="tertReplay"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9M2.5 2.5v3h3"/></svg>Replay</button></div>
           <div class="chart" id="tertChart"></div>
-          <p class="mini" style="margin:10px 0 0">Stimulus gain tracks inter-subject correlation (r = 0.92). State gain stays at 5–7 points even where people diverge, and beats the stimulus gain in 59% of the 1,000 parcels.</p>
+          <p class="mini" style="margin:10px 0 0">Stimulus gain tracks inter-subject correlation (r = 0.92); state gain stays at 5–7 points everywhere and exceeds stimulus gain in 59% of parcels.</p>
         </div>
       </div>
     </div>
-    <p class="caption"><b>Figure 4. Stimuli drive shared sensory and narrative cortex; latent state helps cortex-wide.</b> Gain from adding the stimulus to state-only forecasts, or the state to stimulus-only forecasts (100 Schaefer regions per hemisphere). Stimulus peaks: auditory, story and visual-motion regions. State peaks: cognitive control, touch and memory retrieval (labels via NeuroQuery).</p>
+    <p class="caption"><b>Figure 4.</b> Forecast gain from adding stimulus vs. latent state across Schaefer parcels (left) and inter-subject correlation tertiles (right).</p>
   </div>
   <div class="col">
-    <div class="takeaway"><b>Takeaway 3: State governs the near term and association cortex; the stimulus governs the long term and sensory cortex.</b>Two people's states cannot be swapped at the same movie moment, yet one shared encoder and predictor track each person's own trajectory.</div>
+    <div class="takeaway"><b>State governs near-term &amp; association cortex; stimulus governs long-term &amp; sensory cortex.</b>One shared model tracks each viewer's trajectory, and swapping two viewers' states breaks the forecast.</div>
   </div>
 </section>
 
@@ -571,11 +544,11 @@ footer a{color:var(--muted)}
   <div class="col">
     <div class="sec-label">§8 Demo</div>
     <h2>A brain world model you can steer</h2>
-    <p>Spectator's whole rollout is one 2,048 × 2,049 matrix–vector product per fMRI frame, so the real model runs live in your browser with no server. It starts from participant sub-01's own inferred state, after three minutes of their recorded fMRI. Choose what they watch next, and the model predicts their cortex frame by frame. Scan a frame to update the state, or swap in another person's fMRI and watch the prediction drift.</p>
+    <p>Because each step is a single 2,048 × 2,049 matrix–vector product, the frozen Spectator model runs live in your browser. Start from sub-01's 3-minute fMRI state, switch clips, reveal scans to update the state, or swap in sub-02's history.</p>
   </div>
   <div class="wide">
     <div class="frame" id="sim">
-      <div class="simnote" style="background:var(--state-light)"><b style="color:var(--state-d)">Real model</b><span>The frozen Spectator the paper reports: its transition matrix, its fMRI encoder and sub-01's frozen probe, stored at half precision (forecasts within 0.0005 z of the full model). Clips are five held-out recordings (loaded on demand as you switch). The movie enters as its real TRIBE v2 features, precomputed. "Measured" is sub-01's recorded fMRI of the same clip; "another person" is sub-02's. Scans re-encode the state exactly as in the benchmark's Updating task.</span></div>
+      <div class="simnote" style="background:var(--state-light)"><b style="color:var(--state-d)">Real model</b><span>Frozen <code>spectator-v1</code> weights at fp16 (≤ 0.0005 z from full precision) on five held-out clips with precomputed TRIBE v2 features. Scans re-encode the state identically to BrainStateBench's Updating task.</span></div>
       <div id="simLoading">
         <div class="sim-prog"><span id="simLoadText">Preparing Spectator simulator (24.5 MB initial binary weights)…</span><div class="sim-pbar"><div id="simLoadFill"></div></div></div>
       </div>
@@ -624,43 +597,13 @@ footer a{color:var(--muted)}
         </div>
       </div>
     </div>
-    <p class="caption"><b>Live simulator.</b> Cortex: fsaverage5 inflated surface with the Schaefer 2018 1,000-parcel, 7-network atlas, in the parcel order of the fMRI data. Drag the brain to rotate. The skill readout is the benchmark's score (1 − error / variance about the recording mean) over the last 40 frames, each frame scored before it is scanned. Footage is not shown (copyright); the screen shows how much the movie features change per frame. Built on CNeuroMod / Algonauts 2025 fMRI (CC0) and TRIBE v2 stimulus features (CC BY-NC 4.0).</p>
-  </div>
-</section>
-
-<section id="ablations">
-  <div class="col">
-    <div class="sec-label">§9 Ablations</div>
-    <h2>The slow state, linear operators and two-stage training each matter</h2>
-    <p>Removing the learned slow state costs 4.6 points of Forecast and drops State from 5.5% to 1.2%. Replacing the encoder, the predictor or both with Transformers lowers every score, and their rollouts diverge after two minutes while Spectator stays stable through five.</p>
-  </div>
-  <div class="wide">
-    <div class="frame">
-      <div class="fighead"><p class="figtitle">Change from the full model</p><div class="seg" id="ablSeg" role="group" aria-label="Metric"></div></div>
-      <div style="overflow-x:auto"><table class="abl" id="ablTable"></table></div>
-    </div>
-    <p class="caption"><b>Table 4, interactive.</b> Change relative to the full 180 s Spectator (16.0 / 5.5 / 20.3 / 0.349), in points (Δr for correlation). Bars left of center are losses.</p>
-  </div>
-  <div class="col">
-    <div class="takeaway"><b>Takeaway 4: Gains come from how the state is represented, not from depth.</b>Two timescales with learned multi-minute weights, linear dynamics and a JEPA objective beat deeper Transformer variants on every metric.</div>
-  </div>
-</section>
-
-<section id="faq">
-  <div class="col">
-    <div class="sec-label">§10 FAQ</div>
-    <h2>Common questions</h2>
-    <details><summary>Why not just report correlation like everyone else?</summary><p>Correlation rewards matching the response that every viewer shares. A stimulus-only encoder ranks second on it while capturing no individual state. State, Forecast and Updating each isolate one capability: inferring the state, carrying it forward, and revising it.</p></details>
-    <details><summary>How can State be exactly zero for some models?</summary><p>State scores the difference between two viewings of the same film by the same person. A model that reads only the stimulus predicts identical responses for both viewings, so its predicted difference is zero and it explains none of the real one.</p></details>
-    <details><summary>Why is a linear model better than Transformers here?</summary><p>fMRI is slow and noisy. Predicting in a shared latent space with linear dynamics avoids fitting separate regressions to noisy targets at each lead time, keeps five-minute rollouts stable, and makes every forecast decompose exactly into state and stimulus terms. Transformer encoders and predictors scored lower on every metric in our ablations.</p></details>
-    <details><summary>Is the live simulator running the real model?</summary><p>Yes. It loads the frozen Spectator (transition matrix, fMRI encoder, sub-01's frozen probe) and real held-out recordings: the movie's TRIBE v2 features, precomputed into the model's stimulus drive, and the recorded fMRI of sub-01 and sub-02. A scripted session run in the browser matches the same session run in Python with the full-precision model to within 0.0005 z. The only approximation is half-precision storage.</p></details>
-    <details><summary>What data did you use?</summary><p>Algonauts 2025: whole-cortex fMRI (1,000 Schaefer parcels, TR 1.49 s) from four people watching <i>Friends</i> seasons 1–6 and four films, two of which were watched twice. For transfer, HCP movie fMRI from 184 people on a different scanner.</p></details>
+    <p class="caption"><b>Live simulator.</b> fsaverage5 inflated cortex (Schaefer 1,000 parcels); drag to rotate. Video frames are omitted for copyright (bars show movie-feature change). Data: CNeuroMod / Algonauts 2025 (CC0); features: TRIBE v2 (CC BY-NC 4.0).</p>
   </div>
 </section>
 
 <section id="cite">
   <div class="col">
-    <div class="sec-label">§11 Citation</div>
+    <div class="sec-label">§9 Citation</div>
     <h2>BibTeX</h2>
 <pre class="bib" id="bib">@inproceedings{stateofmind2026,
   title     = {State of Mind: Learning and Evaluating World Models
@@ -697,7 +640,7 @@ const toc=$('toc'),tt=$('tocToggle');
 tt.onclick=()=>{const o=toc.dataset.open!=='true';toc.dataset.open=o;tt.setAttribute('aria-expanded',o);};
 document.querySelectorAll('#tocList a').forEach(a=>a.addEventListener('click',()=>{toc.dataset.open='false';tt.setAttribute('aria-expanded','false');}));
 const secs=[...document.querySelectorAll('main section[id]')];
-const names={overview:'Overview',problem:'§2 The problem',bench:'§3 BrainStateBench',model:'§4 Spectator',results:'§5 Results',lab:'§6 Beyond correlation',where:'§7 Where and when',live:'§8 Live simulator',ablations:'§9 Ablations',faq:'§10 FAQ',cite:'§11 Citation'};
+const names={overview:'Overview',problem:'§2 Setup',bench:'§3 BrainStateBench',model:'§4 Spectator',results:'§5 Results',lab:'§6 Beyond correlation',where:'§7 Where and when',live:'§8 Live simulator',cite:'§9 Citation'};
 const tocLinks=[...document.querySelectorAll('#tocInline a[data-sec]')];
 function onScroll(){let cur='overview';for(const s of secs){if(s.getBoundingClientRect().top<120)cur=s.id;}$('tocCur').textContent=names[cur];
   tocLinks.forEach(a=>a.setAttribute('aria-current',a.dataset.sec===cur?'true':'false'));}
@@ -1021,18 +964,6 @@ function renderTert(anim){const box=$('tertChart'),w=Math.max(300,box.clientWidt
   box.innerHTML=s+'</svg>';
   if(anim){const bars=box.querySelectorAll('.vbar');bars.forEach(b=>b.style.transform='scaleY(0)');void box.offsetWidth;requestAnimationFrame(()=>requestAnimationFrame(()=>bars.forEach(b=>b.style.transform='scaleY(1)')));}}
 renderTert(false);$('tertReplay').onclick=()=>renderTert(true);
-
-/* ---------- ablations ---------- */
-const ABL=[['Architecture',[['w/o slow state u<sub>t</sub>',-4.6,-4.3,-3.4,-.066],['Slow weights: learned → mean',-2.8,-2.8,-2.6,-.040],['Transformer encoder g<sub>φ</sub>',-1.2,-1.2,-1.1,-.016],['Transformer predictor p<sub>θ</sub>',-1.2,-1.1,-.7,-.015],['Transformer g<sub>φ</sub> and p<sub>θ</sub>',-2.7,-2.1,-2.4,-.032]]],
- ['Training',[['w/o pretraining (random init.)',-2.9,-2.7,-2.5,-.041],['Frozen pretrained encoder',-.7,-.6,.2,-.014],['w/o EMA and stop-gradient',-.8,-.7,.1,-.015]]],
- ['Stimulus modalities',[['w/o video features',-2.5,0,-2.1,-.033],['w/o text features',-1.1,0,-.8,-.017],['w/o audio features',-.6,0,-.5,-.006]]],
- ['Hyperparameters',[['Fast-state window: 7.5 → 4.5 s',-.1,-.1,-.1,-.002],['Stimulus window: 7.5 → 1.5 s',-.5,0,-.6,-.005],['State size: 2,048 → 1,024',-.2,-.2,-.1,-.003],['State size: 2,048 → 4,096',.1,.1,.2,.001],['Rollout K: 40 → 80',-.1,-.1,.1,-.002]]]];
-let am=0;
-function renderAbl(){const lim=am===3?.07:5;let s='';ABL.forEach(([g,rows])=>{s+=`<tr><td class="g" colspan="3">${g}</td></tr>`;
-  rows.forEach(r=>{const v=r[am+1],p=Math.abs(v)/lim*50,left=v<0?50-p:50,col=v<0?C.neg:C.state,sign=v>0?'+':v<0?'−':'';
-    s+=`<tr><td>${r[0]}</td><td class="barcell"><div class="dbar"><div class="mid"></div><div class="b" style="left:${left}%;width:${Math.max(p,.4)}%;background:${col}"></div></div></td><td class="v">${sign}${Math.abs(v).toFixed(am===3?3:1)}</td></tr>`;});});
-  $('ablTable').innerHTML=s;}
-seg($('ablSeg'),['Forecast','State','Updating','Δr'],0,i=>{am=i;renderAbl();});renderAbl();
 
 /* ---------- copy ---------- */
 $('copyBib').onclick=async e=>{try{await navigator.clipboard.writeText($('bib').textContent);e.target.textContent='Copied';}catch(err){e.target.textContent='Select the text to copy';}setTimeout(()=>e.target.textContent='Copy',2000);};
