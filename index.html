@@ -528,21 +528,21 @@ footer a:hover{color:var(--ink)}
     <svg id="loop" viewBox="0 0 940 268" role="img" aria-label="Animated diagram: fMRI history is encoded into a fast and slow state, rolled forward under the movie, and corrected by new scans"></svg>
     <p class="loopnote" id="loopNote"></p>
   </div>
-  <p class="caption"><b>A world model of one person's brain.</b> Spectator infers a two-timescale state from 3 minutes of fMRI, rolls it forward under the movie, and updates it when new scans arrive.</p>
+  <p class="caption"><b>A world model of one person's brain.</b> Spectator infers a two-timescale state from 3 minutes of fMRI, rolls it forward under incoming stimuli, and updates it when new scans arrive.</p>
 </div>
 
 <section id="overview">
   <div class="col">
     <div class="sec-label">§1 Overview</div>
     <h2>Matching stimulus responses does not test brain state</h2>
-    <p>Watch the same movie twice and your brain responds differently each time: the stimulus is identical, your <b>state of mind</b> is not. Standard encoding metrics miss this because matching the shared stimulus response already scores high—even for models that never read the brain.</p>
-    <p>We cast naturalistic fMRI as a world-modeling loop—<span class="sm">movie</span> as action, <span class="ob">fMRI</span> as observation, latent <span class="st">state</span> tracking individual dynamics—and introduce <b>BrainStateBench</b> alongside <b>Spectator</b>, a linear two-timescale world model trained with JEPA.</p>
+    <p>Watch the same movie twice and your brain responds differently each time: the stimulus is identical, your <b>state of mind</b> is not. Standard output metrics miss this because matching the shared stimulus response already scores high—even for models that never read the brain.</p>
+    <p>We cast naturalistic fMRI as a world-modeling loop—incoming <span class="sm">stimuli</span> as action, <span class="ob">fMRI</span> as observation, latent <span class="st">state</span> tracking individual dynamics—and introduce <b>BrainStateBench</b> alongside <b>Spectator</b>, a linear two-timescale latent world model trained with JEPA.</p>
     <div class="findings" aria-label="Main findings">
       <div class="findings-title">Key Findings</div>
       <ol>
-        <li><span class="fn">01</span><span><b>Standard correlation misses brain state.</b> Models that never read the brain still score high on correlation while scoring <b>0%</b> on trial-specific brain state.</span></li>
-        <li><span class="fn">02</span><span><b>A linear world model beats nonlinear baselines.</b> Spectator doubles the best baseline on State (<b>5.5%</b> vs. 2.6%), leads on Updating (<b>20.3%</b> vs. 13.4%), and stays stable over 5-minute rollouts where a Transformer diverges.</span></li>
-        <li><span class="fn">03</span><span><b>Stimulus and state map to different brain systems.</b> The movie drives shared sensory regions, while the inferred brain state improves forecasts everywhere—especially in higher-order association cortex (<b>59%</b> of regions).</span></li>
+        <li><span class="fn">01</span><span><b>Standard output metrics miss brain state.</b> Models that never read the brain still score high on output alignment while scoring <b>0%</b> on trial-specific brain state.</span></li>
+        <li><span class="fn">02</span><span><b>A linear latent world model beats nonlinear baselines.</b> Spectator doubles the best baseline on State (<b>5.5%</b> vs. 2.6%), leads on Updating (<b>20.3%</b> vs. 13.4%), and stays stable over 5-minute rollouts where a Transformer diverges.</span></li>
+        <li><span class="fn">03</span><span><b>Stimuli and brain state act on distinct systems.</b> Stimuli drive shared sensory regions, whereas inferred brain state improves forecasts cortex-wide—outweighing stimulus drive in <b>59%</b> of the cortex, especially in association hubs.</span></li>
       </ol>
     </div>
   </div>
@@ -578,15 +578,14 @@ footer a:hover{color:var(--ink)}
         </div>
       </div>
     </div>
-    <p class="try">Switch tasks, models, and networks — all curves show real held-out fMRI.</p>
   </div>
 </section>
 
 <section id="model" class="reveal">
   <div class="col">
     <div class="sec-label">§3 Method</div>
-    <h2>A linear two-timescale world model trained with JEPA</h2>
-    <p>Spectator encodes the last 7.5 s of fMRI into a <span class="st">fast state</span> f<sub>t</sub>, pools 3 minutes via learned lags into a <span class="st">slow state</span> u<sub>t</sub>, and advances s<sub>t</sub> = [f<sub>t</sub>; u<sub>t</sub>] linearly under multimodal movie features:</p>
+    <h2>A linear two-timescale latent world model trained with JEPA</h2>
+    <p>Spectator encodes the last 7.5 s of fMRI into a <span class="st">fast state</span> f<sub>t</sub>, pools 3 minutes via learned lags into a <span class="st">slow state</span> u<sub>t</sub>, and advances s<sub>t</sub> = [f<sub>t</sub>; u<sub>t</sub>] linearly under multimodal stimulus features:</p>
     <div class="eq-stack" role="group" aria-label="Spectator equations">
       <div class="eq-row"><code>f<sub>t</sub> = W<sub>f</sub> [x<sub>t−4</sub>; …; x<sub>t</sub>] + b<sub>f</sub></code><span>fast state · last 7.5 s</span></div>
       <div class="eq-row"><code>u<sub>t,i</sub> = Σ<sub>ℓ</sub> w<sub>iℓ</sub> f<sub>t−ℓ,i</sub></code><span>slow state · 180 s learned lags</span></div>
@@ -600,13 +599,12 @@ footer a:hover{color:var(--ink)}
   </div>
   <div class="wide">
     <div class="frame">
-      <div class="fighead"><p class="figtitle">Every forecast splits in two</p><div class="seg" id="leadSeg" role="group" aria-label="Seconds ahead"></div></div>
+      <div class="fighead"><p class="figtitle">Decompose forecast into brain state and stimulus</p><div class="seg" id="leadSeg" role="group" aria-label="Seconds ahead"></div></div>
       <div class="seg" id="decompNet" role="group" aria-label="Network shown" style="margin-bottom:8px"></div>
       <canvas id="decompCanvas" role="img" aria-label="A real Spectator forecast split exactly into its state term and its stimulus term"></canvas>
       <div class="sharebar" aria-live="polite"><span class="s" id="shareS"></span><span class="a" id="shareA"></span></div>
       <div class="legend" style="margin-top:10px"><span><i style="background:var(--obs)"></i>measured</span><span><i style="background:var(--state)"></i>state term</span><span><i style="background:var(--stim)"></i>stimulus term</span><span><i style="background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 7px)"></i>sum = forecast</span></div>
     </div>
-    <p class="caption"><b>Exact linear decomposition.</b> Because the dynamics are linear, every forecast splits exactly into carried-forward brain state plus accumulated movie drive.</p>
   </div>
 </section>
 
@@ -614,8 +612,8 @@ footer a:hover{color:var(--ink)}
 <section id="live" class="reveal">
   <div class="col">
     <div class="sec-label">§4 Live Simulator</div>
-    <h2>Explore Spectator's rollouts in the browser</h2>
-    <p>Run the trained Spectator model on held-out movie fMRI—switch clips, compare closed-loop scan updating against open-loop forecasting, or swap in another viewer's brain history.</p>
+    <h2>Explore Spectator's rollouts</h2>
+    <p>Run the trained Spectator model on held-out naturalistic fMRI—switch clips, compare closed-loop scan updating against open-loop forecasting, or swap in another viewer's brain history.</p>
   </div>
   <div class="wide">
     <div class="frame" id="sim">
@@ -639,7 +637,7 @@ footer a:hover{color:var(--ink)}
               <canvas id="simScreen" width="640" height="360" aria-label="The current clip's title and how much its movie features change frame to frame"></canvas>
               <div class="simnow"><span>Now: <b id="simNow"></b></span></div>
               <div id="simClips"></div>
-              <div style="display:flex;gap:6px;margin-top:8px"><button class="simtog" id="simMovie" aria-pressed="false" title="Sets the stimulus term to zero">Movie input off</button></div>
+              <div style="display:flex;gap:6px;margin-top:8px"><button class="simtog" id="simMovie" aria-pressed="false" title="Sets the stimulus term to zero">Stimulus input off</button></div>
             </div>
             <div class="simbox">
               <h4>Interact</h4>
@@ -671,7 +669,7 @@ footer a:hover{color:var(--ink)}
               <div class="tchip" title="BrainStateBench's benchmark score (1 − MSE / Var, %) over the trailing 1-minute window"><span id="simScoreLbl">Updating score (1 min)</span><b id="simSkill">–</b></div>
               <div class="tchip" title="Spatial Pearson correlation between measured and predicted parcels on this frame"><span>Spatial r (frame)</span><b id="simR">–</b></div>
               <div class="tchip"><span>Since last scan</span><b id="simSince">–</b></div>
-              <div class="tchip"><span>State / Movie</span><b id="simShare">–</b><div class="share"><span class="s" id="simShS"></span><span class="a" id="simShA"></span></div></div>
+              <div class="tchip"><span>State / Stimulus</span><b id="simShare">–</b><div class="share"><span class="s" id="simShS"></span><span class="a" id="simShA"></span></div></div>
             </div>
             <div class="simbox">
               <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;margin-bottom:6px"><div class="seg" id="simRegion" role="group" aria-label="Region"></div>
@@ -730,15 +728,15 @@ footer a:hover{color:var(--ink)}
         <div class="scrub-hint">Hover any training fraction to inspect scores.</div>
       </div>
     </div>
-    <p class="caption"><b>Long-horizon stability &amp; sample efficiency.</b> Left: Spectator stays above movie-only for 5 full minutes while a Transformer diverges below 0% at 143 s. Right: with 10% of the data, Spectator already beats the 100%-data linear forecaster on State and Updating.</p>
+    <p class="caption"><b>Long-horizon stability &amp; sample efficiency.</b> Left: Spectator stays above stimulus-only for 5 full minutes while a Transformer diverges below 0% at 143 s. Right: with 10% of the data, Spectator already beats the 100%-data linear forecaster on State and Updating.</p>
   </div>
 </section>
 
 <section id="lab" class="reveal">
   <div class="col">
     <div class="sec-label">§6 Perturbations</div>
-    <h2>Input perturbations reveal failures that correlation misses</h2>
-    <p>Altering a single test-time input while keeping Spectator fixed leaves a distinct signature on BrainStateBench, whereas correlation r barely moves.</p>
+    <h2>Input perturbations reveal failures that standard output metrics miss</h2>
+    <p>Altering a single test-time input while keeping Spectator fixed leaves a distinct signature on BrainStateBench, whereas standard output alignment (r) barely moves.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -746,7 +744,7 @@ footer a:hover{color:var(--ink)}
         <div>
           <fieldset>
             <legend><span class="sm">Stimulus</span> the model sees</legend>
-            <label class="opt"><input type="radio" name="stim" value="orig" checked> Original movie features</label>
+            <label class="opt"><input type="radio" name="stim" value="orig" checked> Original stimulus features</label>
             <label class="opt"><input type="radio" name="stim" value="none"> No stimulus term</label>
             <label class="opt"><input type="radio" name="stim" value="time"> Features from another moment</label>
           </fieldset>
@@ -772,7 +770,7 @@ footer a:hover{color:var(--ink)}
   <div class="col">
     <div class="sec-label">§7 Brain Maps</div>
     <h2>Stimulus drives sensory cortex; latent state dominates association hubs</h2>
-    <p>Movie features explain shared sensory and narrative cortex; inferred brain state improves forecasts across the entire cortex and peaks in prefrontal and parietal hubs where viewers diverge.</p>
+    <p>Stimuli primarily drive shared sensory and language regions where viewers respond alike, whereas inferred brain state improves forecasts across the entire cortex—peaking in prefrontal and parietal association hubs where individuals diverge.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -794,7 +792,7 @@ footer a:hover{color:var(--ink)}
         </div>
       </div>
     </div>
-    <p class="caption"><b>Forecast gain across the brain.</b> Adding movie features vs. latent state across cortical regions (left) and grouped by how much viewers agree (right).</p>
+    <p class="caption"><b>Forecast gain across the brain.</b> Adding stimulus vs. latent state across cortical regions (left) and grouped by how much viewers agree (right).</p>
   </div>
 </section>
 
@@ -867,7 +865,7 @@ addEventListener('scroll',onScroll,{passive:true});onScroll();
 /* ---------- original hero loop animation on real held-out fMRI ---------- */
 const L=$('loop');
 const NOTES=['<b>Infer.</b> The encoder reads three minutes of fMRI: the newest 7.5 s become the <span class="st">fast state</span>, the whole window is summarized into the <span class="st">slow state</span>.',
- '<b>Predict.</b> The linear predictor rolls the state forward one frame at a time, driven only by the <span class="sm">movie</span>. No new fMRI is used.',
+ '<b>Predict.</b> The linear predictor rolls the state forward one frame at a time, driven only by incoming <span class="sm">stimuli</span>. No new fMRI is used.',
  '<b>Update.</b> When a new scan <span class="ob">arrives</span>, it passes through the encoder and refreshes the state; the forecast snaps back toward the measurement.'];
 const FIG=window.FIG,EP=FIG.episode,ST=FIG.state;
 const NETNAME={Vis:'Visual',SomMot:'Somatomotor',DorsAttn:'Dorsal attention',SalVentAttn:'Salience',Limbic:'Limbic',Cont:'Control',Default:'Default mode'};
@@ -896,7 +894,7 @@ const pred=el('rect',{x:548,y:64,width:100,height:44,rx:9,fill:'#fff',stroke:C.i
 el('text',{x:598,y:91,'font-size':14.5,'text-anchor':'middle',fill:C.ink,'font-weight':600},L).textContent='Predictor';
 el('path',{d:'M620,108 C640,135 556,135 576,108',fill:'none',stroke:C.faint,'stroke-width':1.3,'stroke-dasharray':'3 3'},L);
 el('text',{x:598,y:146,'font-size':12,'text-anchor':'middle',fill:C.muted},L).textContent='× 40 steps';
-const film=el('g',{},L);el('text',{x:598,y:24,'font-size':12.5,'font-weight':500,'text-anchor':'middle',fill:'#9e5310'},L).textContent='movie features';
+const film=el('g',{},L);el('text',{x:598,y:24,'font-size':12.5,'font-weight':500,'text-anchor':'middle',fill:'#9e5310'},L).textContent='stimulus features';
 const filmCells=[];for(let i=0;i<7;i++){filmCells.push(el('rect',{x:556+i*12,y:32,width:10,height:14,rx:2,fill:C.stim,opacity:.25},film));}
 arrow(598,48,598,62,'a4');
 const PX0=680,PX1=925,PY0=34,PY1=178;
@@ -922,7 +920,7 @@ const dots=EP.reveal_steps.map(k=>el('circle',{cx:xs(k+1),cy:Y(hmeas[k]),r:5,fil
 el('line',{x1:PX0,y1:206,x2:PX0+18,y2:206,stroke:C.obs,'stroke-width':2.2},L);el('text',{x:PX0+24,y:210,'font-size':11.5,fill:C.muted},L).textContent='measured';
 el('line',{x1:PX0+92,y1:206,x2:PX0+110,y2:206,stroke:C.state,'stroke-width':2.2,'stroke-dasharray':'5 3'},L);el('text',{x:PX0+116,y:210,'font-size':11.5,fill:C.muted},L).textContent='forecast';
 el('circle',{cx:PX0+184,cy:206,r:4,fill:C.obs},L);el('text',{x:PX0+192,y:210,'font-size':11.5,fill:C.muted},L).textContent='new scan';
-const stages=[{x:20,w:400,label:'1  Infer: observations → state'},{x:440,w:230,label:'2  Predict under the movie'},{x:690,w:235,label:'3  Update with new scans'}];
+const stages=[{x:20,w:400,label:'1  Infer: observations → state'},{x:440,w:230,label:'2  Predict under stimuli'},{x:690,w:235,label:'3  Update with new scans'}];
 const stBars=stages.map(s=>{const g=el('g',{},L);el('rect',{x:s.x,y:226,width:s.w,height:4,rx:2,fill:C.rule},g);const f=el('rect',{x:s.x,y:226,width:0,height:4,rx:2,fill:C.state},g);
   const t=el('text',{x:s.x,y:252,'font-size':13.5,'font-weight':500,fill:C.faint},g);t.textContent=s.label;return {f,t,w:s.w};});
 const lenFc=fcP.getTotalLength(),lenUp=upP.getTotalLength(),lenTr=futTruthP.getTotalLength();
@@ -958,9 +956,9 @@ const lio=new IntersectionObserver(es=>{if(es[0].isIntersecting){playLoop(0);lio
 const TS=$('taskSvg');
 const TASKS={
  state:{models:[['Spectator',5.5,'spectator'],['Linear forecaster',2.6,'linear'],['Stimulus-only (MIRAGE)',0.0,'mirage']],eq:'d<sub>t</sub> = x<sub>t</sub><sup>(1)</sup> − x<sub>t</sub><sup>(2)</sup>,&nbsp;&nbsp; State = 1 − Σ‖d<sub>t</sub> − d̂<sub>t</sub>‖² / Σ‖d<sub>t</sub>‖²',
-   text:'Two viewings of the same film by the same person. Subtracting them cancels the shared stimulus response and isolates trial-specific brain state.'},
+   text:'Two presentations of the same stimulus to the same viewer. Subtracting them cancels the shared stimulus response and isolates trial-specific brain state.'},
  forecast:{models:[['Spectator',16.0,'spectator_forecast'],['Linear forecaster',11.6,'linear_forecast'],['Stimulus-only (MIRAGE)',8.8,'mirage_forecast']],eq:'Forecast = 1 − Σ‖x<sub>t</sub> − x̂<sub>t</sub>‖² / Σ‖x<sub>t</sub> − x̄‖²',
-   text:'From fMRI up to the anchor and the upcoming movie, roll out 40 steps (60 s) with no new scans. Predicting the recording mean scores 0%.'},
+   text:'From fMRI up to the anchor and upcoming stimuli, roll out 40 steps (60 s) with no new scans. Predicting the recording mean scores 0%.'},
  updating:{models:[['Spectator',20.3,'spectator_updating'],['Linear forecaster',12.7,null],['Stimulus-only (MIRAGE)',8.8,'mirage_forecast']],eq:'Updating = 1 − Σ‖x<sub>t</sub> − x̂<sub>t</sub><sup>upd</sup>‖² / Σ‖x<sub>t</sub> − x̄‖² &nbsp;·&nbsp; scans at t ∈ {8, 16, 24, 32}',
    text:'Same as Forecast, but four measured frames arrive causally during the minute. A model that ignores them scores exactly its Forecast.'}};
 let task='state',tModel=0,tNet=0;
@@ -985,7 +983,7 @@ function drawTask(){
     el('line',{x1:ax,y1:yD(0),x2:x1,y2:yD(0),stroke:C.rule},TS);
     line(dy.map((v,i)=>[X(anchor+i),yD(v)]),{stroke:C.ink,'stroke-width':1.6});line(dp.map((v,i)=>[X(anchor+i),yD(v)]),{stroke:m===2?C.stim:C.state,'stroke-width':2.2,'stroke-dasharray':'6 4'});
     lbl(x0,170,'Δ = view 1 − view 2 (solid), predicted Δ (dashed)',{fill:C.ink,'font-size':12,'font-weight':500});
-    lbl(x0,22,'Same viewer watching the same movie clip twice',{fill:C.ink,'font-weight':500});
+    lbl(x0,22,'Same viewer experiencing the same stimulus twice',{fill:C.ink,'font-weight':500});
     qs=ST.query_scores_percent[key];
   } else {
     const past=colOf(EP.history,n).slice(-40),meas=colOf(EP.measured,n),fut=key?colOf(EP[key],n):null;
@@ -1064,11 +1062,11 @@ function renderLB(anim){const box=$('lbChart');const isR=metric===3,isHcp=datase
   const T_ALG={0:'Spectator gains 4.5 points of Forecast between 7.5 s and 180 s of history; the linear forecaster gains 1.2, and NeuroWorld loses ground beyond 120 s.',
    1:'Spectator rises fivefold from 1.1% at 7.5 s to 5.5% at 180 s—more than double the best baseline (2.6%). Stimulus-only encoders score exactly 0.',
    2:'With four new frames per minute, Spectator reaches 20.3% at 180 s, 6.9 points ahead of the next-best model (NeuroWorld, 13.4%).',
-   3:'By correlation alone, stimulus-only MIRAGE ranks second (0.320) and beats every prior brain world model while scoring 0% on State.'};
+   3:'By output correlation alone, stimulus-only MIRAGE ranks second (0.320) and beats every prior brain world model while scoring 0% on State.'};
   const T_HCP={0:'On HCP 7T (a separate scanner and cohort), Spectator leads at 6.6% Forecast and transfers zero-shot to unseen viewers (7.3%).',
    1:'On a repeated HCP 7T clip, Spectator leads at 6.2% State while stimulus-only encoders score 0.',
    2:'With four scans per minute on HCP 7T, Spectator reaches 15.7% Updating (+2.6 points over NeuroWorld) and 16.7% on unseen viewers.',
-   3:'On HCP 7T, Spectator also ranks first on correlation (r = 0.163).'};
+   3:'On HCP 7T, Spectator also ranks first on output correlation (r = 0.163).'};
   $('lbNote').textContent=(isHcp?T_HCP:T_ALG)[metric];}
 renderLB(false);$('lbReplay').onclick=()=>renderLB(true);
 const lbio=new IntersectionObserver(es=>{if(es[0].isIntersecting){renderLB(true);lbio.disconnect();}},{threshold:.3});lbio.observe($('lbChart'));
@@ -1115,7 +1113,7 @@ function renderHorizon(animateDraw){
     const tr=HZ_TR[hzIdx];
     $('hzReadout').innerHTML=`<span class="t">${t<60?t.toFixed(1)+' s':(t/60).toFixed(1)+' min'}</span>`
       +`<span class="chip"><i style="background:${C.state}"></i>Spectator <b>${HZ_SP[hzIdx].toFixed(1)}%</b></span>`
-      +`<span class="chip"><i style="background:${C.stim}"></i>Movie <b>${HZ_MO[hzIdx].toFixed(1)}%</b></span>`
+      +`<span class="chip"><i style="background:${C.stim}"></i>Stimulus <b>${HZ_MO[hzIdx].toFixed(1)}%</b></span>`
       +`<span class="chip"><i style="background:${C.neg}"></i>Transformer <b style="color:${tr<0?C.neg:''}">${tr.toFixed(1)}%</b></span>`
       +`<span class="chip"><i style="background:${C.grey}"></i>TRIBE <b>${HZ_TB[hzIdx].toFixed(1)}%</b></span>`;
   }
@@ -1187,10 +1185,10 @@ hzio.observe($('horizonChart'));
 /* ---------- input lab (§6) ---------- */
 const LAB={'orig|own':[16.0,5.5,20.3,.349],'none|own':[7.5,5.5,13.7,.224],'orig|zero':[9.4,0.0,8.4,.253],'orig|other':[6.7,-5.1,1.2,.236],'time|own':[-1.4,null,null,null],'orig|time':[2.4,null,null,null]};
 const VERD={'orig|own':'Full inputs: the reference point, shown as the thin vertical mark on each bar.',
- 'none|own':'Forecast halves (16.0 → 7.5) while State is untouched: trial-specific signal comes from the brain, not the movie. Updating still gains over Forecast (13.7 vs 7.5).',
+ 'none|own':'Forecast halves (16.0 → 7.5) while State is untouched: trial-specific signal comes from the brain, not the stimulus. Updating still gains over Forecast (13.7 vs 7.5).',
  'orig|zero':'State drops to exactly 0, since both viewings start from the same empty state. Updating no longer beats Forecast (8.4 vs 9.4).',
  'orig|other':'Another viewer\'s brain at the same moment makes State negative (−5.1) and Updating collapses to 1.2—yet r is 0.236, within 0.03 of the other perturbations.',
- 'time|own':'Movie features from the wrong moment are worse than none: Forecast falls to −1.4, below predicting the mean.',
+ 'time|own':'Stimulus features from the wrong moment are worse than none: Forecast falls to −1.4, below predicting the mean.',
  'orig|time':'The same person\'s state from another moment scores 2.4, below starting from no state at all (9.4). The state is moment-specific.'};
 const MT=[{n:'Forecast',max:17,min:-6},{n:'State',max:6,min:-6},{n:'Updating',max:21,min:-6},{n:'Correlation r',max:.36,min:0,r:1}];
 $('meters').innerHTML=MT.map((m,i)=>`<div class="meter${m.r?' r':''}"><div class="row"><span>${m.n}</span><b id="mv${i}"></b></div><div class="track"><div class="zero" id="mz${i}"></div><div class="fill" id="mf${i}"></div><div class="ghost" id="mg${i}"></div></div></div>`).join('');
@@ -1206,7 +1204,7 @@ function renderLab(){const st=document.querySelector('input[name=stim]:checked')
 document.querySelectorAll('.lab input').forEach(x=>x.addEventListener('change',renderLab));renderLab();
 
 /* ---------- brain maps & tertiles (§7) ---------- */
-const BR={a:{s:'a',grad:'linear-gradient(90deg,#fdf3e3,#f2a447,#b85a07)',lbl:['0','10','20','30 pts'],text:'Stimulus helps most in auditory, story, and visual-motion regions of temporal and occipital cortex (up to ~30 points), and little elsewhere.'},
+const BR={a:{s:'a',grad:'linear-gradient(90deg,#fdf3e3,#f2a447,#b85a07)',lbl:['0','10','20','30 pts'],text:'Stimuli help most in shared auditory, language, and visual-motion regions (up to ~30 points), and little elsewhere.'},
           b:{s:'b',grad:'linear-gradient(90deg,#e6f3f4,#7fc0c6,#14747a)',lbl:['4','6','8','10 pts'],text:'Latent state helps in every parcel, peaking in prefrontal and parietal association cortex (default-mode and control hubs).'}};
 function setBrain(k){const b=BR[k];$('brainLat').src=`assets/brain_${k}_lat.webp`;$('brainMed').src=`assets/brain_${k}_med.webp`;$('cbar').style.background=b.grad;$('cbarLbl').innerHTML=b.lbl.map(x=>`<span>${x}</span>`).join('');$('brainText').textContent=b.text;}
 document.querySelectorAll('#brainSeg button').forEach((b,i)=>b.onclick=()=>{press($('brainSeg'),i);setBrain(b.dataset.map);});setBrain('b');

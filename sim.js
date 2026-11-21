@@ -259,7 +259,7 @@ function setMode(isAuto){
   const note=$('simModeNote');
   if(note)note.textContent=autoScan
     ?'Auto-feeds 1 real fMRI scan every ~12 s (closed-loop)'
-    :'No incoming scans — open-loop rollout from movie + initial state';
+    :'No incoming scans — open-loop rollout from stimuli + initial state';
   updateReadouts();
 }
 $('simMovie').onclick=()=>{movie=!movie;setTog('simMovie',!movie);updateReadouts();requestForecast();};
@@ -288,8 +288,8 @@ function setRowMode(i){
   $('simRowName').textContent=['Prediction','State term','Stimulus term'][i];
   $('simRowSub').textContent=[
     'Spectator rollout',
-    'inferred brain state carried forward (no movie)',
-    'movie-driven component since the last scan'
+    'inferred brain state carried forward (no stimulus)',
+    'stimulus-driven component since the last scan'
   ][i];
 }
 seg(rowSeg,['Prediction','State','Stimulus'],0,setRowMode);
@@ -310,7 +310,7 @@ function updateReadouts(){
   const badge=$('simStatus');
   if(badge){
     if(swapped){badge.textContent='Swapped state · sub-02 history';badge.dataset.kind='warn';badge.hidden=false;}
-    else if(!movie){badge.textContent='Movie input off · state-only rollout';badge.dataset.kind='amber';badge.hidden=false;}
+    else if(!movie){badge.textContent='Stimulus input off · state-only rollout';badge.dataset.kind='amber';badge.hidden=false;}
     else if(!autoScan){badge.textContent='Open-loop Forecast · no incoming scans';badge.dataset.kind='teal';badge.hidden=false;}
     else{badge.hidden=true;}
   }
@@ -454,8 +454,8 @@ function drawScreen(){const W2=scr.width,H=scr.height,c=clips[clip],ch=c.feature
   const x0=24,x1=W2-24,y1=H-60,y0=130,bw=(x1-x0)/ch.length;
   for(let i=0;i<ch.length;i++){const hgt=(y1-y0)*ch[i],on=i<pos;sx.fillStyle=movie?(on?CLIPCOL[clip%CLIPCOL.length]:'#364042'):'#272e30';sx.fillRect(x0+i*bw,y1-hgt,Math.max(1,bw-1),hgt);}
   const px=x0+(pos-1+frac)*bw;sx.fillStyle='#fff';sx.fillRect(px,y0-6,2,y1-y0+12);
-  sx.fillStyle='#949ea1';sx.font='500 20px "JetBrains Mono", ui-monospace, monospace';sx.fillText('movie-feature change per frame',24,H-22);
-  if(!movie){sx.fillStyle='rgba(19,24,26,.78)';sx.fillRect(0,0,W2,H);sx.fillStyle='#fff';sx.textAlign='center';sx.font='600 30px "Inter", sans-serif';sx.fillText('Movie input off',W2/2,H/2-8);sx.fillStyle='#c9d0d2';sx.font='400 21px "Inter", sans-serif';sx.fillText('the stimulus term is zero',W2/2,H/2+26);}
+  sx.fillStyle='#949ea1';sx.font='500 20px "JetBrains Mono", ui-monospace, monospace';sx.fillText('stimulus-feature change per frame',24,H-22);
+  if(!movie){sx.fillStyle='rgba(19,24,26,.78)';sx.fillRect(0,0,W2,H);sx.fillStyle='#fff';sx.textAlign='center';sx.font='600 30px "Inter", sans-serif';sx.fillText('Stimulus input off',W2/2,H/2-8);sx.fillStyle='#c9d0d2';sx.font='400 21px "Inter", sans-serif';sx.fillText('the stimulus term is zero',W2/2,H/2+26);}
   $('simTime').textContent=((pos-1+frac)*TR).toFixed(0)+' s';}
 
 /* ---------- chart (with scan, swap, and movie-off markers) ---------- */
@@ -489,7 +489,7 @@ function drawChart(){const W2=ch.clientWidth,H=ch.clientHeight,pl=34,pr=8,pt=18,
   if(fcast&&hist.length){const off=fcast.from-step;const last=hist[hist.length-1].pred;line([[X(off+frac),Y(Number.isFinite(last)?last:fcast.vals[0])]].concat(fcast.vals.map((v,i)=>[X(off+i+1+frac),Y(v)])),COL.state,1.8,[5,4]);}
   cx2.strokeStyle=COL.ink;cx2.globalAlpha=.4;cx2.beginPath();cx2.moveTo(now,pt);cx2.lineTo(now,H-pb);cx2.stroke();cx2.globalAlpha=1;
   cx2.fillStyle=COL.muted;cx2.textAlign='left';cx2.fillText(region+' network, mean z',pl+4,11);
-  cx2.textAlign='right';cx2.fillText((movie?'past minute  |  next minute':'past minute  |  movie off'),W2-pr,11);}
+  cx2.textAlign='right';cx2.fillText((movie?'past minute  |  next minute':'past minute  |  stimulus off'),W2-pr,11);}
 
 /* ---------- loop ---------- */
 let acc=0,last=performance.now(),fpsN=0,fpsT=0;
