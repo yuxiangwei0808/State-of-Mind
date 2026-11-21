@@ -28,5 +28,7 @@ $NEUROWORLD_OUTPUT/spectator-v1/):
        python -m neuroworld.spectator score <run dir> --seconds 180 --dataset algonauts --store <result store>
 
 neuroworld/scripts/spectator.sh runs all of it. On HCP, steps 2 and 5 are refitted on HCP from the Algonauts encoder
-(--frames 180 --ahead 24; movie factor 10,000), with neuroworld/configs/spectator/hcp.yaml.
+(--frames 180 --ahead 24; movie factor 10,000), with neuroworld/configs/spectator/hcp.yaml. Other history lengths change
+only the window (HISTORY=<seconds> in spectator.sh: --frames and --set model.state_window_trs=<frames> in steps 2-6); at
+7.5 s the window holds only the fast latent's 5 frames, so step 2 is skipped and the JEPA phase starts from stage 0.
 """

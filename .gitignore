@@ -1,4 +1,4 @@
-# Published: source, tests, the README and DATA.md, the example and these settings. Everything else at the top level stays local
+# Published: source, tests, the README, DATA.md and LICENSE, the example and these settings. Everything else at the top level stays local
 # (data/, outputs/, external/, checkpoints/, artifacts/: links or folders for data and results).
 /*
 !/.gitignore
@@ -7,6 +7,7 @@
 !/neuroworld/
 !/tests/
 !/DATA.md
+!/LICENSE
 !/examples/
 
 # Generated files.

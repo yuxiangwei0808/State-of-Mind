@@ -96,7 +96,7 @@ parcels = states.numpy() @ probe[f"W {i}"] + probe[f"b {i}"]              # [B, 
 
 ## Data
 
-Neither dataset is redistributed here. See [DATA.md](DATA.md) for download sources, preprocessing details, preparation commands, and train/test splits:
+Neither dataset is redistributed here. [`neuroworld/nbs_data/download.sh`](neuroworld/nbs_data/download.sh) downloads both, and [DATA.md](DATA.md) covers sources, preprocessing, the preparation commands, and train/test splits:
 
 - **Algonauts 2025** ([CNeuroMod](https://github.com/courtois-neuromod/algonauts_2025.competitors)): 4 participants watching *Friends* S1–6 and four Movie10 films, parcellated into Schaefer-1000 parcels (TR 1.49 s). *Friends* S1–5 are used for training; S6 and all four Movie10 films are held out for evaluation.
 - **HCP 7T Movies** ([Human Connectome Project](https://www.humanconnectome.org/)): 184 participants parcellated into the same 1,000 Schaefer parcels (TR 1 s), split into 148 training and 36 unseen participants.
@@ -122,6 +122,9 @@ Training on Algonauts (*Friends* S1–5) proceeds in four stages:
 ```bash
 # Train Spectator end-to-end on Algonauts and score on BrainStateBench
 OUT=outputs/my-spectator neuroworld/scripts/spectator.sh algonauts
+
+# Other history lengths (seconds; default 180, the main table also reports 7.5 and 120)
+HISTORY=120 OUT=outputs/my-spectator-120s neuroworld/scripts/spectator.sh algonauts
 
 # Transfer to HCP (reuses the Algonauts fast encoder and refits slow lags + transition matrix)
 OUT=outputs/my-spectator neuroworld/scripts/spectator.sh hcp
@@ -210,4 +213,4 @@ All analysis commands run from the repository root and read from `$NEUROWORLD_OU
 
 Parts of the codebase are adapted from [LeWM](https://github.com/lucas-maes/le-wm) (SIGReg and conditional Transformer blocks; MIT) and [TRIBE v2](https://github.com/facebookresearch/tribev2) (stimulus projections and contextual encoder; CC BY-NC 4.0). Each adapted file documents its provenance and modifications, and full third-party license texts are in [`neuroworld/licenses/`](neuroworld/licenses).
 
-The pretrained Spectator weights are released under **CC BY-NC 4.0** (matching TRIBE v2).
+The code and the pretrained Spectator weights are released under **CC BY-NC 4.0** (matching TRIBE v2; [LICENSE](LICENSE)).
