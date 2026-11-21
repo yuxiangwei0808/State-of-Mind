@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>State of Mind — SuperMimic-Inspired Design Preview</title>
+<meta name="description" content="Preview of SuperMimic-inspired layout, animations, dark cortex theater, scrubbable charts, and guided counterfactual demo for State of Mind.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314747a'/%3E%3Ccircle cx='12' cy='16' r='5.5' fill='%23faf9f5'/%3E%3Ccircle cx='20' cy='16' r='5.5' fill='%23cf7722' fill-opacity='.92'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+/* Warm archival paper canvas (#faf9f5) paired with a dark slate 3D cortex theater (#0e1518)
+   and three semantic mineral inks: teal = inferred brain state, amber = movie stimulus, cobalt = measured fMRI. */
+:root{
+  --display:"Newsreader","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --bg:#faf9f5;
+  --surface:#ffffff;
+  --panel:#f1efe8;
+  --panel-hover:#e9e6dd;
+  --border:rgba(24,34,38,.10);
+  --border-strong:rgba(24,34,38,.18);
+  --rule:rgba(24,34,38,.08);
+  --ink:#182226;
+  --ink-2:#3d494d;
+  --muted:#647074;
+  --faint:#949ea1;
+  --state:#14747a; --state-d:#0e585d; --state-soft:#e6f2f2;
+  --stim:#cf7722; --stim-d:#9e5310; --stim-soft:#fbf0e2;
+  --obs:#2f65a8; --obs-soft:#ebf2fb;
+  --neg:#b94438; --neg-soft:#fbeceb;
+  --stage:#0f1619; --stage-2:#172227;
+  --shadow-sm:0 1px 2px rgba(24,34,38,.04);
+  --shadow-card:0 1px 2px rgba(24,34,38,.04), 0 12px 32px -16px rgba(24,34,38,.10);
+  --shadow-pill:0 1px 3px rgba(24,34,38,.09);
+  --col:720px; --wide:1020px;
+  --radius:16px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:68px;background:var(--bg)}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+  .reveal{opacity:1!important;transform:none!important}
+}
+body{
+  margin:0;
+  background:radial-gradient(ellipse 90% 440px at 50% 0%, rgba(20,116,122,.06), transparent 72%), var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16.5px;
+  line-height:1.68;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+a{color:var(--ink);text-decoration:underline;text-decoration-color:rgba(20,116,122,.38);text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
+a:hover{color:var(--state-d);text-decoration-color:var(--state)}
+img{max-width:100%;height:auto;display:block}
+button{font:inherit;color:inherit}
+code{font-family:var(--mono);font-size:.88em}
+:focus-visible{outline:2px solid var(--state);outline-offset:2px;border-radius:6px}
+.col{max-width:var(--col);margin:0 auto;padding:0 22px}
+.wide{max-width:var(--wide);margin:0 auto;padding:0 22px}
+p{margin:0 0 1.05em;color:var(--ink-2)}
+b,strong{font-weight:600;color:var(--ink)}
+.num{font-family:var(--mono);font-size:.86em;font-variant-numeric:tabular-nums}
+.st{color:var(--state);font-weight:600}.sm{color:var(--stim-d);font-weight:600}.ob{color:var(--obs);font-weight:600}
+
+/* subtle scroll reveal */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* preview banner */
+.preview-ribbon{
+  background:var(--stage);color:#cbd5d8;font-size:12.5px;padding:7px 16px;text-align:center;
+  display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.preview-ribbon b{color:#fff;font-weight:600}
+.preview-ribbon a{color:#7cd3d8;text-decoration:none;font-weight:500;padding:2px 9px;border:1px solid rgba(124,211,216,.3);border-radius:999px}
+.preview-ribbon a:hover{background:rgba(124,211,216,.12);color:#fff}
+
+/* sticky nav (SuperMimic-inspired brand + Explore links + Try it CTA) */
+.toc{
+  position:sticky;top:0;z-index:30;
+  background:rgba(250,249,245,.88);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--rule);
+}
+.toc-progress{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--state);transition:width .08s linear;pointer-events:none}
+.toc-bar{max-width:var(--wide);margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:12px;height:52px;font-size:14px;color:var(--muted)}
+.toc-brand{font-family:var(--display);font-weight:600;font-size:17px;color:var(--ink);text-decoration:none;letter-spacing:-0.015em;white-space:nowrap}
+.toc-brand:hover{color:var(--state-d)}
+.toc button.toggle{display:flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;color:var(--muted);padding:6px 0;margin-left:auto;font-weight:500}
+.toc .cur{color:var(--ink);font-weight:600}
+.toc .chev{transition:transform .2s}
+.toc[data-open="true"] .chev{transform:rotate(180deg)}
+.toc ol{display:none;list-style:none;margin:0 auto;padding:8px 22px 16px;max-width:var(--col);columns:2;column-gap:28px;font-size:14.5px}
+.toc[data-open="true"] ol{display:block}
+.toc ol a{text-decoration:none;color:var(--ink-2);display:block;padding:5px 0;font-weight:500}
+.toc ol a span{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-right:8px}
+.toc-inline{display:none;list-style:none;margin:0 auto;padding:0;gap:3px;justify-content:center;align-items:center}
+.toc-inline a{
+  text-decoration:none;color:var(--muted);font-size:13px;font-weight:500;
+  padding:5px 10px;border-radius:999px;white-space:nowrap;
+  transition:color .15s,background .15s;
+}
+.toc-inline a:hover{color:var(--ink);background:rgba(24,34,38,.045)}
+.toc-inline a[aria-current="true"]{color:var(--state-d);background:var(--state-soft);font-weight:600}
+.toc-cta{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:999px;
+  background:var(--ink);color:#fff;text-decoration:none;
+  font-size:12.5px;font-weight:600;white-space:nowrap;
+  transition:background .15s,transform .15s;
+}
+.toc-cta:hover{background:var(--state);color:#fff;transform:translateY(-1px)}
+@media (min-width:920px){
+  .toc button.toggle,.toc ol{display:none!important}
+  .toc-inline{display:flex}
+}
+
+/* hero */
+header{padding:64px 0 28px;text-align:center}
+.hero-kicker{
+  display:inline-flex;align-items:center;gap:8px;
+  font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--state-d);background:var(--state-soft);
+  padding:4px 12px;border-radius:999px;margin-bottom:18px;
+}
+.hero-kicker i{width:6px;height:6px;border-radius:50%;background:var(--state)}
+h1{
+  font-family:var(--display);
+  font-size:clamp(38px,5.4vw,58px);
+  line-height:1.06;
+  font-weight:600;
+  letter-spacing:-0.028em;
+  margin:0 auto 14px;
+  max-width:860px;
+  color:var(--ink);
+  text-wrap:balance;
+}
+.hero-sub{
+  font-size:clamp(17px,2vw,20px);line-height:1.48;color:var(--ink-2);
+  max-width:660px;margin:0 auto 14px;text-wrap:balance;
+}
+.hero-meta{font:500 13.5px var(--mono);color:var(--muted);margin-bottom:22px}
+.authors{font-size:15px;font-weight:500;color:var(--ink-2);margin-bottom:2px}
+.affil{font-size:13.5px;color:var(--muted);margin-bottom:22px}
+.pills{display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
+.pill{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);
+  font-size:14px;font-weight:500;text-decoration:none;color:var(--ink);
+  box-shadow:var(--shadow-sm);
+  transition:transform .15s,border-color .15s,box-shadow .15s,background .15s;
+}
+.pill:hover{border-color:var(--border-strong);box-shadow:0 4px 12px -4px rgba(24,34,38,.12);transform:translateY(-1px);color:var(--ink)}
+.pill.main{background:var(--state);border-color:var(--state);color:#fff;box-shadow:0 4px 14px -4px rgba(20,116,122,.45)}
+.pill.main:hover{background:var(--state-d);border-color:var(--state-d);color:#fff;box-shadow:0 6px 18px -4px rgba(20,116,122,.5)}
+.pill[aria-disabled="true"]{opacity:.68;cursor:default;pointer-events:none;box-shadow:none}
+.pill .soon{font-family:var(--mono);font-size:10.5px;font-weight:500;opacity:.8;background:var(--panel);padding:1px 6px;border-radius:999px}
+.pill svg{width:14px;height:14px;flex:none}
+
+/* highlights 3-card strip (SuperMimic-inspired "Get the highlights / Why it works") */
+.hi-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:26px auto 12px}
+@media (max-width:780px){.hi-grid{grid-template-columns:1fr}}
+.hi-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 22px 18px;box-shadow:var(--shadow-card);
+  display:flex;flex-direction:column;justify-content:space-between;gap:12px;
+  transition:transform .2s,border-color .2s;
+}
+.hi-card:hover{transform:translateY(-2px);border-color:var(--border-strong)}
+.hi-eye{font:600 11px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--state)}
+.hi-num{font-family:var(--display);font-size:clamp(34px,3.8vw,44px);line-height:1.0;font-weight:600;letter-spacing:-0.03em;color:var(--ink);margin:4px 0 6px}
+.hi-desc{font-size:14px;line-height:1.48;color:var(--ink-2);margin:0}
+.hi-viz{padding-top:10px;border-top:1px solid var(--rule)}
+.ratio-row{display:grid;grid-template-columns:76px 1fr 42px;align-items:center;gap:8px;font:500 11.5px var(--mono);color:var(--muted);margin-top:6px}
+.ratio-row:first-child{margin-top:0}
+.ratio-row b{color:var(--ink);text-align:right}
+.ratio-track{height:8px;border-radius:999px;background:var(--panel);overflow:hidden}
+.ratio-fill{height:100%;border-radius:999px;width:0;transition:width 1s cubic-bezier(.22,1,.36,1)}
+.ratio-fill.ours{background:var(--state)}
+.ratio-fill.base{background:#b8c0c2}
+.ratio-fill.stim{background:var(--stim)}
+
+/* sections & typography (punchy 2-5 word keynote headlines) */
+section{padding:64px 0 8px}
+.sec-label{
+  font-family:var(--mono);font-size:11.5px;font-weight:600;
+  letter-spacing:.09em;color:var(--state);text-transform:uppercase;margin-bottom:6px;
+}
+h2{
+  font-family:var(--display);
+  font-size:clamp(28px,3.6vw,40px);
+  line-height:1.12;font-weight:600;letter-spacing:-0.024em;
+  margin:0 0 14px;color:var(--ink);text-wrap:balance;
+}
+h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;margin:24px 0 8px;color:var(--ink)}
+
+/* figure frames & controls */
+.frame{
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--surface);
+  padding:22px 24px 18px;
+  margin:24px auto 10px;
+  box-shadow:var(--shadow-card);
+}
+.img-frame{
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--surface);
+  padding:16px 18px;
+  margin:22px auto 10px;
+  box-shadow:var(--shadow-card);
+}
+.figtitle{font-weight:600;font-size:15.5px;letter-spacing:-0.01em;margin:0;color:var(--ink)}
+.fighead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px;margin-bottom:14px}
+.caption{font-size:14px;line-height:1.58;color:var(--muted);margin:10px auto 0;max-width:var(--wide)}
+.caption b{color:var(--ink-2);font-weight:600}
+.try{font-size:13.5px;color:var(--muted);text-align:center;margin-top:8px}
+.replay{
+  display:inline-flex;align-items:center;gap:5px;
+  background:none;border:1px solid transparent;border-radius:999px;
+  color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;padding:4px 10px;
+  transition:color .15s,background .15s;
+}
+.replay:hover{color:var(--ink);background:var(--panel)}
+.seg{
+  display:inline-flex;align-items:center;gap:2px;
+  border-radius:999px;padding:3px;
+  background:var(--panel);border:1px solid rgba(24,34,38,.05);
+  flex-wrap:wrap;
+}
+.seg button{
+  border:0;background:transparent;color:var(--muted);
+  font-size:13px;font-weight:500;padding:5px 12px;border-radius:999px;cursor:pointer;
+  transition:color .15s,background .15s,box-shadow .15s;
+}
+.seg button:hover:not(:disabled){color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:var(--shadow-pill)}
+.seg button:disabled{opacity:.36;cursor:not-allowed}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:15px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+
+/* SuperMimic-inspired animated "How it works" loop (§3) */
+#howSvg{width:100%;height:auto;display:block}
+#howSvg text{font-family:var(--sans)}
+.how-note{font-size:14px;color:var(--ink-2);margin:10px 0 0;padding-top:10px;border-top:1px solid var(--rule);line-height:1.55}
+
+/* equations */
+.eq{font-family:var(--mono);font-size:13.5px;background:var(--panel);border-radius:10px;padding:9px 14px;overflow-x:auto;white-space:nowrap;margin:8px 0;line-height:1.65;color:var(--ink)}
+.eq-stack{display:grid;gap:8px;background:var(--panel);border:1px solid rgba(24,34,38,.05);border-radius:12px;padding:14px 18px;margin:14px 0 18px}
+.eq-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 18px}
+.eq-row code{font-family:var(--mono);font-size:14px;color:var(--ink);font-weight:500}
+.eq-row span{font-size:13px;color:var(--muted)}
+
+/* task explorer */
+.tasks{display:grid;grid-template-columns:224px minmax(0,1fr);gap:22px}
+.tasks>div{min-width:0}
+@media (max-width:740px){.tasks{grid-template-columns:1fr}}
+.tasklist{display:flex;flex-direction:column;gap:8px}
+.taskbtn{
+  text-align:left;border:1px solid var(--border);background:var(--bg);
+  border-radius:12px;padding:11px 14px;cursor:pointer;
+  transition:border-color .15s,background .15s,box-shadow .15s;
+}
+.taskbtn:hover{border-color:var(--border-strong);background:var(--surface)}
+.taskbtn b{display:block;font-size:15px;color:var(--ink);margin-bottom:2px}
+.taskbtn span{font-size:13px;color:var(--muted);line-height:1.35;display:block}
+.taskbtn[aria-pressed="true"]{border-color:rgba(20,116,122,.45);background:var(--state-soft);box-shadow:0 2px 8px -3px rgba(20,116,122,.18)}
+.taskbtn[aria-pressed="true"] b{color:var(--state-d)}
+#taskSvg{width:100%;height:auto;display:block}
+#taskSvg text{font-family:var(--sans)}
+.taskinfo{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;font-size:14px;margin-top:8px}
+.score{font-family:var(--mono);font-size:13.5px;color:var(--ink-2)}
+.score b{font-size:18px;color:var(--ink)}
+
+/* charts & scrubbable horizon readout */
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart text{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+.chart .mut{fill:var(--muted)}
+.chart .val{font-family:var(--mono);font-size:12px}
+.chart rect.bar{transform-box:fill-box;transform-origin:left center;transition:transform .85s cubic-bezier(.2,.7,.2,1)}
+.chart.pre rect.bar{transform:scaleX(0)}
+.scrub-bar{
+  display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;
+  background:var(--panel);border-radius:10px;padding:7px 12px;margin-bottom:8px;
+  font:500 12px var(--mono);color:var(--ink-2);
+}
+.scrub-bar .t{color:var(--ink);font-weight:600}
+.scrub-bar .chip{display:inline-flex;align-items:center;gap:5px}
+.scrub-bar .chip i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.scrub-hint{font-size:11.5px;color:var(--faint);margin-top:6px}
+.callout{font-size:14px;color:var(--ink-2);background:var(--stim-soft);border-radius:10px;padding:10px 14px;margin:14px 0 0;line-height:1.52}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:22px}
+.mini{font-size:14px;line-height:1.55;color:var(--ink-2)}
+
+/* decomposition */
+#decompCanvas{width:100%;height:220px;display:block}
+.sharebar{height:24px;border-radius:8px;overflow:hidden;display:flex;font:600 11.5px var(--mono);margin-top:10px}
+.sharebar span{display:flex;align-items:center;padding:0 10px;white-space:nowrap;color:#fff;transition:flex-basis .4s ease}
+.sharebar .s{background:var(--state)}.sharebar .a{background:var(--stim);justify-content:flex-end}
+
+/* input lab */
+.lab{display:grid;grid-template-columns:minmax(250px,310px) 1fr;gap:28px;align-items:start}
+@media (max-width:740px){.lab{grid-template-columns:1fr}}
+.lab fieldset{border:0;padding:0;margin:0 0 16px}
+.lab fieldset:last-child{margin-bottom:0}
+.lab legend{font-weight:600;font-size:14px;margin-bottom:6px;padding:0;color:var(--ink)}
+.opt{
+  display:flex;gap:10px;align-items:center;
+  padding:7px 10px;border-radius:9px;cursor:pointer;font-size:14px;color:var(--ink-2);
+  border:1px solid transparent;transition:background .15s,border-color .15s;
+}
+.opt:hover{background:var(--panel)}
+.opt:has(input:checked){background:var(--state-soft);border-color:rgba(20,116,122,.28);color:var(--ink);font-weight:500}
+.opt input{margin:0;accent-color:var(--state)}
+.opt.dis{opacity:.38;cursor:not-allowed}
+.meters{display:grid;gap:15px}
+.meter .row{display:flex;justify-content:space-between;font-size:14px;color:var(--ink-2);margin-bottom:5px}
+.meter .row b{font-family:var(--mono);font-weight:600;font-size:13.5px;color:var(--ink)}
+.track{position:relative;height:12px;background:var(--panel);border-radius:999px;overflow:hidden}
+.track .fill{position:absolute;top:0;bottom:0;border-radius:999px;transition:left .4s ease,width .4s ease;background:var(--state)}
+.track .ghost{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);opacity:.45}
+.track .zero{position:absolute;top:0;bottom:0;width:1px;background:var(--faint)}
+.meter.r .fill{background:var(--obs)}
+.verdict{margin-top:16px;font-size:14px;background:var(--panel);border-radius:10px;padding:12px 14px;line-height:1.55;color:var(--ink-2)}
+
+/* brain maps */
+.brainpair{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+.cbar{height:8px;border-radius:999px;max-width:220px;margin-top:10px}
+.cbar-lbl{display:flex;justify-content:space-between;max-width:220px;font:11.5px var(--mono);color:var(--muted);margin-top:3px}
+
+/* live simulator: dark poster gate + dark slate 3D theater + guided 3-perturbation strip */
+.simnote{
+  display:flex;gap:10px;align-items:baseline;
+  font-size:13.5px;line-height:1.5;color:var(--ink-2);
+  background:var(--state-soft);border-radius:10px;padding:10px 14px;margin:0 0 14px;
+}
+.simnote b{color:var(--state-d);font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+
+/* visual click-to-launch poster gate (SuperMimic-inspired) */
+.sim-poster{
+  position:relative;border-radius:14px;overflow:hidden;
+  background:radial-gradient(ellipse 75% 80% at 50% 45%, #1a2a31 0%, #0d1417 100%);
+  color:#eef3f4;padding:34px 24px;min-height:310px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;
+}
+.sim-poster-brains{
+  display:flex;gap:28px;justify-content:center;align-items:center;
+  opacity:.82;filter:drop-shadow(0 16px 32px rgba(0,0,0,.55));
+  pointer-events:none;max-width:520px;margin-bottom:2px;
+}
+.sim-poster-brains img{width:190px;max-width:42vw;height:auto;border-radius:12px;opacity:.92}
+.sim-poster h3{font-family:var(--display);font-size:26px;color:#fff;margin:0;letter-spacing:-0.02em}
+.sim-poster p{color:#a8b8bd;font-size:14.5px;max-width:500px;margin:0}
+.sim-poster-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  font:500 11.5px var(--mono);color:#8ad8dc;
+  background:rgba(20,116,122,.22);border:1px solid rgba(124,211,216,.28);
+  padding:4px 12px;border-radius:999px;
+}
+.sim-launch{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:11px 26px;border-radius:999px;border:0;
+  background:#198990;color:#fff;font-size:15px;font-weight:600;cursor:pointer;
+  box-shadow:0 8px 24px -6px rgba(20,116,122,.65);
+  transition:transform .15s,background .15s,box-shadow .15s;
+}
+.sim-launch:hover{background:#1fa0a8;transform:translateY(-1px);box-shadow:0 12px 28px -6px rgba(25,137,144,.72)}
+
+/* guided 3-perturbation strip ("Take a closer look.") */
+.story-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.story-head span{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.story-restore{background:none;border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;color:var(--ink-2);cursor:pointer}
+.story-restore:hover{background:var(--panel);color:var(--ink)}
+.story-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+@media (max-width:740px){.story-grid{grid-template-columns:1fr}}
+.story-card{
+  text-align:left;padding:11px 13px;border-radius:12px;
+  border:1px solid var(--border);background:var(--bg);cursor:pointer;
+  transition:border-color .15s,background .15s,transform .15s,box-shadow .15s;
+}
+.story-card:hover{border-color:var(--border-strong);background:var(--surface);transform:translateY(-1px)}
+.story-card b{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink);margin-bottom:3px}
+.story-card b i{width:8px;height:8px;border-radius:50%;flex:none}
+.story-card span{display:block;font-size:12px;line-height:1.4;color:var(--muted)}
+.story-card[aria-pressed="true"]{border-color:var(--state);background:var(--state-soft);box-shadow:0 4px 14px -6px rgba(20,116,122,.28)}
+.story-card[aria-pressed="true"] b{color:var(--state-d)}
+
+.simgrid{display:grid;grid-template-columns:276px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.simgrid{grid-template-columns:1fr}}
+.simcol{display:flex;flex-direction:column;gap:12px;min-width:0}
+.simbox{background:var(--bg);border:1px solid var(--rule);border-radius:12px;padding:12px}
+.simbox h4{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+#simScreen{width:100%;aspect-ratio:16/9;display:block;border-radius:8px;background:#13181a}
+.simnow{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);margin:6px 0 10px}
+.simnow b{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#simClips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sim-clip{
+  display:flex;gap:7px;align-items:center;text-align:left;
+  padding:7px 8px;border-radius:8px;border:1px solid var(--border);background:var(--surface);
+  cursor:pointer;font-size:12px;font-weight:500;
+  transition:opacity .15s,border-color .15s,background .15s;
+}
+.sim-clip:hover{border-color:var(--border-strong)}
+.sim-clip[aria-pressed="true"]{border-color:var(--ink);background:var(--panel);font-weight:600}
+.sim-clip[data-loading="true"]{opacity:.55;cursor:wait}
+.sim-clip i{width:8px;height:8px;border-radius:3px;flex:none}
+.simtog{
+  flex:1;padding:6px 10px;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface);cursor:pointer;font-size:12.5px;font-weight:500;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.simtog:hover{border-color:var(--border-strong)}
+.simtog[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sim-mode{width:100%;display:grid;grid-template-columns:1fr 1fr;margin-bottom:5px}
+.sim-mode button{font-size:12px;padding:5px 6px;text-align:center}
+.sim-mode-note{font-size:11.5px;line-height:1.35;color:var(--muted);margin:0 0 9px;padding:0 2px}
+
+/* DARK CORTEX THEATER STAGE */
+.brainwrap{
+  position:relative;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;
+  background:radial-gradient(ellipse 78% 72% at 50% 48%, #19262c 0%, #0e1518 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 16px 36px -18px rgba(10,18,22,.45);
+}
+#simBrain{width:100%;height:500px;display:block;cursor:grab;touch-action:none}
+#simBrain:active{cursor:grabbing}
+.simbar{position:absolute;left:10px;right:10px;top:10px;display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;pointer-events:none}
+.simbar > *{pointer-events:auto}
+.brainwrap .simbar .seg{background:rgba(16,24,28,.78);border-color:rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+.brainwrap .simbar .seg button{font-size:12px;padding:4px 10px;color:#a5b4b8}
+.brainwrap .simbar .seg button:hover{color:#fff}
+.brainwrap .simbar .seg button[aria-pressed="true"]{background:rgba(255,255,255,.94);color:#10181c}
+.brainwrap .rowlbl{position:absolute;left:14px;font-size:12.5px;color:#98a8ad;pointer-events:none}
+.brainwrap .rowlbl b{color:#f2f6f7;font-weight:600}
+.brainwrap .brain-hint{position:absolute;left:14px;bottom:10px;font-size:11px;color:#73848a;pointer-events:none}
+.brainwrap .cmap{position:absolute;right:14px;bottom:10px;display:flex;align-items:center;gap:8px;font:11px var(--mono);color:#98a8ad;pointer-events:none}
+.cmap .g{width:100px;height:7px;border-radius:999px;background:linear-gradient(90deg,#1e4f8a,#5aa0d0,#dcdcdc,#f2a447,#c2410c)}
+.sim-status{position:absolute;right:12px;top:52px;padding:4px 10px;border-radius:999px;font:600 11px var(--mono);pointer-events:none;border:1px solid transparent;backdrop-filter:blur(8px)}
+.sim-status[data-kind="warn"]{background:rgba(185,68,56,.26);color:#ffb9b0;border-color:rgba(255,155,143,.35)}
+.sim-status[data-kind="amber"]{background:rgba(207,119,34,.25);color:#ffd29d;border-color:rgba(255,193,120,.35)}
+.sim-status[data-kind="teal"]{background:rgba(20,116,122,.32);color:#9ce3e8;border-color:rgba(124,211,216,.38)}
+.sim-tip{
+  position:absolute;z-index:5;pointer-events:none;
+  background:rgba(12,18,21,.94);color:#f6f5f0;border:1px solid rgba(255,255,255,.12);
+  padding:7px 10px;border-radius:9px;font-size:12px;line-height:1.4;
+  box-shadow:0 8px 20px -6px rgba(0,0,0,.45);backdrop-filter:blur(6px);
+  max-width:240px;white-space:nowrap;
+}
+.sim-tip b{color:#fff;font-weight:600;display:block}
+.sim-tip .vals{font-family:var(--mono);font-size:11px;color:#d2dbdd;margin-top:2px}
+.sim-tip .hint{font-size:10.5px;color:#8ad8dc;margin-top:2px}
+.flash{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 70%,rgba(90,160,208,.28),transparent 60%);opacity:0;transition:opacity .6s}
+.flash.on{opacity:1;transition:none}
+
+.sim-telemetry{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:640px){.sim-telemetry{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tchip{background:var(--bg);border:1px solid var(--rule);border-radius:10px;padding:8px 11px;min-width:0}
+.tchip span{display:block;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tchip b{display:block;font:600 15px var(--mono);color:var(--ink);margin-top:2px;white-space:nowrap}
+.tchip .share{height:6px;border-radius:999px;overflow:hidden;display:flex;margin-top:5px}
+.share .s{background:var(--state);transition:flex-basis .4s}.share .a{background:var(--stim);transition:flex-basis .4s}
+#simChart{width:100%;height:168px;display:block}
+.act{
+  display:block;width:100%;padding:8px 10px;border-radius:10px;
+  border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;margin-bottom:7px;
+  transition:border-color .15s,background .15s;
+}
+.act:hover{border-color:var(--border-strong)}
+.act b{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--ink)}
+.act span{font-size:11.5px;color:var(--muted);line-height:1.35;display:block;margin-top:1px}
+.act.primary{border-color:rgba(47,101,168,.4);background:var(--obs-soft)}
+.kbd{font:500 10px var(--mono);color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+.sim-perf{font:11px var(--mono);color:var(--faint);margin-top:8px;display:flex;justify-content:space-between;gap:6px}
+.livetag{font:11px var(--mono);color:var(--muted);display:inline-flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0}
+.dot{width:7px;height:7px;border-radius:50%;background:#dc4c4c;animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(220,76,76,.48)}70%{box-shadow:0 0 0 7px rgba(220,76,76,0)}100%{box-shadow:0 0 0 0 rgba(220,76,76,0)}}
+#simLoading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted);font-size:14.5px}
+.sim-prog{width:min(360px,100%);text-align:center;padding:48px 16px}
+.sim-pbar{height:7px;border-radius:999px;background:var(--panel);overflow:hidden;margin-top:10px}
+#simLoadFill{height:100%;width:0;background:var(--state);border-radius:999px;transition:width .18s ease}
+
+/* bibtex & footer */
+.bib-wrap{position:relative}
+pre.bib{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:18px 86px 18px 20px;overflow-x:auto;
+  font:13px/1.6 var(--mono);color:var(--ink);margin:12px 0;
+  box-shadow:var(--shadow-sm);
+}
+.copy{
+  position:absolute;top:12px;right:12px;
+  border:1px solid var(--border);background:var(--bg);border-radius:999px;
+  padding:5px 13px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--ink-2);
+  transition:background .15s,border-color .15s,color .15s;
+}
+.copy:hover{background:var(--panel);border-color:var(--border-strong);color:var(--ink)}
+footer{border-top:1px solid var(--rule);margin-top:64px;padding:28px 0 48px;color:var(--muted);font-size:13.5px}
+footer .wide{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+footer a{color:var(--muted)}
+footer a:hover{color:var(--ink)}
+</style>
+</head>
+<body id="top">
+
+<div class="preview-ribbon">
+  <span><b>Design Preview</b> · SuperMimic-inspired layout &amp; animations</span>
+  <a href="../">← Compare with current live page</a>
+</div>
+
+<nav class="toc" id="toc" data-open="false" aria-label="Contents">
+  <div class="toc-bar">
+    <a class="toc-brand" href="#top">State of Mind</a>
+    <ul class="toc-inline" id="tocInline">
+      <li><a href="#highlights" data-sec="highlights" aria-current="true">Highlights</a></li>
+      <li><a href="#live" data-sec="live">Web Demo</a></li>
+      <li><a href="#overview" data-sec="overview">Overview</a></li>
+      <li><a href="#bench" data-sec="bench">Benchmark</a></li>
+      <li><a href="#model" data-sec="model">How It Works</a></li>
+      <li><a href="#results" data-sec="results">Results</a></li>
+      <li><a href="#lab" data-sec="lab">Input Lab</a></li>
+      <li><a href="#where" data-sec="where">Cortex</a></li>
+      <li><a href="#cite" data-sec="cite">Cite</a></li>
+    </ul>
+    <button class="toggle" id="tocToggle" aria-expanded="false" aria-controls="tocList">
+      <span class="cur" id="tocCur">Highlights</span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m2 4 4 4 4-4"/></svg>
+    </button>
+    <a class="toc-cta" href="#live">Try it →</a>
+  </div>
+  <ol id="tocList">
+    <li><a href="#highlights"><span>01</span>Highlights</a></li>
+    <li><a href="#live"><span>02</span>Live Web Demo</a></li>
+    <li><a href="#overview"><span>03</span>Overview</a></li>
+    <li><a href="#bench"><span>04</span>BrainStateBench</a></li>
+    <li><a href="#model"><span>05</span>How Spectator Works</a></li>
+    <li><a href="#results"><span>06</span>Results</a></li>
+    <li><a href="#lab"><span>07</span>Input Lab</a></li>
+    <li><a href="#where"><span>08</span>Cortical Maps</a></li>
+    <li><a href="#cite"><span>09</span>Citation</a></li>
+  </ol>
+  <div class="toc-progress" id="tocProgress" aria-hidden="true"></div>
+</nav>
+
+<header id="highlights">
+  <div class="wide">
+    <div class="hero-kicker"><i></i>BrainStateBench · Spectator</div>
+    <h1>Same movie.<br>Different state of mind.</h1>
+    <p class="hero-sub">Learning and evaluating world models of naturalistic brain dynamics—inferring an individual's latent state, rolling it forward under the movie, and updating it when scans arrive.</p>
+    <div class="hero-meta">1,000 cortical parcels · 60 s rollouts · 5.4 ms in your browser</div>
+    <div class="authors">Anonymous authors</div>
+    <div class="affil">Preprint · names and affiliations withheld during review</div>
+    <div class="pills">
+      <a class="pill main" href="#live"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 3.2 12.8 8l-8.3 4.8z"/></svg>Try Live Simulator</a>
+      <span class="pill" aria-disabled="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5l3 3v10H4z"/><path d="M9 1.5v3h3"/></svg>Paper <span class="soon">soon</span></span>
+      <a class="pill" href="https://github.com/yuxiangwei0808/State-of-Mind" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/></svg>Code</a>
+      <a class="pill" href="https://huggingface.co/stanjsx/Spectator" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="3" width="11" height="10" rx="2"/><path d="M5.5 7h5M5.5 10h3.5"/></svg>Weights &amp; Scores</a>
+      <a class="pill" href="#cite"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 4h4v4H5c0 1.5.7 2.5 2 3l-.6 1.2C4 11.4 3 9.8 3 7.5zm6 0h4v4h-2c0 1.5.7 2.5 2 3l-.6 1.2C10 11.4 9 9.8 9 7.5z"/></svg>BibTeX</a>
+    </div>
+
+    <!-- NEW: SuperMimic-inspired 3-card Highlights strip -->
+    <div class="hi-grid" id="hiGrid">
+      <div class="hi-card">
+        <div>
+          <div class="hi-eye">Individual state</div>
+          <div class="hi-num">2.1×</div>
+          <p class="hi-desc">State score over the best baseline on repeated movie viewings. Stimulus-only encoders score 0%.</p>
+        </div>
+        <div class="hi-viz">
+          <div class="ratio-row"><span>Spectator</span><div class="ratio-track"><div class="ratio-fill ours" data-w="100"></div></div><b>5.5%</b></div>
+          <div class="ratio-row"><span>Linear</span><div class="ratio-track"><div class="ratio-fill base" data-w="47"></div></div><b>2.6%</b></div>
+          <div class="ratio-row"><span>MIRAGE</span><div class="ratio-track"><div class="ratio-fill stim" data-w="2"></div></div><b>0.0%</b></div>
+        </div>
+      </div>
+
+      <div class="hi-card">
+        <div>
+          <div class="hi-eye">Long-horizon stability</div>
+          <div class="hi-num">5 min</div>
+          <p class="hi-desc">Open-loop rollout stays positive (+9.6%) at 300 s, while a Transformer counterpart collapses below 0% at 143 s.</p>
+        </div>
+        <div class="hi-viz">
+          <svg viewBox="0 0 240 52" width="100%" height="52" aria-hidden="true">
+            <line x1="4" y1="34" x2="236" y2="34" stroke="#d5d4ce" stroke-dasharray="3 3"/>
+            <path class="hi-spark" d="M4,8 Q45,22 95,25 T236,26" fill="none" stroke="#14747a" stroke-width="2.4" stroke-linecap="round"/>
+            <path class="hi-spark" d="M4,12 Q58,24 114,34 T152,50" fill="none" stroke="#b94438" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
+            <text x="236" y="20" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" fill="#14747a">+9.6%</text>
+            <text x="158" y="49" font-family="JetBrains Mono,monospace" font-size="10" fill="#b94438">−473%</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="hi-card">
+        <div>
+          <div class="hi-eye">Linear &amp; data-efficient</div>
+          <div class="hi-num">5.4 ms</div>
+          <p class="hi-desc">One 60 s rollout runs live in WebGL—and with just 10% data (4.7 h), Spectator already beats 100%-data baselines.</p>
+        </div>
+        <div class="hi-viz">
+          <div class="ratio-row"><span>10% data</span><div class="ratio-track"><div class="ratio-fill ours" data-w="76"></div></div><b>15.5%</b></div>
+          <div class="ratio-row"><span>100% lin</span><div class="ratio-track"><div class="ratio-fill base" data-w="62"></div></div><b>12.7%</b></div>
+          <div class="ratio-row"><span>100% ours</span><div class="ratio-track"><div class="ratio-fill ours" data-w="100"></div></div><b>20.3%</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ELEVATED LIVE DEMO (moved up from §7, with dark poster gate, dark 3D cortex theater, and 3 guided counterfactual stories) -->
+<section id="live" class="reveal">
+  <div class="col">
+    <div class="sec-label">Web demo</div>
+    <h2>Run the brain world model in your browser.</h2>
+    <p>Each step is one 2,048 × 2,049 matrix–vector product, so frozen <code>spectator-v1</code> runs live on real held-out movie fMRI. Launch below, then try the three controlled perturbations.</p>
+  </div>
+  <div class="wide">
+    <div class="frame" id="sim">
+      <div class="simnote"><b>Real model</b><span>Frozen <code>spectator-v1</code> weights at fp16 (≤ 0.0005 z from full precision) on two held-out recordings (<em>Friends</em> &amp; <em>The Wolf of Wall Street</em>) with precomputed TRIBE v2 features.</span></div>
+      <div id="simLoading">
+        <div class="sim-poster" style="width:100%">
+          <span class="sim-poster-badge">● WebGL · 1,000 Schaefer parcels · 5.4 ms / 60 s rollout</span>
+          <div class="sim-poster-brains">
+            <img src="../assets/brain_b_lat.webp" alt="Left hemisphere lateral preview">
+            <img src="../assets/brain_b_med.webp" alt="Left hemisphere medial preview">
+          </div>
+          <h3>Interactive 3D Cortical Simulator</h3>
+          <p>Compare recorded sub-01 fMRI against Spectator's live rollout—cut the movie, turn off scan updates, or swap in another viewer's brain history.</p>
+          <button type="button" class="sim-launch" id="simLaunchBtn">▶ Start the demo (24.5 MB)</button>
+        </div>
+      </div>
+
+      <div id="simUI" hidden>
+        <!-- NEW: SuperMimic-inspired "Take a closer look." 3-perturbation strip -->
+        <div class="story-head">
+          <span>Take a closer look — try 3 controlled perturbations</span>
+          <button type="button" class="story-restore" id="storyRestore" hidden>↺ Restore default (Updating)</button>
+        </div>
+        <div class="story-grid" role="group" aria-label="Guided perturbations">
+          <button type="button" class="story-card" data-story="cut" aria-pressed="false">
+            <b><i style="background:var(--stim)"></i>1 · Cut the movie</b>
+            <span>Zero the stimulus term. Watch visual cortex flatten while internal state coasts.</span>
+          </button>
+          <button type="button" class="story-card" data-story="open" aria-pressed="false">
+            <b><i style="background:var(--state)"></i>2 · Stop incoming scans</b>
+            <span>Switch to open-loop Forecast. Compare 1-min drift against 4/min Updating.</span>
+          </button>
+          <button type="button" class="story-card" data-story="swap" aria-pressed="false">
+            <b><i style="background:var(--neg)"></i>3 · Swap to sub-02's brain</b>
+            <span>Same movie, another viewer's 3-min history. Association cortex diverges.</span>
+          </button>
+        </div>
+
+        <div class="simgrid">
+          <div class="simcol">
+            <div class="simbox">
+              <h4>Stimulus <span id="simTime" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h4>
+              <canvas id="simScreen" width="640" height="360" aria-label="The current clip's title and how much its movie features change frame to frame"></canvas>
+              <div class="simnow"><span>Now: <b id="simNow"></b></span></div>
+              <div id="simClips"></div>
+              <div style="display:flex;gap:6px;margin-top:8px"><button class="simtog" id="simMovie" aria-pressed="false" title="Sets the stimulus term to zero">Movie input off</button></div>
+            </div>
+            <div class="simbox">
+              <h4>Interact</h4>
+              <div class="seg sim-mode" id="simMode" role="group" aria-label="Rollout mode"></div>
+              <p class="sim-mode-note" id="simModeNote">Auto-feeds 1 real fMRI scan every ~12 s (closed-loop)</p>
+              <button class="act primary" id="simScan"><b>Reveal 1 real scan <span class="kbd">S</span></b><span>Feed sub-01's recorded fMRI at this frame</span></button>
+              <button class="act" id="simSwap" style="margin-bottom:0"><b>Swap to sub-02's brain</b><span>Use another viewer's 3-min fMRI history</span></button>
+            </div>
+            <div class="simbox">
+              <h4>Playback <span class="livetag"><span class="dot"></span><span id="simClock"></span></span></h4>
+              <div class="seg" id="simSpeed" role="group" aria-label="Speed" style="margin-bottom:8px"></div>
+              <div style="display:flex;gap:6px"><button class="simtog" id="simPause" aria-pressed="false">Pause</button><button class="simtog" id="simReset">Reset</button></div>
+              <div class="sim-perf"><span>step <span id="simStep">–</span></span><span>60 s fc <span id="simFc">–</span></span><span id="simFps">–</span></div>
+            </div>
+          </div>
+          <div class="simcol">
+            <div class="brainwrap">
+              <canvas id="simBrain" aria-label="Recorded fMRI (top) and Spectator's prediction (bottom) on left and right hemispheres; drag to rotate, hover to inspect, click to select network"></canvas>
+              <div class="simbar"><div class="seg" id="simView" role="group" aria-label="View"></div><div class="seg" id="simRow" role="group" aria-label="Bottom row"></div></div>
+              <div class="rowlbl" style="top:52px"><b>Measured</b> · sub-01, recorded</div>
+              <div class="sim-status" id="simStatus" hidden></div>
+              <div class="rowlbl" id="simLblB" style="top:256px"><b id="simRowName">Prediction</b> · <span id="simRowSub">Spectator, since the last scan</span></div>
+              <div class="sim-tip" id="simTip" hidden></div>
+              <div class="brain-hint">Drag to rotate · hover parcel · click to plot · dbl-click reset</div>
+              <div class="cmap"><span>−</span><span class="g"></span><span>+ BOLD, <span id="simCmapLbl"></span></span></div>
+              <div class="flash" id="simFlash"></div>
+            </div>
+            <div class="sim-telemetry" aria-label="Live telemetry">
+              <div class="tchip" title="BrainStateBench's benchmark score (1 − MSE / Var, %) over the trailing 1-minute window"><span id="simScoreLbl">Updating score (1 min)</span><b id="simSkill">–</b></div>
+              <div class="tchip" title="Spatial Pearson correlation between measured and predicted parcels on this frame"><span>Spatial r (frame)</span><b id="simR">–</b></div>
+              <div class="tchip"><span>Since last scan</span><b id="simSince">–</b></div>
+              <div class="tchip"><span>State / Movie</span><b id="simShare">–</b><div class="share"><span class="s" id="simShS"></span><span class="a" id="simShA"></span></div></div>
+            </div>
+            <div class="simbox">
+              <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;margin-bottom:6px"><div class="seg" id="simRegion" role="group" aria-label="Region"></div>
+                <div class="legend"><span><i style="background:var(--obs)"></i>measured</span><span><i style="background:var(--ink)"></i>prediction</span><span><i style="background:repeating-linear-gradient(90deg,var(--state) 0 4px,transparent 4px 7px)"></i>forecast</span><span><i style="background:var(--neg)"></i>swap</span></div></div>
+              <canvas id="simChart" aria-label="Region activity, past minute and forecast for the next minute"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption"><b>Live simulator.</b> fsaverage5 inflated cortex (Schaefer 1,000 parcels); drag to rotate, hover to inspect parcels, click to plot that network. Video frames omitted for copyright (bars show movie-feature change). Data: CNeuroMod / Algonauts 2025 (CC0); features: TRIBE v2 (CC BY-NC 4.0).</p>
+  </div>
+</section>
+
+<section id="overview" class="reveal">
+  <div class="col">
+    <div class="sec-label">Overview</div>
+    <h2>Matching the output does not test the state.</h2>
+    <p>Watch the same movie twice and your brain responds differently each time: the stimulus is identical, your <b>state of mind</b> is not. Standard encoding metrics cannot tell whether a model tracks that state, because matching the shared stimulus response already scores high—even for models that never read the brain.</p>
+    <p>We cast naturalistic fMRI as a world-modeling loop—where the <span class="sm">movie</span> is the action, <span class="ob">fMRI</span> is the observation, and the latent <span class="st">state</span> tracks individual dynamics—and introduce <b>BrainStateBench</b> alongside <b>Spectator</b>, a two-timescale linear world model trained with a JEPA objective.</p>
+  </div>
+  <div class="wide">
+    <figure class="img-frame"><img src="../assets/fig1.webp" alt="Figure 1 of the paper: existing approaches versus Spectator and BrainStateBench" width="1600" height="461"></figure>
+    <p class="caption"><b>Figure 1.</b> Prior encoders keep no brain state or skip updates (left). Spectator infers, predicts, and updates a two-timescale state, which BrainStateBench probes directly (right).</p>
+  </div>
+</section>
+
+<section id="bench" class="reveal">
+  <div class="col">
+    <div class="sec-label">Benchmark</div>
+    <h2>One state. Three tests.</h2>
+    <p>A frozen linear probe maps each model's latent state to 1,000 cortical parcels, scoring variance explained (%) over 60 s rollouts on Algonauts 2025 (~66 h of movie fMRI across four viewers).</p>
+  </div>
+  <div class="wide">
+    <div class="frame">
+      <div class="tasks">
+        <div class="tasklist" role="group" aria-label="Tasks">
+          <button class="taskbtn" data-task="state" aria-pressed="true"><b>State</b><span>Infer the individual's state</span></button>
+          <button class="taskbtn" data-task="forecast" aria-pressed="false"><b>Forecast</b><span>Predict a minute, no new data</span></button>
+          <button class="taskbtn" data-task="updating" aria-pressed="false"><b>Updating</b><span>Use four new scans</span></button>
+        </div>
+        <div>
+          <svg id="taskSvg" viewBox="0 0 640 230" role="img" aria-label="Measured fMRI and model forecasts for one real query of the selected task"></svg>
+          <div class="seg" id="taskNet" role="group" aria-label="Network shown" style="margin:4px 0 8px"></div>
+          <div class="taskinfo">
+            <div class="seg" id="taskModel" role="group" aria-label="Model"></div>
+            <div class="score" id="taskScore"></div>
+          </div>
+          <div class="eq" id="taskEq"></div>
+          <p class="mini" id="taskText" style="margin:8px 0 0"></p>
+        </div>
+      </div>
+    </div>
+    <p class="try">Switch tasks, models, and networks — every curve is real held-out fMRI and saved forecasts from the median-scoring query.</p>
+  </div>
+</section>
+
+<!-- SUPERMIMIC-INSPIRED "HOW IT WORKS" ANIMATED CLOSED-LOOP DIAGRAM -->
+<section id="model" class="reveal">
+  <div class="col">
+    <div class="sec-label">How it works</div>
+    <h2>Two timescales. One linear loop.</h2>
+    <p>The encoder turns the last 7.5 s of fMRI into a 1,024-d <span class="st">fast state</span> f<sub>t</sub> and pools 3 minutes of fast states into a 1,024-d <span class="st">slow state</span> u<sub>t</sub> via learned lag weights; a linear predictor advances s<sub>t</sub> = [f<sub>t</sub>; u<sub>t</sub>] under multimodal movie features.</p>
+  </div>
+  <div class="wide">
+    <div class="frame" id="howLoop">
+      <div class="fighead">
+        <p class="figtitle">Spectator world-modeling loop</p>
+        <div class="seg" id="howMode" role="group" aria-label="Loop mode"></div>
+      </div>
+      <svg id="howSvg" viewBox="0 0 920 272" role="img" aria-label="Animated Spectator loop showing fast and slow state encoding, linear rollout driven by movie features, and optional closed-loop scan updates"></svg>
+      <p class="how-note" id="howNote"></p>
+    </div>
+  </div>
+  <div class="col">
+    <div class="eq-stack" role="group" aria-label="Spectator equations">
+      <div class="eq-row"><code>f<sub>t</sub> = W<sub>f</sub> [x<sub>t−4</sub>; …; x<sub>t</sub>] + b<sub>f</sub></code><span>fast state · last 7.5 s</span></div>
+      <div class="eq-row"><code>u<sub>t,i</sub> = Σ<sub>ℓ</sub> w<sub>iℓ</sub> f<sub>t−ℓ,i</sub></code><span>slow state · 180 s learned lags</span></div>
+      <div class="eq-row"><code>ŝ<sub>t+1</sub> = ŝ<sub>t</sub> + W [ŝ<sub>t</sub>; ā<sub>t+1</sub>; 1]</code><span>linear latent rollout</span></div>
+    </div>
+    <p>We pretrain the encoder on fMRI, train both components with a 40-step EMA-target JEPA loss, then freeze the encoder and solve W in closed form via ridge regression.</p>
+  </div>
+  <div class="wide">
+    <div class="grid2" style="align-items:stretch;margin-top:20px">
+      <figure class="img-frame" style="margin:0;display:flex;align-items:center"><img src="../assets/fig2.webp" alt="Figure 2 of the paper: Spectator architecture and training" width="990" height="590"></figure>
+      <div class="frame" style="margin:0">
+        <div class="fighead"><p class="figtitle">Every forecast splits in two</p><div class="seg" id="leadSeg" role="group" aria-label="Seconds ahead"></div></div>
+        <div class="seg" id="decompNet" role="group" aria-label="Network shown" style="margin-bottom:8px"></div>
+        <canvas id="decompCanvas" role="img" aria-label="A real Spectator forecast split exactly into its state term and its stimulus term"></canvas>
+        <div class="sharebar" aria-live="polite"><span class="s" id="shareS"></span><span class="a" id="shareA"></span></div>
+        <div class="legend" style="margin-top:10px"><span><i style="background:var(--obs)"></i>measured</span><span><i style="background:var(--state)"></i>state term</span><span><i style="background:var(--stim)"></i>stimulus term</span><span><i style="background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 7px)"></i>sum = forecast</span></div>
+      </div>
+    </div>
+    <p class="caption"><b>Exact linear decomposition.</b> Every k-step forecast equals M<sup>k</sup>s<sub>t</sub> (carried-forward state) plus accumulated stimulus drive. Bar shares span all held-out Algonauts recordings.</p>
+  </div>
+</section>
+
+<section id="results" class="reveal">
+  <div class="col">
+    <div class="sec-label">Results</div>
+    <h2>More history, wider lead.</h2>
+    <p>Evaluated against six baselines across four families—stimulus-only encoders (TRIBE v2, MIRAGE), a per-lead linear forecaster, Kalman state-space modeling (IPSID), and prior brain world models (NeuroWorld, BrainVista)—on Algonauts 2025 and 184-viewer HCP 7T.</p>
+  </div>
+  <div class="wide">
+    <div class="frame">
+      <div class="fighead">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <p class="figtitle">BrainStateBench scores</p>
+          <div class="seg" id="datasetSeg" role="group" aria-label="Dataset"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button class="replay" id="lbReplay"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9M2.5 2.5v3h3"/></svg>Replay</button>
+          <div class="seg" id="metricSeg" role="group" aria-label="Metric"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:500;color:var(--muted)">fMRI history</span>
+        <div class="seg" id="histSeg" role="group" aria-label="History length"></div>
+        <span class="legend" style="margin-left:auto"><span><i style="background:var(--state)"></i>Spectator</span><span><i style="background:var(--stim)"></i>stimulus-only</span><span><i style="background:#b8c0c2"></i>other baselines</span></span>
+      </div>
+      <div class="chart pre" id="lbChart" aria-live="polite"></div>
+      <p class="callout" id="lbNote"></p>
+    </div>
+    <p class="caption"><b>Algonauts 2025 &amp; HCP 7T leaderboard.</b> Toggle dataset, metric, and history length (HCP 7T: 184 viewers on a different 7T scanner, 180 s history).</p>
+  </div>
+
+  <!-- UPGRADED: Scrubbable + scroll-drawn 5-minute stability & data efficiency -->
+  <div class="wide">
+    <div class="grid2" style="margin-top:20px">
+      <div class="frame" style="margin:0">
+        <div class="fighead" style="margin-bottom:8px"><p class="figtitle">5-minute open-loop stability</p><span class="num" style="color:var(--muted);font-size:12px">201 steps · no scans</span></div>
+        <div class="scrub-bar" id="hzReadout" aria-live="polite"></div>
+        <div class="chart" id="horizonChart" tabindex="0" role="region" aria-label="Interactive 5-minute open-loop stability chart; move pointer or press left and right arrow keys to inspect each lead time"></div>
+        <div class="scrub-hint">Move across the chart—or focus and press ← / →—to read any horizon.</div>
+      </div>
+      <div class="frame" style="margin:0">
+        <div class="fighead" style="margin-bottom:8px"><p class="figtitle">Data efficiency (10% → 100%)</p><div class="seg" id="dsMetricSeg" role="group" aria-label="Data efficiency metric"></div></div>
+        <div class="scrub-bar" id="dsReadout" aria-live="polite"></div>
+        <div class="chart" id="datasizeChart"></div>
+        <div class="scrub-hint">Hover any training fraction to compare exact scores.</div>
+      </div>
+    </div>
+    <p class="caption"><b>Long-horizon stability &amp; sample efficiency.</b> Left: Spectator stays above movie-only across a full 5-minute rollout while a Transformer counterpart diverges below 0% at 143 s. Right: with just 10% data (4.7 h), Spectator already beats the 100%-data linear forecaster on State and Updating.</p>
+  </div>
+</section>
+
+<section id="lab" class="reveal">
+  <div class="col">
+    <div class="sec-label">Beyond correlation</div>
+    <h2>Break one input. Watch what moves.</h2>
+    <p>Keeping Spectator fixed, we perturb one input at test time: drop the stimulus, zero the fMRI, or swap in another viewer's fMRI from the same scene. Each perturbation leaves a distinct signature on BrainStateBench while correlation r barely moves.</p>
+  </div>
+  <div class="wide">
+    <div class="frame">
+      <div class="lab">
+        <div>
+          <fieldset>
+            <legend><span class="sm">Stimulus</span> the model sees</legend>
+            <label class="opt"><input type="radio" name="stim" value="orig" checked> Original movie features</label>
+            <label class="opt"><input type="radio" name="stim" value="none"> No stimulus term</label>
+            <label class="opt"><input type="radio" name="stim" value="time"> Features from another moment</label>
+          </fieldset>
+          <fieldset>
+            <legend><span class="st">Brain state</span> it starts from</legend>
+            <label class="opt"><input type="radio" name="fmri" value="own" checked> This person's own fMRI</label>
+            <label class="opt"><input type="radio" name="fmri" value="zero"> No fMRI (zeros)</label>
+            <label class="opt"><input type="radio" name="fmri" value="other"> Another person's fMRI, same moment</label>
+            <label class="opt"><input type="radio" name="fmri" value="time"> This person's state from another moment</label>
+          </fieldset>
+        </div>
+        <div>
+          <div class="meters" id="meters"></div>
+          <div class="verdict" id="verdict" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+    <p class="caption"><b>Input perturbation lab (Table 3).</b> One input altered at a time; vertical marks show full-input scores.</p>
+  </div>
+</section>
+
+<section id="where" class="reveal">
+  <div class="col">
+    <div class="sec-label">Cortical maps</div>
+    <h2>Where state lives across cortex.</h2>
+    <p>Linearity splits every forecast into stimulus and state contributions across cortex. The stimulus drives shared sensory and narrative regions; the inferred state helps everywhere, most in prefrontal and parietal association cortex where viewers diverge.</p>
+  </div>
+  <div class="wide">
+    <div class="frame">
+      <div class="grid2" style="align-items:start">
+        <div>
+          <div class="fighead"><p class="figtitle">Forecast gain on the left hemisphere</p></div>
+          <div class="seg" id="brainSeg" role="group" aria-label="Brain map" style="margin-bottom:14px">
+            <button aria-pressed="false" data-map="a">from the stimulus</button>
+            <button aria-pressed="true" data-map="b">from the latent state</button>
+          </div>
+          <div class="brainpair"><img id="brainLat" src="../assets/brain_b_lat.webp" alt="Lateral view" width="636" height="462"><img id="brainMed" src="../assets/brain_b_med.webp" alt="Medial view" width="649" height="464"></div>
+          <div class="cbar" id="cbar"></div><div class="cbar-lbl" id="cbarLbl"></div>
+          <p class="mini" id="brainText" style="margin:12px 0 0"></p>
+        </div>
+        <div>
+          <div class="fighead"><p class="figtitle">Gain by how much people agree</p><button class="replay" id="tertReplay"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9M2.5 2.5v3h3"/></svg>Replay</button></div>
+          <div class="chart" id="tertChart"></div>
+          <p class="mini" style="margin:12px 0 0">Stimulus gain tracks inter-subject correlation (r = 0.92); state gain stays at 5–7 points everywhere and exceeds stimulus gain in 59% of parcels.</p>
+        </div>
+      </div>
+    </div>
+    <p class="caption"><b>Figure 4.</b> Forecast gain from adding stimulus vs. latent state across Schaefer parcels (left) and inter-subject correlation tertiles (right).</p>
+  </div>
+</section>
+
+<section id="cite" class="reveal">
+  <div class="col">
+    <div class="sec-label">Citation</div>
+    <h2>BibTeX</h2>
+    <div class="bib-wrap">
+<pre class="bib" id="bib">@inproceedings{stateofmind2026,
+  title     = {State of Mind: Learning and Evaluating World Models
+               of Naturalistic Brain Dynamics},
+  author    = {Anonymous},
+  booktitle = {Under review},
+  year      = {2026}
+}</pre>
+      <button class="copy" id="copyBib" type="button">Copy</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wide">
+    <span>State of Mind · <a href="../">Current live page</a> · <a href="https://github.com/yuxiangwei0808/State-of-Mind" target="_blank" rel="noopener">GitHub</a> · <a href="https://huggingface.co/stanjsx/Spectator" target="_blank" rel="noopener">Hugging Face</a></span>
+    <a href="#top">Back to top ↑</a>
+  </div>
+</footer>
+
+<script src="../figdata.js"></script>
+<script src="../three.min.js" defer></script>
+<script src="../mesh.js" defer></script>
+<script src="sim.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+"use strict";
+const $=id=>document.getElementById(id);
+const C={ink:'#182226',muted:'#647074',faint:'#949ea1',rule:'#e5e4de',state:'#14747a',stim:'#cf7722',obs:'#2f65a8',neg:'#b94438',grey:'#b8c0c2'};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function seg(el,items,init,cb){el.innerHTML='';items.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed',i===init?'true':'false');
+  b.onclick=()=>{if(b.disabled)return;[...el.children].forEach(c=>c.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i,t);};el.appendChild(b);});}
+function press(el,i){[...el.children].forEach((c,j)=>c.setAttribute('aria-pressed',j===i?'true':'false'));}
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function pathD(p){return p.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ');}
+
+/* ---------- scroll reveal & highlight bar entrance ---------- */
+const reveals=[...document.querySelectorAll('.reveal')];
+if(reduce){reveals.forEach(r=>r.classList.add('in'));}
+else{
+  const rio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rio.unobserve(e.target);}}),{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+  reveals.forEach(r=>rio.observe(r));
+}
+requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  document.querySelectorAll('.ratio-fill[data-w]').forEach(f=>{f.style.width=f.dataset.w+'%';});
+}));
+
+/* ---------- contents bar & scroll progress ---------- */
+const toc=$('toc'),tt=$('tocToggle'),prog=$('tocProgress');
+tt.onclick=()=>{const o=toc.dataset.open!=='true';toc.dataset.open=o;tt.setAttribute('aria-expanded',o);};
+document.querySelectorAll('#tocList a').forEach(a=>a.addEventListener('click',()=>{toc.dataset.open='false';tt.setAttribute('aria-expanded','false');}));
+const secs=[$('highlights'),...document.querySelectorAll('main section[id]')];
+const names={highlights:'Highlights',live:'Web Demo',overview:'Overview',bench:'Benchmark',model:'How It Works',results:'Results',lab:'Input Lab',where:'Cortex',cite:'Citation'};
+const tocLinks=[...document.querySelectorAll('#tocInline a[data-sec]')];
+function onScroll(){
+  let cur='highlights';for(const s of secs){if(s&&s.getBoundingClientRect().top<130)cur=s.id;}
+  $('tocCur').textContent=names[cur]||'Highlights';
+  tocLinks.forEach(a=>a.setAttribute('aria-current',a.dataset.sec===cur?'true':'false'));
+  const maxY=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+  if(prog)prog.style.width=Math.min(100,Math.max(0,scrollY/maxY*100)).toFixed(2)+'%';
+}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+/* ---------- SuperMimic-inspired animated "How it works" closed loop (§3) ---------- */
+const HSVG=$('howSvg');
+let howClosed=true;
+function buildHowLoop(){
+  HSVG.innerHTML='';
+  const defs=el('defs',{},HSVG);
+  const mk=(id,col)=>{const m=el('marker',{id,viewBox:'0 0 10 10',refX:8,refY:5,markerWidth:6,markerHeight:6,orient:'auto'},defs);
+    el('path',{d:'M1,1.5 L8.5,5 L1,8.5',fill:'none',stroke:col,'stroke-width':1.8,'stroke-linecap':'round','stroke-linejoin':'round'},m);};
+  mk('arrTeal',C.state);mk('arrStim',C.stim);mk('arrObs',C.obs);mk('arrInk',C.ink);mk('arrFaint','#c5c7c2');
+
+  // Connecting paths
+  const pEnc=el('path',{id:'pEnc',d:'M196,112 L252,112',fill:'none',stroke:C.state,'stroke-width':2,'marker-end':'url(#arrTeal)'},HSVG);
+  const pRoll=el('path',{id:'pRoll',d:'M432,112 L488,112',fill:'none',stroke:C.ink,'stroke-width':2,'marker-end':'url(#arrInk)'},HSVG);
+  const pOut=el('path',{id:'pOut',d:'M676,112 L732,112',fill:'none',stroke:C.state,'stroke-width':2,'marker-end':'url(#arrTeal)'},HSVG);
+  // Movie drive entering top of Predictor
+  const pMov=el('path',{id:'pMov',d:'M582,48 L582,72',fill:'none',stroke:C.stim,'stroke-width':2,'marker-end':'url(#arrStim)'},HSVG);
+  // Self-loop on Predictor (open-loop autoregressive rollout)
+  const pSelf=el('path',{id:'pSelf',d:'M618,154 C644,192 520,192 546,154',fill:'none',stroke:C.state,'stroke-width':2,'stroke-dasharray':'5 4','marker-end':'url(#arrTeal)'},HSVG);
+  // Closed-loop feedback arc from new fMRI scan back to Encoder
+  const pUpd=el('path',{id:'pUpd',d:'M822,154 C822,238 342,238 342,158',fill:'none',stroke:C.obs,'stroke-width':2.2,'marker-end':'url(#arrObs)'},HSVG);
+
+  // Movie pill above Predictor
+  el('rect',{x:500,y:10,width:164,height:36,rx:18,fill:'#fbf0e2',stroke:'rgba(207,119,34,.45)','stroke-width':1.2},HSVG);
+  el('text',{x:582,y:32,'text-anchor':'middle','font-size':13,'font-weight':600,fill:'#9e5310'},HSVG).textContent='Movie drive  āₜ₊₁';
+
+  // Helper to draw clean Apple-style cards
+  function card(x,y,w,h,step,title,sub1,sub2,accent,fillBg){
+    const g=el('g',{},HSVG);
+    const r=el('rect',{x,y,width:w,height:h,rx:14,fill:fillBg||'#fff',stroke:accent,'stroke-width':1.5},g);
+    el('text',{x:x+14,y:y+22,'font-family':'JetBrains Mono,monospace','font-size':10.5,'font-weight':600,fill:accent},g).textContent=step;
+    el('text',{x:x+14,y:y+44,'font-size':15.5,'font-weight':600,fill:C.ink},g).textContent=title;
+    el('text',{x:x+14,y:y+63,'font-size':12,fill:C.muted},g).textContent=sub1;
+    if(sub2)el('text',{x:x+14,y:y+79,'font-size':11.5,fill:C.faint},g).textContent=sub2;
+    return {g,r};
+  }
+  card(20,66,174,92,'01 · OBSERVE','3-min fMRI','1,000 cortical parcels','sliding 180 s window',C.obs,'#f7fafe');
+  const encCard=card(256,66,174,92,'02 · ENCODE','Two-timescale sₜ','fast (7.5 s) + slow (180 s)','frozen JEPA encoder',C.state,'#f2f9f9');
+  const rollCard=card(492,66,182,92,'03 · ROLL OUT','Linear transition','ŝₜ₊₁ = ŝₜ + W[ŝₜ; āₜ₊₁; 1]','5.4 ms per 60 s rollout',C.ink,'#ffffff');
+  card(736,66,164,92,'04 · READ OUT','Cortex ŷₜ₊₁','frozen linear probe','1,000 parcels · +60 s',C.state,'#f2f9f9');
+
+  el('text',{x:582,y:194,'text-anchor':'middle','font-size':11.5,'font-weight':600,fill:C.state},HSVG).textContent='↺ 40 open-loop steps (60 s)';
+  const updPill=el('g',{},HSVG);
+  el('rect',{x:482,y:219,width:200,height:26,rx:13,fill:'#ebf2fb',stroke:'rgba(47,101,168,.38)','stroke-width':1.1},updPill);
+  const updLbl=el('text',{x:582,y:236,'text-anchor':'middle','font-size':12,'font-weight':600,fill:C.obs},updPill);
+  updLbl.textContent='New fMRI scan every ~12 s';
+
+  // Animated traveling pulses
+  const dotEnc=el('circle',{r:4.5,fill:C.state},HSVG);
+  const dotRoll=el('circle',{r:4.5,fill:C.ink},HSVG);
+  const dotOut=el('circle',{r:4.5,fill:C.state},HSVG);
+  const dotMov=el('circle',{r:4.5,fill:C.stim},HSVG);
+  const dotSelf=el('circle',{r:4.5,fill:C.state},HSVG);
+  const dotUpd=el('circle',{r:5.2,fill:C.obs},HSVG);
+
+  function syncHowStyle(){
+    pUpd.setAttribute('stroke',howClosed?C.obs:'#d2d4ce');
+    pUpd.setAttribute('stroke-dasharray',howClosed?'':'5 5');
+    pUpd.setAttribute('opacity',howClosed?'1':'.45');
+    pUpd.setAttribute('marker-end',howClosed?'url(#arrObs)':'url(#arrFaint)');
+    updPill.setAttribute('opacity',howClosed?'1':'.35');
+    updLbl.textContent=howClosed?'New fMRI scan every ~12 s (closed-loop)':'Feedback disabled — open-loop Forecast';
+    dotUpd.setAttribute('opacity',howClosed?'1':'0');
+    $('howNote').innerHTML=howClosed
+      ?'<b>Updating (closed-loop):</b> Spectator rolls forward under the movie, and whenever a real fMRI scan arrives (~every 12 s), it passes back through the encoder to refresh the latent state—lifting 1-min score from <b>16.0% → 20.3%</b>.'
+      :'<b>Forecast (open-loop):</b> After encoding the initial 3-min history, no new fMRI arrives. The linear transition orbits the self-loop driven purely by the upcoming movie, staying stable for a full <b>5 minutes (+9.6%)</b>.';
+  }
+  syncHowStyle();
+  seg($('howMode'),['Updating (closed-loop)','Forecast (open-loop)'],0,i=>{howClosed=(i===0);syncHowStyle();});
+
+  const paths=[
+    [pEnc,dotEnc,2200,0],
+    [pRoll,dotRoll,2200,.25],
+    [pOut,dotOut,2200,.5],
+    [pMov,dotMov,1800,.1],
+    [pSelf,dotSelf,1600,0],
+    [pUpd,dotUpd,3200,0]
+  ];
+  function place(path,dot,u){
+    const L=path.getTotalLength();
+    const pt=path.getPointAtLength(L*u);
+    dot.setAttribute('cx',pt.x.toFixed(1));
+    dot.setAttribute('cy',pt.y.toFixed(1));
+  }
+  if(reduce){
+    paths.forEach(([p,d])=>place(p,d,.5));
+  }else{
+    let howVis=false;
+    const hio=new IntersectionObserver(es=>{howVis=es[0].isIntersecting;},{threshold:.05});
+    hio.observe($('howLoop'));
+    function animHow(now){
+      if(howVis){
+        paths.forEach(([p,d,dur,ph])=>{
+          const u=((now/dur)+ph)%1;
+          place(p,d,u);
+        });
+        if(howClosed){
+          const uUp=((now/3200)%1);
+          const flash=uUp>.88?1:0;
+          encCard.r.setAttribute('stroke-width',flash?2.8:1.5);
+          encCard.r.setAttribute('fill',flash?'#e0f1f2':'#f2f9f9');
+        }else{
+          encCard.r.setAttribute('stroke-width',1.5);
+          encCard.r.setAttribute('fill','#f2f9f9');
+        }
+        const uSelf=(now/1600)%1;
+        rollCard.r.setAttribute('stroke-width',uSelf>.82?2.3:1.5);
+      }
+      requestAnimationFrame(animHow);
+    }
+    requestAnimationFrame(animHow);
+  }
+}
+buildHowLoop();
+
+/* ---------- task explorer (§2) ---------- */
+const FIG=window.FIG,EP=FIG.episode,ST=FIG.state;
+const NETNAME={Vis:'Visual',SomMot:'Somatomotor',DorsAttn:'Dorsal attention',SalVentAttn:'Salience',Limbic:'Limbic',Cont:'Control',Default:'Default mode'};
+const NETS=EP.networks;const colOf=(a,n)=>a.map(r=>r[n]);
+const partName=r=>{const m=r.match(/movie10\/(figures|life|bourne|wolf)(\d+)\/run-0(\d)/);if(!m)return r;return ({figures:'Hidden Figures',life:'Life',bourne:'The Bourne Supremacy',wolf:'The Wolf of Wall Street'})[m[1]]+', part '+(+m[2])+(m[3]==='2'?' (second viewing)':'');};
+const shortPart=r=>partName(r).replace(', part',' pt.').replace(' (second viewing)',', 2nd viewing');
+const mmss=s=>Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0');
+const TS=$('taskSvg');
+const TASKS={
+ state:{models:[['Spectator',5.5,'spectator'],['Linear forecaster',2.6,'linear'],['Stimulus-only (MIRAGE)',0.0,'mirage']],eq:'d<sub>t</sub> = x<sub>t</sub><sup>(1)</sup> − x<sub>t</sub><sup>(2)</sup>,&nbsp;&nbsp; State = 1 − Σ‖d<sub>t</sub> − d̂<sub>t</sub>‖² / Σ‖d<sub>t</sub>‖²',
+   text:'Two viewings of the same film by the same person. Subtracting them cancels the shared stimulus response and isolates trial-specific brain state.'},
+ forecast:{models:[['Spectator',16.0,'spectator_forecast'],['Linear forecaster',11.6,'linear_forecast'],['Stimulus-only (MIRAGE)',8.8,'mirage_forecast']],eq:'Forecast = 1 − Σ‖x<sub>t</sub> − x̂<sub>t</sub>‖² / Σ‖x<sub>t</sub> − x̄‖²',
+   text:'From fMRI up to the anchor and the upcoming movie, roll out 40 steps (60 s) with no new scans. Predicting the recording mean scores 0%.'},
+ updating:{models:[['Spectator',20.3,'spectator_updating'],['Linear forecaster',12.7,null],['Stimulus-only (MIRAGE)',8.8,'mirage_forecast']],eq:'Updating = 1 − Σ‖x<sub>t</sub> − x̂<sub>t</sub><sup>upd</sup>‖² / Σ‖x<sub>t</sub> − x̄‖² &nbsp;·&nbsp; scans at t ∈ {8, 16, 24, 32}',
+   text:'Same as Forecast, but four measured frames arrive causally during the minute. A model that ignores them scores exactly its Forecast.'}};
+let task='state',tModel=0,tNet=0;
+function drawTask(){
+  TS.innerHTML='';const W=640,H=230,x0=40,x1=620;const T=task,m=tModel,n=tNet;
+  const X=i=>x0+(x1-x0)*i/80;
+  const line=(pts,attrs)=>el('path',Object.assign({d:pathD(pts),fill:'none'},attrs),TS);
+  const lbl=(x,y,t,a)=>{const e=el('text',Object.assign({x,y,'font-size':12,fill:C.muted},a||{}),TS);e.textContent=t;return e;};
+  const anchor=40,ax=X(anchor);
+  el('line',{x1:ax,y1:14,x2:ax,y2:H-26,stroke:C.faint,'stroke-dasharray':'3 3'},TS);lbl(ax,H-10,'anchor t₀',{'text-anchor':'middle'});lbl(x1,H-10,'+60 s',{'text-anchor':'end'});
+  const [name,score,key]=TASKS[T].models[m];let qs=null,extra='';
+  if(T==='state'){
+    const a=[...colOf(ST.viewing1_before,n),...colOf(ST.viewing1_after,n)],b=[...colOf(ST.viewing2_before,n),...colOf(ST.viewing2_after,n)];
+    const lim=1.05*Math.max(...a.map(Math.abs),...b.map(Math.abs));
+    const yA=v=>62-v*34/lim,yB=v=>132-v*34/lim;
+    const p1=a.map((v,i)=>[X(i),yA(v)]),p2=b.map((v,i)=>[X(i),yB(v)]);
+    const band=p1.slice(anchor).concat(p2.slice(anchor).reverse());el('path',{d:pathD(band)+'Z',fill:'rgba(20,116,122,.08)'},TS);
+    line(p1,{stroke:C.obs,'stroke-width':2});line(p2,{stroke:'#7aa0cf','stroke-width':2});
+    lbl(x0-38,yA(0)+4,'view 1');lbl(x0-38,yB(0)+4,'view 2');
+    const dy=colOf(ST.measured_difference,n),dp=colOf(ST[key.replace(/_.*/,'')+'_difference'],n);
+    const dl=1.05*Math.max(...dy.map(Math.abs),...dp.map(Math.abs),1e-6),yD=v=>200-v*22/dl;
+    el('line',{x1:ax,y1:yD(0),x2:x1,y2:yD(0),stroke:C.rule},TS);
+    line(dy.map((v,i)=>[X(anchor+i),yD(v)]),{stroke:C.ink,'stroke-width':1.6});line(dp.map((v,i)=>[X(anchor+i),yD(v)]),{stroke:m===2?C.stim:C.state,'stroke-width':2.2,'stroke-dasharray':'6 4'});
+    lbl(x0,170,'Δ = view 1 − view 2 (solid), predicted Δ (dashed)',{fill:C.ink,'font-size':12,'font-weight':500});
+    lbl(x0,22,`sub-01 watching ${shortPart('task-movie10/'+ST.part+'/run-01')} twice, at ${mmss(ST.origin_seconds)}`,{fill:C.ink,'font-weight':500});
+    qs=ST.query_scores_percent[key];
+  } else {
+    const past=colOf(EP.history,n).slice(-40),meas=colOf(EP.measured,n),fut=key?colOf(EP[key],n):null;
+    const lim=1.05*Math.max(...past.map(Math.abs),...meas.map(Math.abs),...(fut||[]).map(Math.abs)),yv=v=>110-v*72/lim;
+    line(past.map((v,i)=>[X(i),yv(v)]),{stroke:C.obs,'stroke-width':2.2});
+    line([[X(anchor-1),yv(past[39])]].concat(meas.map((v,i)=>[X(anchor+i),yv(v)])),{stroke:C.obs,'stroke-width':1.6,opacity:.45});
+    if(fut)line([[X(anchor-1),yv(past[39])]].concat(fut.map((v,i)=>[X(anchor+i),yv(v)])),{stroke:m===2?C.stim:C.state,'stroke-width':2.4,'stroke-dasharray':'6 4'});
+    else lbl((ax+x1)/2,108,'per-query Updating forecasts of this model were not saved',{'text-anchor':'middle','font-style':'italic'});
+    if(T==='updating'&&m!==1)EP.reveal_steps.forEach(k=>el('circle',{cx:X(anchor+k),cy:yv(meas[k]),r:5,fill:C.obs},TS));
+    lbl(x0,22,(T==='updating'?'forecast, with four new frames revealed':'forecast, no new observations')+` · sub-01, ${shortPart(EP.run)}`,{fill:C.ink,'font-weight':500});
+    lbl(x0,H-10,'fMRI up to t₀',{});
+    qs=key?EP.scores_whole_cortex_percent[key]:null;
+    if(T==='updating'&&m===2)extra=' Stimulus-only ignores new scans, so this is its Forecast unchanged.';
+  }
+  $('taskScore').innerHTML=`${name}: <b>${score.toFixed(1)}%</b> <span style="color:var(--muted);font-size:12px">benchmark${qs===null?'':' · query '+qs.toFixed(1)+'%'}</span>`;
+  $('taskEq').innerHTML=TASKS[T].eq;
+  $('taskText').textContent=TASKS[T].text+(T==='state'&&m===2?' A stimulus-only model predicts identical responses for both viewings, so predicted Δ is identically zero.':'')+extra+` Curves: ${NETNAME[NETS[n]]} network mean (z); scores pool all 1,000 parcels.`;
+}
+seg($('taskModel'),['Spectator','Linear forecaster','Stimulus-only'],0,i=>{tModel=i;drawTask();});
+seg($('taskNet'),NETS.map(k=>NETNAME[k]),0,i=>{tNet=i;drawTask();});
+document.querySelectorAll('.taskbtn').forEach(b=>b.onclick=()=>{task=b.dataset.task;document.querySelectorAll('.taskbtn').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));drawTask();});
+drawTask();
+
+/* ---------- decomposition (§3) ---------- */
+const LEADS=[1.5,7.5,15,30,60],SHARE=[95,71,56,24,13];let leadIdx=0,dNet=0;
+const cv=$('decompCanvas'),ctx=cv.getContext('2d');
+function drawDecomp(){const d=Math.min(2,devicePixelRatio||1),w=cv.clientWidth,h=cv.clientHeight;cv.width=w*d;cv.height=h*d;ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);
+  const past=colOf(EP.history,dNet).slice(-30),meas=colOf(EP.measured,dNet),stT=colOf(EP.state_part,dNet),smT=colOf(EP.movie_part,dNet),tot=colOf(EP.spectator_forecast,dNet);
+  const lim=1.08*Math.max(...[...past,...meas,...stT,...smT,...tot].map(Math.abs));
+  const n=70,X=i=>6+(w-12)*i/n,Yv=v=>12+(h-36)*(.5-v/(2*lim)),t0=X(30);
+  ctx.fillStyle='#f6f5f0';ctx.fillRect(t0,4,w-6-t0,h-28);
+  ctx.strokeStyle=C.faint;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(t0,4);ctx.lineTo(t0,h-22);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=C.rule;ctx.beginPath();ctx.moveTo(6,Yv(0));ctx.lineTo(w-6,Yv(0));ctx.stroke();
+  const ln=(arr,off,col,lw,dash,alpha)=>{ctx.globalAlpha=alpha||1;ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.beginPath();arr.forEach((v,i)=>{const x=X(i+off),y=Yv(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;};
+  ln(past,0,C.obs,2);ln(meas,30,C.obs,1.5,null,.45);ln(smT,30,C.stim,2);ln(stT,30,C.state,2);ln(tot,30,C.ink,1.4,[5,4]);
+  const xc=X(29+LEADS[leadIdx]/1.49);ctx.fillStyle='rgba(24,34,38,.10)';ctx.fillRect(xc-4,4,8,h-28);
+  ctx.fillStyle=C.muted;ctx.font='11px "JetBrains Mono", ui-monospace, monospace';ctx.textAlign='center';ctx.fillText('now',t0,h-6);if(xc-t0>44&&w-6-xc>50)ctx.fillText('+'+LEADS[leadIdx]+' s',xc,h-6);ctx.textAlign='right';ctx.fillText('+60 s',w-6,h-6);
+  ctx.textAlign='left';ctx.fillText(NETNAME[NETS[dNet]]+', mean z',8,14);}
+function setLead(i){leadIdx=i;const s=SHARE[i];$('shareS').style.flexBasis=s+'%';$('shareA').style.flexBasis=(100-s)+'%';$('shareS').textContent=s+'% state';$('shareA').textContent=(100-s)+'%'+(100-s>=30?' stimulus':'');drawDecomp();}
+seg($('leadSeg'),LEADS.map(l=>'+'+l+' s'),0,setLead);setLead(0);
+seg($('decompNet'),NETS.map(k=>NETNAME[k]),0,i=>{dNet=i;drawDecomp();});
+
+/* ---------- leaderboard (§4) ---------- */
+function hbars(box,rows,opt){
+  const w=Math.max(320,box.clientWidth),lw=Math.min(180,w*.32),rh=opt.rh||34,h=rows.length*rh+26;
+  const vals=rows.map(r=>r.v),mn=Math.min(0,...vals,opt.min??0),mx=Math.max(...vals,opt.max??0),x0=lw+12,x1=w-56,sx=v=>x0+(x1-x0)*(v-mn)/(mx-mn||1);
+  let s=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${opt.aria}">`;
+  (opt.ticks||[]).forEach(t=>{s+=`<line x1="${sx(t)}" x2="${sx(t)}" y1="2" y2="${h-20}" stroke="${C.rule}"/><text class="mut val" x="${sx(t)}" y="${h-4}" text-anchor="middle">${opt.fmt(t)}</text>`;});
+  rows.forEach((r,i)=>{const y=6+i*rh,z=sx(0),xv=sx(r.v),bx=Math.min(z,xv),bw=Math.max(2,Math.abs(xv-z));
+    s+=`<text x="${lw}" y="${y+16}" text-anchor="end" style="font-weight:${r.bold?600:400};fill:${r.bold?C.ink:C.muted}">${r.label}</text>`;
+    s+=`<rect class="bar" x="${bx}" y="${y+3}" width="${bw}" height="18" rx="4" fill="${r.color}" style="transition-delay:${i*55}ms"/>`;
+    s+=`<text class="val" x="${Math.max(xv,z)+8}" y="${y+16}" style="font-weight:${r.bold?600:500};fill:${r.bold?C.ink:C.muted}">${opt.fmt(r.v)}</text>`;});
+  s+=`<line x1="${sx(0)}" x2="${sx(0)}" y1="2" y2="${h-20}" stroke="${C.faint}"/>`;box.innerHTML=s+'</svg>';}
+function grow(box){box.classList.add('pre');void box.offsetWidth;requestAnimationFrame(()=>requestAnimationFrame(()=>box.classList.remove('pre')));}
+const MODELS_ALG=[{n:'TRIBE v2',f:'so',s:[[4.2,0,4.1],[4.2,0,4.1],[4.2,0,4.1]],r:.173},{n:'MIRAGE',f:'so',s:[[8.8,0,8.8],[8.8,0,8.8],[8.8,0,8.8]],r:.320},
+ {n:'Linear forecaster',s:[[10.4,1.4,14.7],[11.6,2.6,14.8],[11.6,2.6,12.7]],r:.294},{n:'IPSID',s:[[8.5,.9,12.4],[8.7,1.2,12.5],[8.7,1.2,12.5]],r:.243},
+ {n:'NeuroWorld',s:[[8.9,.2,13.7],[9.2,.4,14.4],[8.3,.4,13.4]],r:.239},{n:'BrainVista',s:[[5.0,-.4,8.4],[6.4,.2,10.2],[6.6,.2,10.3]],r:.220},
+ {n:'Spectator',s:[[11.5,1.1,16.9],[15.0,4.5,19.8],[16.0,5.5,20.3]],r:.349,ours:1}];
+const MODELS_HCP=[{n:'TRIBE v2',f:'so',s:[null,null,[2.6,0,2.5]],r:.094},{n:'MIRAGE',f:'so',s:[null,null,[3.6,0,3.4]],r:.121},
+ {n:'Linear forecaster',s:[null,null,[6.2,5.1,11.6]],r:.157},{n:'IPSID',s:[null,null,[4.7,5.0,12.8]],r:.143},
+ {n:'NeuroWorld',s:[null,null,[1.8,2.5,13.1]],r:.109},{n:'BrainVista',s:[null,null,[1.0,1.6,3.1]],r:.055},
+ {n:'Spectator',s:[null,null,[6.6,6.2,15.7]],r:.163,ours:1}];
+const MET=['Forecast','State','Updating','Correlation r'];let dataset=0,metric=1,hist=2;
+const datasetSeg=$('datasetSeg'),metricSeg=$('metricSeg'),histSeg=$('histSeg');
+function syncHistLock(){const lock=dataset===1||metric===3;[...histSeg.children].forEach((b,j)=>b.disabled=(lock&&j!==2));if(lock){hist=2;press(histSeg,2);}}
+seg(datasetSeg,['Algonauts 2025','HCP 7T (184)'],0,i=>{dataset=i;syncHistLock();renderLB(true);});
+seg(metricSeg,MET,metric,i=>{metric=i;syncHistLock();renderLB(true);});
+seg(histSeg,['7.5 s','120 s','180 s'],hist,i=>{hist=i;renderLB(true);});
+function renderLB(anim){const box=$('lbChart');const isR=metric===3,isHcp=dataset===1,M=isHcp?MODELS_HCP:MODELS_ALG;
+  const rows=M.map(m=>({label:m.n,v:isR?m.r:m.s[hist][metric],bold:!!m.ours,color:m.ours?C.state:m.f==='so'?C.stim:C.grey})).sort((a,b)=>b.v-a.v);
+  const ticks=isHcp?(isR?[0,.05,.1,.15]:metric===2?[0,5,10,15]:[0,2,4,6]):(isR?[0,.1,.2,.3]:metric===1?[0,2,4,6]:[0,5,10,15,20]);
+  const max=isHcp?(isR?.18:metric===2?17:7.2):(isR?.36:metric===1?6:21);
+  const min=isHcp?0:(metric===1?-.6:0);
+  hbars(box,rows,{aria:(isHcp?'HCP 7T ':'Algonauts ')+MET[metric]+' by model',fmt:v=>isR?v.toFixed(3):v.toFixed(1),ticks,max,min});
+  if(anim)grow(box);else box.classList.remove('pre');
+  const T_ALG={0:'Spectator gains 4.5 points of Forecast between 7.5 s and 180 s of history; the linear forecaster gains 1.2, and NeuroWorld loses ground beyond 120 s.',
+   1:'Spectator rises fivefold from 1.1% at 7.5 s to 5.5% at 180 s—more than double the best baseline (2.6%). Stimulus-only encoders score exactly 0.',
+   2:'With four new frames per minute, Spectator reaches 20.3% at 180 s, 6.9 points ahead of the next-best model (NeuroWorld, 13.4%).',
+   3:'By correlation alone, stimulus-only MIRAGE ranks second (0.320) and beats every prior brain world model while scoring 0% on State.'};
+  const T_HCP={0:'On HCP 7T (184 viewers, different scanner, zero TRIBE v2 exposure), Spectator leads at 6.6% Forecast—and reaches 7.3% zero-shot on 36 unseen individuals.',
+   1:'Scored on a clip viewed twice by 27 held-out HCP viewers, Spectator leads at 6.2% State while stimulus-only encoders score 0.',
+   2:'With four scans per minute on HCP 7T, Spectator reaches 15.7% Updating (+2.6 points over NeuroWorld, 13.1%) and 16.7% zero-shot on unseen viewers.',
+   3:'On 60-step parcel-averaged Pearson r on HCP 7T (Table 12), Spectator ranks first at 0.163 (0.217 over steps 1–30; 94.9% Cls@Top10).'};
+  $('lbNote').textContent=(isHcp?T_HCP:T_ALG)[metric];}
+renderLB(false);$('lbReplay').onclick=()=>renderLB(true);
+const lbio=new IntersectionObserver(es=>{if(es[0].isIntersecting){renderLB(true);lbio.disconnect();}},{threshold:.3});lbio.observe($('lbChart'));
+
+/* ---------- UPGRADED: Scrubbable + scroll-drawn 5-minute rollout stability ---------- */
+const HZ_S=[1.5,3.0,4.5,7.5,11.9,16.4,22.4,29.8,38.7,49.2,61.1,73.0,84.9,98.3,113.2,128.1,140.1,144.5,150.5,162.4,180.3,210.1,239.9,269.7,299.5];
+const HZ_SP=[43.49,32.35,26.98,24.69,22.45,18.97,14.83,12.16,11.54,11.71,11.48,10.85,10.37,10.16,10.15,10.15,9.96,9.94,9.87,9.85,9.82,9.7,9.72,9.63,9.56];
+const HZ_MO=[9.41,9.72,9.71,9.62,9.64,9.8,9.79,9.62,9.56,9.5,9.38,9.18,9.08,8.98,8.88,8.94,8.86,8.87,8.81,8.79,8.75,8.69,8.7,8.62,8.56];
+const HZ_TR=[39.56,28.64,21.89,18.08,16.81,15.03,12.72,10.8,10.11,10.05,9.69,8.61,7.14,5.43,3.78,2.1,0.28,-0.47,-1.61,-4.58,-11.18,-31.58,-78.03,-190.19,-473.4];
+const HZ_TB=[4.28,4.28,4.34,4.41,4.41,4.48,4.47,4.35,4.32,4.33,4.34,4.32,4.33,4.26,4.19,4.22,4.22,4.25,4.23,4.27,4.26,4.18,4.2,4.15,4.16];
+let hzIdx=17,hzDrawn=false; // starts at 144.5 s (right where Transformer crosses 0%)
+function renderHorizon(animateDraw){
+  const box=$('horizonChart'),w=Math.max(300,box.clientWidth),h=215,pl=36,pr=14,pt=14,pb=28;
+  const ymin=-10,ymax=46,sx=t=>pl+(w-pl-pr)*t/300,sy=v=>pt+(h-pt-pb)*(ymax-v)/(ymax-ymin);
+  const poly=(arr,clip)=>{const pts=[];for(let i=0;i<arr.length;i++){const v=arr[i];if(clip&&v<ymin){if(i>0&&arr[i-1]>=ymin){const f=(arr[i-1]-ymin)/(arr[i-1]-v);pts.push([sx(HZ_S[i-1]+f*(HZ_S[i]-HZ_S[i-1])),sy(ymin)]);}break;}pts.push([sx(HZ_S[i]),sy(v)]);}return pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');};
+  let s=`<svg viewBox="0 0 ${w} ${h}" style="cursor:crosshair" role="img" aria-label="5-minute open-loop stability">`;
+  [-10,0,10,20,30,40].forEach(t=>{s+=`<line x1="${pl}" x2="${w-pr}" y1="${sy(t)}" y2="${sy(t)}" stroke="${t===0?C.faint:C.rule}" stroke-dasharray="${t===0?'3 3':''}"/><text class="mut val" x="${pl-6}" y="${sy(t)+4}" text-anchor="end">${t}%</text>`;});
+  [0,60,120,180,240,300].forEach(t=>{s+=`<line x1="${sx(t)}" x2="${sx(t)}" y1="${pt}" y2="${h-pb}" stroke="${C.rule}" opacity=".55"/><text class="mut val" x="${sx(t)}" y="${h-8}" text-anchor="middle">${t===0?'0':t/60+' min'}</text>`;});
+  s+=`<path class="hz-draw" d="${poly(HZ_TB,false)}" fill="none" stroke="${C.grey}" stroke-width="1.8"/>`;
+  s+=`<path class="hz-draw" d="${poly(HZ_MO,false)}" fill="none" stroke="${C.stim}" stroke-width="1.9" stroke-dasharray="5 3"/>`;
+  s+=`<path class="hz-draw" d="${poly(HZ_TR,true)}" fill="none" stroke="${C.neg}" stroke-width="2.2"/>`;
+  s+=`<path class="hz-draw" d="${poly(HZ_SP,false)}" fill="none" stroke="${C.state}" stroke-width="2.8"/>`;
+  s+=`<line id="hzCursor" x1="0" x2="0" y1="${pt}" y2="${h-pb}" stroke="${C.ink}" stroke-width="1.2" stroke-dasharray="2 2" opacity=".55"/>`;
+  s+=`<circle id="hzDotTB" r="3.5" fill="${C.grey}" stroke="#fff" stroke-width="1.5"/>`;
+  s+=`<circle id="hzDotMO" r="3.8" fill="${C.stim}" stroke="#fff" stroke-width="1.5"/>`;
+  s+=`<circle id="hzDotTR" r="4" fill="${C.neg}" stroke="#fff" stroke-width="1.5"/>`;
+  s+=`<circle id="hzDotSP" r="4.8" fill="${C.state}" stroke="#fff" stroke-width="1.8"/>`;
+  s+=`<rect id="hzHit" x="${pl}" y="${pt}" width="${w-pl-pr}" height="${h-pt-pb}" fill="transparent"/>`;
+  box.innerHTML=s+'</svg>';
+  if(animateDraw&&!reduce){
+    box.querySelectorAll('.hz-draw').forEach(p=>{
+      const L=p.getTotalLength();
+      const origDash=p.getAttribute('stroke-dasharray');
+      p.style.strokeDasharray=L;p.style.strokeDashoffset=L;p.style.transition='stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1)';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{p.style.strokeDashoffset='0';}));
+      if(origDash)setTimeout(()=>{p.style.strokeDasharray=origDash;},1150);
+    });
+  }
+  function setHz(idx){
+    hzIdx=Math.max(0,Math.min(HZ_S.length-1,idx));
+    const t=HZ_S[hzIdx],x=sx(t);
+    const cur=$('hzCursor');if(cur){cur.setAttribute('x1',x);cur.setAttribute('x2',x);}
+    const put=(id,v)=>{const c=$(id);if(!c)return;if(v<ymin){c.setAttribute('opacity','0');return;}c.setAttribute('opacity','1');c.setAttribute('cx',x);c.setAttribute('cy',sy(v));};
+    put('hzDotSP',HZ_SP[hzIdx]);put('hzDotMO',HZ_MO[hzIdx]);put('hzDotTR',HZ_TR[hzIdx]);put('hzDotTB',HZ_TB[hzIdx]);
+    const tr=HZ_TR[hzIdx];
+    $('hzReadout').innerHTML=`<span class="t">${t<60?t.toFixed(1)+' s':(t/60).toFixed(1)+' min'}</span>`
+      +`<span class="chip"><i style="background:${C.state}"></i>Spectator <b>${HZ_SP[hzIdx].toFixed(1)}%</b></span>`
+      +`<span class="chip"><i style="background:${C.stim}"></i>Movie <b>${HZ_MO[hzIdx].toFixed(1)}%</b></span>`
+      +`<span class="chip"><i style="background:${C.neg}"></i>Transformer <b style="color:${tr<0?C.neg:''}">${tr.toFixed(1)}%</b></span>`
+      +`<span class="chip"><i style="background:${C.grey}"></i>TRIBE <b>${HZ_TB[hzIdx].toFixed(1)}%</b></span>`;
+  }
+  setHz(hzIdx);
+  const hit=$('hzHit');
+  if(hit){
+    const pick=clientX=>{
+      const r=hit.getBoundingClientRect();
+      const frac=Math.max(0,Math.min(1,(clientX-r.left)/r.width));
+      const target=frac*300;
+      let best=0,bd=1e9;
+      HZ_S.forEach((v,i)=>{const d=Math.abs(v-target);if(d<bd){bd=d;best=i;}});
+      setHz(best);
+    };
+    hit.addEventListener('pointermove',e=>pick(e.clientX));
+    hit.addEventListener('pointerdown',e=>pick(e.clientX));
+  }
+  box.onkeydown=e=>{
+    if(e.key==='ArrowLeft'){e.preventDefault();setHz(hzIdx-1);}
+    else if(e.key==='ArrowRight'){e.preventDefault();setHz(hzIdx+1);}
+  };
+}
+
+/* ---------- UPGRADED: Data efficiency with hover readout ---------- */
+const DS_X=['10%','25%','50%','100%'],DS_H=['4.7 h','11.7 h','23.3 h','46.6 h'];
+const DS_DATA=[
+  {n:'Forecast',ticks:[6,10,14,18],min:6,max:18,sp:[11.47,13.78,15.19,15.95],ls:[9.05,11.32,12.53,13.59],lr:[8.34,9.59,10.35,11.62]},
+  {n:'State',ticks:[0,2,4,6],min:0,max:6.2,sp:[3.63,4.29,5.07,5.47],ls:[1.61,3.04,4.00,4.69],lr:[0.89,1.38,1.88,2.61]},
+  {n:'Updating',ticks:[8,12,16,20],min:8,max:22,sp:[15.51,18.05,19.48,20.32],ls:[12.01,13.06,15.34,16.47],lr:[10.26,12.43,13.27,12.72]}
+];
+let dsIdx=1,dsHover=0;
+function renderDatasize(animateDraw){
+  const box=$('datasizeChart'),d=DS_DATA[dsIdx],w=Math.max(300,box.clientWidth),h=215,pl=36,pr=28,pt=14,pb=32;
+  const sx=i=>pl+(w-pl-pr)*i/3,sy=v=>pt+(h-pt-pb)*(d.max-v)/(d.max-d.min);
+  const path=arr=>arr.map((v,i)=>(i?'L':'M')+sx(i).toFixed(1)+','+sy(v).toFixed(1)).join(' ');
+  let s=`<svg viewBox="0 0 ${w} ${h}" style="cursor:crosshair" role="img" aria-label="Data efficiency on ${d.n}">`;
+  d.ticks.forEach(t=>{s+=`<line x1="${pl}" x2="${w-pr}" y1="${sy(t)}" y2="${sy(t)}" stroke="${C.rule}"/><text class="mut val" x="${pl-6}" y="${sy(t)+4}" text-anchor="end">${t}%</text>`;});
+  if(d.sp[0]>d.lr[3]){const yl=sy(d.lr[3]);s+=`<line x1="${pl}" x2="${w-pr}" y1="${yl}" y2="${yl}" stroke="${C.faint}" stroke-dasharray="3 3"/>`;}
+  DS_X.forEach((lbl,i)=>{const x=sx(i);s+=`<text class="val" x="${x}" y="${h-16}" text-anchor="middle">${lbl}</text><text class="mut val" x="${x}" y="${h-3}" text-anchor="middle" style="font-size:10.5px">${DS_H[i]}</text>`;});
+  s+=`<line id="dsCursor" x1="${sx(dsHover)}" x2="${sx(dsHover)}" y1="${pt}" y2="${h-pb}" stroke="${C.ink}" stroke-width="1.2" stroke-dasharray="2 2" opacity=".45"/>`;
+  [[d.lr,C.faint,1.9,'4 3'],[d.ls,C.obs,2.0,''],[d.sp,C.state,2.8,'']].forEach(([arr,col,lw,dash])=>{
+    s+=`<path class="ds-draw" d="${path(arr)}" fill="none" stroke="${col}" stroke-width="${lw}" stroke-dasharray="${dash}"/>`;
+    arr.forEach((v,i)=>{s+=`<circle cx="${sx(i).toFixed(1)}" cy="${sy(v).toFixed(1)}" r="${col===C.state?4.5:3.4}" fill="${col}" stroke="#fff" stroke-width="1.3"/>`;});
+  });
+  s+=`<rect id="dsHit" x="${pl}" y="${pt}" width="${w-pl-pr}" height="${h-pt-pb}" fill="transparent"/>`;
+  box.innerHTML=s+'</svg>';
+  if(animateDraw&&!reduce){
+    box.querySelectorAll('.ds-draw').forEach(p=>{
+      const L=p.getTotalLength(),orig=p.getAttribute('stroke-dasharray');
+      p.style.strokeDasharray=L;p.style.strokeDashoffset=L;p.style.transition='stroke-dashoffset .9s cubic-bezier(.22,1,.36,1)';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{p.style.strokeDashoffset='0';}));
+      if(orig)setTimeout(()=>{p.style.strokeDasharray=orig;},950);
+    });
+  }
+  function setDs(i){
+    dsHover=Math.max(0,Math.min(3,i));
+    const cur=$('dsCursor');if(cur){cur.setAttribute('x1',sx(dsHover));cur.setAttribute('x2',sx(dsHover));}
+    $('dsReadout').innerHTML=`<span class="t">${DS_X[dsHover]} (${DS_H[dsHover]})</span>`
+      +`<span class="chip"><i style="background:${C.state}"></i>Spectator <b>${d.sp[dsHover].toFixed(1)}%</b></span>`
+      +`<span class="chip"><i style="background:${C.obs}"></i>Lin (Sp targets) <b>${d.ls[dsHover].toFixed(1)}%</b></span>`
+      +`<span class="chip"><i style="background:${C.faint}"></i>Lin (real fMRI) <b>${d.lr[dsHover].toFixed(1)}%</b></span>`;
+  }
+  setDs(dsHover);
+  const hit=$('dsHit');
+  if(hit){
+    const pick=clientX=>{const r=hit.getBoundingClientRect();setDs(Math.round(Math.max(0,Math.min(1,(clientX-r.left)/r.width))*3));};
+    hit.addEventListener('pointermove',e=>pick(e.clientX));
+    hit.addEventListener('pointerdown',e=>pick(e.clientX));
+  }
+}
+seg($('dsMetricSeg'),['Forecast','State','Updating'],dsIdx,i=>{dsIdx=i;renderDatasize(true);});
+renderHorizon(false);renderDatasize(false);
+const hzio=new IntersectionObserver(es=>{if(es[0].isIntersecting&&!hzDrawn){hzDrawn=true;renderHorizon(true);renderDatasize(true);hzio.disconnect();}},{threshold:.25});
+hzio.observe($('horizonChart'));
+
+/* ---------- input lab (§5) ---------- */
+const LAB={'orig|own':[16.0,5.5,20.3,.349],'none|own':[7.5,5.5,13.7,.224],'orig|zero':[9.4,0.0,8.4,.253],'orig|other':[6.7,-5.1,1.2,.236],'time|own':[-1.4,null,null,null],'orig|time':[2.4,null,null,null]};
+const VERD={'orig|own':'Full inputs: the reference point, shown as the thin vertical mark on each bar.',
+ 'none|own':'Forecast halves (16.0 → 7.5) while State is untouched: trial-specific signal comes from the brain, not the movie. Updating still gains over Forecast (13.7 vs 7.5).',
+ 'orig|zero':'State drops to exactly 0, since both viewings start from the same empty state. Updating no longer beats Forecast (8.4 vs 9.4).',
+ 'orig|other':'Another viewer\'s brain at the same moment makes State negative (−5.1) and Updating collapses to 1.2—yet r is 0.236, within 0.03 of the other perturbations.',
+ 'time|own':'Movie features from the wrong moment are worse than none: Forecast falls to −1.4, below predicting the mean.',
+ 'orig|time':'The same person\'s state from another moment scores 2.4, below starting from no state at all (9.4). The state is moment-specific.'};
+const MT=[{n:'Forecast',max:17,min:-6},{n:'State',max:6,min:-6},{n:'Updating',max:21,min:-6},{n:'Correlation r',max:.36,min:0,r:1}];
+$('meters').innerHTML=MT.map((m,i)=>`<div class="meter${m.r?' r':''}"><div class="row"><span>${m.n}</span><b id="mv${i}"></b></div><div class="track"><div class="zero" id="mz${i}"></div><div class="fill" id="mf${i}"></div><div class="ghost" id="mg${i}"></div></div></div>`).join('');
+const pos=(m,v)=>100*(v-m.min)/(m.max-m.min);
+function renderLab(){const st=document.querySelector('input[name=stim]:checked').value,fm=document.querySelector('input[name=fmri]:checked').value;
+  document.querySelectorAll('input[name=fmri]').forEach(x=>{const d=st!=='orig'&&x.value!=='own';x.disabled=d;x.parentElement.classList.toggle('dis',d);});
+  document.querySelectorAll('input[name=stim]').forEach(x=>{const d=fm!=='own'&&x.value!=='orig';x.disabled=d;x.parentElement.classList.toggle('dis',d);});
+  const key=st+'|'+fm,v=LAB[key],ref=LAB['orig|own'];
+  MT.forEach((m,i)=>{const val=v[i],z=pos(m,0),f=$('mf'+i),lab=$('mv'+i);$('mz'+i).style.left=z+'%';$('mg'+i).style.left=pos(m,ref[i])+'%';
+    if(val===null){f.style.width='0';lab.textContent='not reported';lab.style.color=C.faint;return;}
+    const p=pos(m,val);f.style.left=Math.min(z,p)+'%';f.style.width=Math.abs(p-z)+'%';f.style.background=val<0?C.neg:(m.r?C.obs:C.state);lab.style.color='';lab.textContent=m.r?val.toFixed(3):val.toFixed(1)+'%';});
+  $('verdict').textContent=VERD[key];}
+document.querySelectorAll('.lab input').forEach(x=>x.addEventListener('change',renderLab));renderLab();
+
+/* ---------- brain maps & tertiles (§6) ---------- */
+const BR={a:{s:'a',grad:'linear-gradient(90deg,#fdf3e3,#f2a447,#b85a07)',lbl:['0','10','20','30 pts'],text:'Stimulus helps most in auditory, story, and visual-motion regions of temporal and occipital cortex (up to ~30 points), and little elsewhere.'},
+          b:{s:'b',grad:'linear-gradient(90deg,#e6f3f4,#7fc0c6,#14747a)',lbl:['4','6','8','10 pts'],text:'Latent state helps in every parcel, peaking in prefrontal and parietal association cortex (default-mode and control hubs).'}};
+function setBrain(k){const b=BR[k];$('brainLat').src=`../assets/brain_${k}_lat.webp`;$('brainMed').src=`../assets/brain_${k}_med.webp`;$('cbar').style.background=b.grad;$('cbarLbl').innerHTML=b.lbl.map(x=>`<span>${x}</span>`).join('');$('brainText').textContent=b.text;}
+document.querySelectorAll('#brainSeg button').forEach((b,i)=>b.onclick=()=>{press($('brainSeg'),i);setBrain(b.dataset.map);});setBrain('b');
+function renderTert(anim){const box=$('tertChart'),w=Math.max(300,box.clientWidth),h=230,pl=30,pb=42,S=[2.0,5.8,15.0],Lv=[5.3,6.8,6.9],G=['individuals differ','in between','individuals agree'];
+  const sy=v=>h-pb-(h-pb-26)*v/16,gw=(w-pl-6)/3,bw=Math.min(44,gw*.3);
+  let s=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Forecast gain by tertile of inter-subject correlation">`;
+  [0,5,10,15].forEach(t=>s+=`<line x1="${pl}" x2="${w}" y1="${sy(t)}" y2="${sy(t)}" stroke="${C.rule}"/><text class="mut val" x="${pl-6}" y="${sy(t)+4}" text-anchor="end">${t}</text>`);
+  G.forEach((g,i)=>{const cx=pl+gw*i+gw/2;
+    s+=`<rect class="vbar" x="${cx-bw-3}" y="${sy(S[i])}" width="${bw}" height="${sy(0)-sy(S[i])}" rx="4" fill="${C.stim}" style="transform-box:fill-box;transform-origin:bottom;transition:transform .85s ${i*80}ms cubic-bezier(.2,.7,.2,1)"/><text class="val" x="${cx-bw/2-3}" y="${sy(S[i])-6}" text-anchor="middle">${S[i].toFixed(1)}</text>`;
+    s+=`<rect class="vbar" x="${cx+3}" y="${sy(Lv[i])}" width="${bw}" height="${sy(0)-sy(Lv[i])}" rx="4" fill="${C.state}" style="transform-box:fill-box;transform-origin:bottom;transition:transform .85s ${i*80+40}ms cubic-bezier(.2,.7,.2,1)"/><text class="val" x="${cx+bw/2+3}" y="${sy(Lv[i])-6}" text-anchor="middle">${Lv[i].toFixed(1)}</text>`;
+    s+=`<text class="mut" x="${cx}" y="${h-20}" text-anchor="middle" style="font-size:12.5px">${g}</text>`;});
+  s+=`<rect x="${pl+6}" y="4" width="11" height="11" rx="3" fill="${C.stim}"/><text x="${pl+22}" y="14" style="font-size:12.5px">stimulus</text><rect x="${pl+96}" y="4" width="11" height="11" rx="3" fill="${C.state}"/><text x="${pl+112}" y="14" style="font-size:12.5px">latent state</text>`;
+  box.innerHTML=s+'</svg>';
+  if(anim){const bars=box.querySelectorAll('.vbar');bars.forEach(b=>b.style.transform='scaleY(0)');void box.offsetWidth;requestAnimationFrame(()=>requestAnimationFrame(()=>bars.forEach(b=>b.style.transform='scaleY(1)')));}}
+renderTert(false);$('tertReplay').onclick=()=>renderTert(true);
+const tio=new IntersectionObserver(es=>{if(es[0].isIntersecting){renderTert(true);tio.disconnect();}},{threshold:.3});tio.observe($('tertChart'));
+
+/* ---------- copy ---------- */
+$('copyBib').onclick=async e=>{try{await navigator.clipboard.writeText($('bib').textContent);e.target.textContent='Copied ✓';}catch(err){e.target.textContent='Select text';}setTimeout(()=>e.target.textContent='Copy',2000);};
+
+/* ---------- resize ---------- */
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{drawDecomp();renderLB(false);renderHorizon(false);renderDatasize(false);renderTert(false);drawTask();},150);});
+
+/* ---------- click-to-launch visual poster gate (SuperMimic-inspired) ---------- */
+let simStarted=false;
+function startSim(){
+  if(simStarted)return;
+  simStarted=true;
+  const lb=$('simLoading');
+  if(lb)lb.innerHTML='<div class="sim-prog"><span id="simLoadText">Loading Spectator weights &amp; first clip (24.5 MB)…</span><div class="sim-pbar"><div id="simLoadFill"></div></div></div>';
+  setTimeout(()=>{window.initSpectatorSim().catch(err=>{console.error(err);if(!document.getElementById('simLoading')){$('simUI').hidden=true;const p=document.createElement('p');p.style.cssText='text-align:center;color:var(--muted);padding:24px';p.textContent='The live simulator needs WebGL, which this browser did not provide.';$('sim').appendChild(p);}});},40);
+}
+const launchBtn=$('simLaunchBtn');
+if(launchBtn)launchBtn.onclick=startSim;
+});
+</script>
+</body>
+</html>
