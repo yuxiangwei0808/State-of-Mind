@@ -1,7 +1,7 @@
 # Spectator, step 3 (the JEPA phase): the whole encoder (fast map and lag weights, rate 5e-5 x 0.2 = 1e-5) trained against
 # its EMA copy (momentum 0.998), with a matrix predictor (rate 5e-5) from a closed-form start, one layer-normalized movie row
 # shifted 3 s, movie dropped from 30% of sequences, one-step + 40-step rollout latent losses. Stops after 10 epochs without a
-# better probe score on Friends S6. Run as D180 (kept epoch 58); frozen copy: ${NEUROWORLD_OUTPUT}/spectator-v1/algonauts/jepa.
+# better probe score on Friends S6; the paper's run kept epoch 58.
 # Its encoder file is step 2's output and its start matrix comes from python -m neuroworld.spectator matrix (see __init__.py).
 # Frozen on November 12, 2026: a fully resolved configuration, so later changes to defaults do not change it.
 data:
