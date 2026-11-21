@@ -319,8 +319,9 @@ h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;mar
 }
 .simtog:hover{border-color:var(--border-strong)}
 .simtog[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
-.sim-mode{width:100%;display:grid;grid-template-columns:1fr 1fr;margin-bottom:8px}
+.sim-mode{width:100%;display:grid;grid-template-columns:1fr 1fr;margin-bottom:5px}
 .sim-mode button{font-size:12px;padding:5px 6px;text-align:center}
+.sim-mode-note{font-size:11.5px;line-height:1.35;color:var(--muted);margin:0 0 9px;padding:0 2px}
 .brainwrap{position:relative;border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--surface)}
 #simBrain{width:100%;height:500px;display:block;cursor:grab;touch-action:none}
 #simBrain:active{cursor:grabbing}
@@ -664,6 +665,7 @@ footer a:hover{color:var(--ink)}
             <div class="simbox">
               <h4>Interact</h4>
               <div class="seg sim-mode" id="simMode" role="group" aria-label="Rollout mode"></div>
+              <p class="sim-mode-note" id="simModeNote">Auto-feeds 1 real fMRI scan every ~12 s (closed-loop)</p>
               <button class="act primary" id="simScan"><b>Reveal 1 real scan <span class="kbd">S</span></b><span>Feed sub-01's recorded fMRI at this frame</span></button>
               <button class="act" id="simSwap" style="margin-bottom:0"><b>Swap to sub-02's brain</b><span>Use another viewer's 3-min fMRI history</span></button>
             </div>

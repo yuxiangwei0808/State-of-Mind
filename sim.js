@@ -258,6 +258,10 @@ seg($('simMode'),['Updating (4/min)','Forecast (open)'],0,i=>{
   autoScan=(i===0);
   const lbl=$('simScoreLbl');
   if(lbl)lbl.textContent=autoScan?'Updating score (1 min)':'Forecast score (1 min)';
+  const note=$('simModeNote');
+  if(note)note.textContent=autoScan
+    ?'Auto-feeds 1 real fMRI scan every ~12 s (closed-loop)'
+    :'No incoming scans — open-loop rollout from movie + initial state';
   updateReadouts();
 });
 let speed=1,paused=false,visible=true;
