@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>State of Mind — SuperMimic-Inspired Design Preview</title>
-<meta name="description" content="Preview of SuperMimic-inspired layout, animations, dark cortex theater, scrubbable charts, and guided counterfactual demo for State of Mind.">
+<title>State of Mind: Learning and Evaluating World Models of Naturalistic Brain Dynamics (Preview)</title>
+<meta name="description" content="BrainStateBench tests whether brain world models track an individual's state; Spectator is a linear latent world model that does—and runs live in your browser.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314747a'/%3E%3Ccircle cx='12' cy='16' r='5.5' fill='%23faf9f5'/%3E%3Ccircle cx='20' cy='16' r='5.5' fill='%23cf7722' fill-opacity='.92'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +31,7 @@
   --stim:#cf7722; --stim-d:#9e5310; --stim-soft:#fbf0e2;
   --obs:#2f65a8; --obs-soft:#ebf2fb;
   --neg:#b94438; --neg-soft:#fbeceb;
-  --stage:#0f1619; --stage-2:#172227;
+  --stage:#0f1619;
   --shadow-sm:0 1px 2px rgba(24,34,38,.04);
   --shadow-card:0 1px 2px rgba(24,34,38,.04), 0 12px 32px -16px rgba(24,34,38,.10);
   --shadow-pill:0 1px 3px rgba(24,34,38,.09);
@@ -48,7 +48,7 @@ html{scroll-behavior:smooth;scroll-padding-top:68px;background:var(--bg)}
 }
 body{
   margin:0;
-  background:radial-gradient(ellipse 90% 440px at 50% 0%, rgba(20,116,122,.06), transparent 72%), var(--bg);
+  background:radial-gradient(ellipse 90% 420px at 50% 0%, rgba(20,116,122,.055), transparent 72%), var(--bg);
   color:var(--ink);
   font-family:var(--sans);
   font-size:16.5px;
@@ -64,7 +64,7 @@ code{font-family:var(--mono);font-size:.88em}
 :focus-visible{outline:2px solid var(--state);outline-offset:2px;border-radius:6px}
 .col{max-width:var(--col);margin:0 auto;padding:0 22px}
 .wide{max-width:var(--wide);margin:0 auto;padding:0 22px}
-p{margin:0 0 1.05em;color:var(--ink-2)}
+p{margin:0 0 1.0em;color:var(--ink-2)}
 b,strong{font-weight:600;color:var(--ink)}
 .num{font-family:var(--mono);font-size:.86em;font-variant-numeric:tabular-nums}
 .st{color:var(--state);font-weight:600}.sm{color:var(--stim-d);font-weight:600}.ob{color:var(--obs);font-weight:600}
@@ -73,7 +73,7 @@ b,strong{font-weight:600;color:var(--ink)}
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
 .reveal.in{opacity:1;transform:none}
 
-/* preview banner */
+/* temporary preview banner */
 .preview-ribbon{
   background:var(--stage);color:#cbd5d8;font-size:12.5px;padding:7px 16px;text-align:center;
   display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;
@@ -82,7 +82,38 @@ b,strong{font-weight:600;color:var(--ink)}
 .preview-ribbon a{color:#7cd3d8;text-decoration:none;font-weight:500;padding:2px 9px;border:1px solid rgba(124,211,216,.3);border-radius:999px}
 .preview-ribbon a:hover{background:rgba(124,211,216,.12);color:#fff}
 
-/* sticky nav (SuperMimic-inspired brand + Explore links + Try it CTA) */
+/* original academic paper header */
+header{padding:56px 0 26px;text-align:center}
+h1{
+  font-family:var(--display);
+  font-size:clamp(34px,4.8vw,52px);
+  line-height:1.09;
+  font-weight:600;
+  letter-spacing:-0.025em;
+  margin:0 auto 16px;
+  max-width:860px;
+  color:var(--ink);
+  text-wrap:balance;
+}
+.authors{font-size:16.5px;font-weight:500;color:var(--ink-2);margin-bottom:4px}
+.affil{font-size:14px;color:var(--muted);margin-bottom:24px}
+.pills{display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
+.pill{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);
+  font-size:14px;font-weight:500;text-decoration:none;color:var(--ink);
+  box-shadow:var(--shadow-sm);
+  transition:transform .15s,border-color .15s,box-shadow .15s,background .15s;
+}
+.pill:hover{border-color:var(--border-strong);box-shadow:0 4px 12px -4px rgba(24,34,38,.12);transform:translateY(-1px);color:var(--ink)}
+.pill.main{background:var(--state);border-color:var(--state);color:#fff;box-shadow:0 4px 14px -4px rgba(20,116,122,.45)}
+.pill.main:hover{background:var(--state-d);border-color:var(--state-d);color:#fff;box-shadow:0 6px 18px -4px rgba(20,116,122,.5)}
+.pill[aria-disabled="true"]{opacity:.68;cursor:default;pointer-events:none;box-shadow:none}
+.pill .soon{font-family:var(--mono);font-size:10.5px;font-weight:500;opacity:.8;background:var(--panel);padding:1px 6px;border-radius:999px}
+.pill svg{width:14px;height:14px;flex:none}
+
+/* sticky nav with brand wordmark + Try it CTA */
 .toc{
   position:sticky;top:0;z-index:30;
   background:rgba(250,249,245,.88);
@@ -118,88 +149,22 @@ b,strong{font-weight:600;color:var(--ink)}
   transition:background .15s,transform .15s;
 }
 .toc-cta:hover{background:var(--state);color:#fff;transform:translateY(-1px)}
-@media (min-width:920px){
+@media (min-width:900px){
   .toc button.toggle,.toc ol{display:none!important}
   .toc-inline{display:flex}
 }
 
-/* hero */
-header{padding:64px 0 28px;text-align:center}
-.hero-kicker{
-  display:inline-flex;align-items:center;gap:8px;
-  font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;
-  color:var(--state-d);background:var(--state-soft);
-  padding:4px 12px;border-radius:999px;margin-bottom:18px;
-}
-.hero-kicker i{width:6px;height:6px;border-radius:50%;background:var(--state)}
-h1{
-  font-family:var(--display);
-  font-size:clamp(38px,5.4vw,58px);
-  line-height:1.06;
-  font-weight:600;
-  letter-spacing:-0.028em;
-  margin:0 auto 14px;
-  max-width:860px;
-  color:var(--ink);
-  text-wrap:balance;
-}
-.hero-sub{
-  font-size:clamp(17px,2vw,20px);line-height:1.48;color:var(--ink-2);
-  max-width:660px;margin:0 auto 14px;text-wrap:balance;
-}
-.hero-meta{font:500 13.5px var(--mono);color:var(--muted);margin-bottom:22px}
-.authors{font-size:15px;font-weight:500;color:var(--ink-2);margin-bottom:2px}
-.affil{font-size:13.5px;color:var(--muted);margin-bottom:22px}
-.pills{display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
-.pill{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:8px 16px;border-radius:999px;
-  border:1px solid var(--border);background:var(--surface);
-  font-size:14px;font-weight:500;text-decoration:none;color:var(--ink);
-  box-shadow:var(--shadow-sm);
-  transition:transform .15s,border-color .15s,box-shadow .15s,background .15s;
-}
-.pill:hover{border-color:var(--border-strong);box-shadow:0 4px 12px -4px rgba(24,34,38,.12);transform:translateY(-1px);color:var(--ink)}
-.pill.main{background:var(--state);border-color:var(--state);color:#fff;box-shadow:0 4px 14px -4px rgba(20,116,122,.45)}
-.pill.main:hover{background:var(--state-d);border-color:var(--state-d);color:#fff;box-shadow:0 6px 18px -4px rgba(20,116,122,.5)}
-.pill[aria-disabled="true"]{opacity:.68;cursor:default;pointer-events:none;box-shadow:none}
-.pill .soon{font-family:var(--mono);font-size:10.5px;font-weight:500;opacity:.8;background:var(--panel);padding:1px 6px;border-radius:999px}
-.pill svg{width:14px;height:14px;flex:none}
-
-/* highlights 3-card strip (SuperMimic-inspired "Get the highlights / Why it works") */
-.hi-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:26px auto 12px}
-@media (max-width:780px){.hi-grid{grid-template-columns:1fr}}
-.hi-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:20px 22px 18px;box-shadow:var(--shadow-card);
-  display:flex;flex-direction:column;justify-content:space-between;gap:12px;
-  transition:transform .2s,border-color .2s;
-}
-.hi-card:hover{transform:translateY(-2px);border-color:var(--border-strong)}
-.hi-eye{font:600 11px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--state)}
-.hi-num{font-family:var(--display);font-size:clamp(34px,3.8vw,44px);line-height:1.0;font-weight:600;letter-spacing:-0.03em;color:var(--ink);margin:4px 0 6px}
-.hi-desc{font-size:14px;line-height:1.48;color:var(--ink-2);margin:0}
-.hi-viz{padding-top:10px;border-top:1px solid var(--rule)}
-.ratio-row{display:grid;grid-template-columns:76px 1fr 42px;align-items:center;gap:8px;font:500 11.5px var(--mono);color:var(--muted);margin-top:6px}
-.ratio-row:first-child{margin-top:0}
-.ratio-row b{color:var(--ink);text-align:right}
-.ratio-track{height:8px;border-radius:999px;background:var(--panel);overflow:hidden}
-.ratio-fill{height:100%;border-radius:999px;width:0;transition:width 1s cubic-bezier(.22,1,.36,1)}
-.ratio-fill.ours{background:var(--state)}
-.ratio-fill.base{background:#b8c0c2}
-.ratio-fill.stim{background:var(--stim)}
-
-/* sections & typography (punchy 2-5 word keynote headlines) */
-section{padding:64px 0 8px}
+/* sections & crisp display headings */
+section{padding:58px 0 6px}
 .sec-label{
   font-family:var(--mono);font-size:11.5px;font-weight:600;
   letter-spacing:.09em;color:var(--state);text-transform:uppercase;margin-bottom:6px;
 }
 h2{
   font-family:var(--display);
-  font-size:clamp(28px,3.6vw,40px);
-  line-height:1.12;font-weight:600;letter-spacing:-0.024em;
-  margin:0 0 14px;color:var(--ink);text-wrap:balance;
+  font-size:clamp(28px,3.5vw,38px);
+  line-height:1.13;font-weight:600;letter-spacing:-0.022em;
+  margin:0 0 12px;color:var(--ink);text-wrap:balance;
 }
 h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;margin:24px 0 8px;color:var(--ink)}
 
@@ -209,7 +174,7 @@ h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;mar
   border-radius:var(--radius);
   background:var(--surface);
   padding:22px 24px 18px;
-  margin:24px auto 10px;
+  margin:22px auto 10px;
   box-shadow:var(--shadow-card);
 }
 .img-frame{
@@ -217,7 +182,7 @@ h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;mar
   border-radius:var(--radius);
   background:var(--surface);
   padding:16px 18px;
-  margin:22px auto 10px;
+  margin:20px auto 10px;
   box-shadow:var(--shadow-card);
 }
 .figtitle{font-weight:600;font-size:15.5px;letter-spacing:-0.01em;margin:0;color:var(--ink)}
@@ -249,7 +214,7 @@ h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;mar
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
 .legend i{display:inline-block;width:15px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
 
-/* SuperMimic-inspired animated "How it works" loop (§3) */
+/* animated "How it works" closed-loop SVG (§4) */
 #howSvg{width:100%;height:auto;display:block}
 #howSvg text{font-family:var(--sans)}
 .how-note{font-size:14px;color:var(--ink-2);margin:10px 0 0;padding-top:10px;border-top:1px solid var(--rule);line-height:1.55}
@@ -338,7 +303,7 @@ h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;mar
 .cbar{height:8px;border-radius:999px;max-width:220px;margin-top:10px}
 .cbar-lbl{display:flex;justify-content:space-between;max-width:220px;font:11.5px var(--mono);color:var(--muted);margin-top:3px}
 
-/* live simulator: dark poster gate + dark slate 3D theater + guided 3-perturbation strip */
+/* live simulator: dark poster gate + dark slate 3D theater */
 .simnote{
   display:flex;gap:10px;align-items:baseline;
   font-size:13.5px;line-height:1.5;color:var(--ink-2);
@@ -346,16 +311,15 @@ h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;mar
 }
 .simnote b{color:var(--state-d);font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 
-/* visual click-to-launch poster gate (SuperMimic-inspired) */
 .sim-poster{
   position:relative;border-radius:14px;overflow:hidden;
   background:radial-gradient(ellipse 75% 80% at 50% 45%, #1a2a31 0%, #0d1417 100%);
-  color:#eef3f4;padding:34px 24px;min-height:310px;
+  color:#eef3f4;padding:34px 24px;min-height:300px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;
 }
 .sim-poster-brains{
   display:flex;gap:28px;justify-content:center;align-items:center;
-  opacity:.82;filter:drop-shadow(0 16px 32px rgba(0,0,0,.55));
+  opacity:.86;filter:drop-shadow(0 16px 32px rgba(0,0,0,.55));
   pointer-events:none;max-width:520px;margin-bottom:2px;
 }
 .sim-poster-brains img{width:190px;max-width:42vw;height:auto;border-radius:12px;opacity:.92}
@@ -375,25 +339,6 @@ h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;mar
   transition:transform .15s,background .15s,box-shadow .15s;
 }
 .sim-launch:hover{background:#1fa0a8;transform:translateY(-1px);box-shadow:0 12px 28px -6px rgba(25,137,144,.72)}
-
-/* guided 3-perturbation strip ("Take a closer look.") */
-.story-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap}
-.story-head span{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.story-restore{background:none;border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;color:var(--ink-2);cursor:pointer}
-.story-restore:hover{background:var(--panel);color:var(--ink)}
-.story-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
-@media (max-width:740px){.story-grid{grid-template-columns:1fr}}
-.story-card{
-  text-align:left;padding:11px 13px;border-radius:12px;
-  border:1px solid var(--border);background:var(--bg);cursor:pointer;
-  transition:border-color .15s,background .15s,transform .15s,box-shadow .15s;
-}
-.story-card:hover{border-color:var(--border-strong);background:var(--surface);transform:translateY(-1px)}
-.story-card b{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink);margin-bottom:3px}
-.story-card b i{width:8px;height:8px;border-radius:50%;flex:none}
-.story-card span{display:block;font-size:12px;line-height:1.4;color:var(--muted)}
-.story-card[aria-pressed="true"]{border-color:var(--state);background:var(--state-soft);box-shadow:0 4px 14px -6px rgba(20,116,122,.28)}
-.story-card[aria-pressed="true"] b{color:var(--state-d)}
 
 .simgrid{display:grid;grid-template-columns:276px minmax(0,1fr);gap:16px;align-items:start}
 @media (max-width:820px){.simgrid{grid-template-columns:1fr}}
@@ -425,7 +370,7 @@ h3{font-family:var(--display);font-size:21px;line-height:1.3;font-weight:600;mar
 .sim-mode button{font-size:12px;padding:5px 6px;text-align:center}
 .sim-mode-note{font-size:11.5px;line-height:1.35;color:var(--muted);margin:0 0 9px;padding:0 2px}
 
-/* DARK CORTEX THEATER STAGE */
+/* dark cortex theater stage */
 .brainwrap{
   position:relative;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;
   background:radial-gradient(ellipse 78% 72% at 50% 48%, #19262c 0%, #0e1518 100%);
@@ -512,17 +457,31 @@ footer a:hover{color:var(--ink)}
 <body id="top">
 
 <div class="preview-ribbon">
-  <span><b>Design Preview</b> · SuperMimic-inspired layout &amp; animations</span>
+  <span><b>Refined Preview (Option A)</b> · Original academic header + Live Demo after Overview</span>
   <a href="../">← Compare with current live page</a>
 </div>
+
+<header>
+  <div class="wide">
+    <h1>State of Mind: Learning and Evaluating World Models of Naturalistic Brain Dynamics</h1>
+    <div class="authors">Anonymous authors</div>
+    <div class="affil">Preprint · names and affiliations withheld during review</div>
+    <div class="pills">
+      <a class="pill main" href="#live"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 3.2 12.8 8l-8.3 4.8z"/></svg>Live Simulator</a>
+      <span class="pill" aria-disabled="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5l3 3v10H4z"/><path d="M9 1.5v3h3"/></svg>Paper <span class="soon">soon</span></span>
+      <a class="pill" href="https://github.com/yuxiangwei0808/State-of-Mind" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/></svg>Code</a>
+      <a class="pill" href="https://huggingface.co/stanjsx/Spectator" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="3" width="11" height="10" rx="2"/><path d="M5.5 7h5M5.5 10h3.5"/></svg>Weights &amp; Scores</a>
+      <a class="pill" href="#cite"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 4h4v4H5c0 1.5.7 2.5 2 3l-.6 1.2C4 11.4 3 9.8 3 7.5zm6 0h4v4h-2c0 1.5.7 2.5 2 3l-.6 1.2C10 11.4 9 9.8 9 7.5z"/></svg>BibTeX</a>
+    </div>
+  </div>
+</header>
 
 <nav class="toc" id="toc" data-open="false" aria-label="Contents">
   <div class="toc-bar">
     <a class="toc-brand" href="#top">State of Mind</a>
     <ul class="toc-inline" id="tocInline">
-      <li><a href="#highlights" data-sec="highlights" aria-current="true">Highlights</a></li>
-      <li><a href="#live" data-sec="live">Web Demo</a></li>
-      <li><a href="#overview" data-sec="overview">Overview</a></li>
+      <li><a href="#overview" data-sec="overview" aria-current="true">Overview</a></li>
+      <li><a href="#live" data-sec="live">Live Demo</a></li>
       <li><a href="#bench" data-sec="bench">Benchmark</a></li>
       <li><a href="#model" data-sec="model">How It Works</a></li>
       <li><a href="#results" data-sec="results">Results</a></li>
@@ -531,135 +490,63 @@ footer a:hover{color:var(--ink)}
       <li><a href="#cite" data-sec="cite">Cite</a></li>
     </ul>
     <button class="toggle" id="tocToggle" aria-expanded="false" aria-controls="tocList">
-      <span class="cur" id="tocCur">Highlights</span>
+      <span class="cur" id="tocCur">Overview</span>
       <svg class="chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m2 4 4 4 4-4"/></svg>
     </button>
     <a class="toc-cta" href="#live">Try it →</a>
   </div>
   <ol id="tocList">
-    <li><a href="#highlights"><span>01</span>Highlights</a></li>
-    <li><a href="#live"><span>02</span>Live Web Demo</a></li>
-    <li><a href="#overview"><span>03</span>Overview</a></li>
-    <li><a href="#bench"><span>04</span>BrainStateBench</a></li>
-    <li><a href="#model"><span>05</span>How Spectator Works</a></li>
-    <li><a href="#results"><span>06</span>Results</a></li>
-    <li><a href="#lab"><span>07</span>Input Lab</a></li>
-    <li><a href="#where"><span>08</span>Cortical Maps</a></li>
-    <li><a href="#cite"><span>09</span>Citation</a></li>
+    <li><a href="#overview"><span>§1</span>Overview</a></li>
+    <li><a href="#live"><span>§2</span>Live Demo</a></li>
+    <li><a href="#bench"><span>§3</span>BrainStateBench</a></li>
+    <li><a href="#model"><span>§4</span>How It Works</a></li>
+    <li><a href="#results"><span>§5</span>Results</a></li>
+    <li><a href="#lab"><span>§6</span>Input Lab</a></li>
+    <li><a href="#where"><span>§7</span>Cortical Maps</a></li>
+    <li><a href="#cite"><span>§8</span>Citation</a></li>
   </ol>
   <div class="toc-progress" id="tocProgress" aria-hidden="true"></div>
 </nav>
 
-<header id="highlights">
-  <div class="wide">
-    <div class="hero-kicker"><i></i>BrainStateBench · Spectator</div>
-    <h1>Same movie.<br>Different state of mind.</h1>
-    <p class="hero-sub">Learning and evaluating world models of naturalistic brain dynamics—inferring an individual's latent state, rolling it forward under the movie, and updating it when scans arrive.</p>
-    <div class="hero-meta">1,000 cortical parcels · 60 s rollouts · 5.4 ms in your browser</div>
-    <div class="authors">Anonymous authors</div>
-    <div class="affil">Preprint · names and affiliations withheld during review</div>
-    <div class="pills">
-      <a class="pill main" href="#live"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 3.2 12.8 8l-8.3 4.8z"/></svg>Try Live Simulator</a>
-      <span class="pill" aria-disabled="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5l3 3v10H4z"/><path d="M9 1.5v3h3"/></svg>Paper <span class="soon">soon</span></span>
-      <a class="pill" href="https://github.com/yuxiangwei0808/State-of-Mind" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/></svg>Code</a>
-      <a class="pill" href="https://huggingface.co/stanjsx/Spectator" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="3" width="11" height="10" rx="2"/><path d="M5.5 7h5M5.5 10h3.5"/></svg>Weights &amp; Scores</a>
-      <a class="pill" href="#cite"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 4h4v4H5c0 1.5.7 2.5 2 3l-.6 1.2C4 11.4 3 9.8 3 7.5zm6 0h4v4h-2c0 1.5.7 2.5 2 3l-.6 1.2C10 11.4 9 9.8 9 7.5z"/></svg>BibTeX</a>
-    </div>
-
-    <!-- NEW: SuperMimic-inspired 3-card Highlights strip -->
-    <div class="hi-grid" id="hiGrid">
-      <div class="hi-card">
-        <div>
-          <div class="hi-eye">Individual state</div>
-          <div class="hi-num">2.1×</div>
-          <p class="hi-desc">State score over the best baseline on repeated movie viewings. Stimulus-only encoders score 0%.</p>
-        </div>
-        <div class="hi-viz">
-          <div class="ratio-row"><span>Spectator</span><div class="ratio-track"><div class="ratio-fill ours" data-w="100"></div></div><b>5.5%</b></div>
-          <div class="ratio-row"><span>Linear</span><div class="ratio-track"><div class="ratio-fill base" data-w="47"></div></div><b>2.6%</b></div>
-          <div class="ratio-row"><span>MIRAGE</span><div class="ratio-track"><div class="ratio-fill stim" data-w="2"></div></div><b>0.0%</b></div>
-        </div>
-      </div>
-
-      <div class="hi-card">
-        <div>
-          <div class="hi-eye">Long-horizon stability</div>
-          <div class="hi-num">5 min</div>
-          <p class="hi-desc">Open-loop rollout stays positive (+9.6%) at 300 s, while a Transformer counterpart collapses below 0% at 143 s.</p>
-        </div>
-        <div class="hi-viz">
-          <svg viewBox="0 0 240 52" width="100%" height="52" aria-hidden="true">
-            <line x1="4" y1="34" x2="236" y2="34" stroke="#d5d4ce" stroke-dasharray="3 3"/>
-            <path class="hi-spark" d="M4,8 Q45,22 95,25 T236,26" fill="none" stroke="#14747a" stroke-width="2.4" stroke-linecap="round"/>
-            <path class="hi-spark" d="M4,12 Q58,24 114,34 T152,50" fill="none" stroke="#b94438" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
-            <text x="236" y="20" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" fill="#14747a">+9.6%</text>
-            <text x="158" y="49" font-family="JetBrains Mono,monospace" font-size="10" fill="#b94438">−473%</text>
-          </svg>
-        </div>
-      </div>
-
-      <div class="hi-card">
-        <div>
-          <div class="hi-eye">Linear &amp; data-efficient</div>
-          <div class="hi-num">5.4 ms</div>
-          <p class="hi-desc">One 60 s rollout runs live in WebGL—and with just 10% data (4.7 h), Spectator already beats 100%-data baselines.</p>
-        </div>
-        <div class="hi-viz">
-          <div class="ratio-row"><span>10% data</span><div class="ratio-track"><div class="ratio-fill ours" data-w="76"></div></div><b>15.5%</b></div>
-          <div class="ratio-row"><span>100% lin</span><div class="ratio-track"><div class="ratio-fill base" data-w="62"></div></div><b>12.7%</b></div>
-          <div class="ratio-row"><span>100% ours</span><div class="ratio-track"><div class="ratio-fill ours" data-w="100"></div></div><b>20.3%</b></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
-
 <main>
 
-<!-- ELEVATED LIVE DEMO (moved up from §7, with dark poster gate, dark 3D cortex theater, and 3 guided counterfactual stories) -->
+<section id="overview" style="padding-top:42px">
+  <div class="col">
+    <div class="sec-label">§1 Overview</div>
+    <h2>Same movie. Different state of mind.</h2>
+    <p>Watch the same movie twice and your brain responds differently each time—the stimulus is identical, your <b>state of mind</b> is not. Standard encoding metrics miss this because matching the shared stimulus response already scores high, even without reading the brain.</p>
+    <p>We cast naturalistic fMRI as a world-modeling loop—<span class="sm">movie</span> as action, <span class="ob">fMRI</span> as observation, latent <span class="st">state</span> tracking individual dynamics—and introduce <b>BrainStateBench</b> alongside <b>Spectator</b>, a two-timescale linear world model trained with JEPA.</p>
+  </div>
+  <div class="wide">
+    <figure class="img-frame"><img src="../assets/fig1.webp" alt="Figure 1 of the paper: existing approaches versus Spectator and BrainStateBench" width="1600" height="461"></figure>
+    <p class="caption"><b>Figure 1.</b> Prior encoders keep no brain state or skip updates (left). Spectator infers, predicts, and updates a two-timescale state, which BrainStateBench probes directly (right).</p>
+  </div>
+</section>
+
+<!-- OPTION A: LIVE DEMO RIGHT AFTER OVERVIEW (dark poster gate + dark 3D cortex theater, no redundant 3 story cards) -->
 <section id="live" class="reveal">
   <div class="col">
-    <div class="sec-label">Web demo</div>
+    <div class="sec-label">§2 Live Demo</div>
     <h2>Run the brain world model in your browser.</h2>
-    <p>Each step is one 2,048 × 2,049 matrix–vector product, so frozen <code>spectator-v1</code> runs live on real held-out movie fMRI. Launch below, then try the three controlled perturbations.</p>
+    <p>Each step is one 2,048 × 2,049 matrix–vector product, so frozen <code>spectator-v1</code> runs live on real held-out movie fMRI. Toggle scan updating, cut the movie input, or swap in another viewer's history.</p>
   </div>
   <div class="wide">
     <div class="frame" id="sim">
       <div class="simnote"><b>Real model</b><span>Frozen <code>spectator-v1</code> weights at fp16 (≤ 0.0005 z from full precision) on two held-out recordings (<em>Friends</em> &amp; <em>The Wolf of Wall Street</em>) with precomputed TRIBE v2 features.</span></div>
       <div id="simLoading">
         <div class="sim-poster" style="width:100%">
-          <span class="sim-poster-badge">● WebGL · 1,000 Schaefer parcels · 5.4 ms / 60 s rollout</span>
+          <span class="sim-poster-badge">● WebGL · Frozen spectator-v1 · Real held-out movie fMRI</span>
           <div class="sim-poster-brains">
             <img src="../assets/brain_b_lat.webp" alt="Left hemisphere lateral preview">
             <img src="../assets/brain_b_med.webp" alt="Left hemisphere medial preview">
           </div>
           <h3>Interactive 3D Cortical Simulator</h3>
-          <p>Compare recorded sub-01 fMRI against Spectator's live rollout—cut the movie, turn off scan updates, or swap in another viewer's brain history.</p>
+          <p>Compare recorded sub-01 fMRI against Spectator's live rollout across 1,000 cortical parcels.</p>
           <button type="button" class="sim-launch" id="simLaunchBtn">▶ Start the demo (24.5 MB)</button>
         </div>
       </div>
 
       <div id="simUI" hidden>
-        <!-- NEW: SuperMimic-inspired "Take a closer look." 3-perturbation strip -->
-        <div class="story-head">
-          <span>Take a closer look — try 3 controlled perturbations</span>
-          <button type="button" class="story-restore" id="storyRestore" hidden>↺ Restore default (Updating)</button>
-        </div>
-        <div class="story-grid" role="group" aria-label="Guided perturbations">
-          <button type="button" class="story-card" data-story="cut" aria-pressed="false">
-            <b><i style="background:var(--stim)"></i>1 · Cut the movie</b>
-            <span>Zero the stimulus term. Watch visual cortex flatten while internal state coasts.</span>
-          </button>
-          <button type="button" class="story-card" data-story="open" aria-pressed="false">
-            <b><i style="background:var(--state)"></i>2 · Stop incoming scans</b>
-            <span>Switch to open-loop Forecast. Compare 1-min drift against 4/min Updating.</span>
-          </button>
-          <button type="button" class="story-card" data-story="swap" aria-pressed="false">
-            <b><i style="background:var(--neg)"></i>3 · Swap to sub-02's brain</b>
-            <span>Same movie, another viewer's 3-min history. Association cortex diverges.</span>
-          </button>
-        </div>
-
         <div class="simgrid">
           <div class="simcol">
             <div class="simbox">
@@ -714,24 +601,11 @@ footer a:hover{color:var(--ink)}
   </div>
 </section>
 
-<section id="overview" class="reveal">
-  <div class="col">
-    <div class="sec-label">Overview</div>
-    <h2>Matching the output does not test the state.</h2>
-    <p>Watch the same movie twice and your brain responds differently each time: the stimulus is identical, your <b>state of mind</b> is not. Standard encoding metrics cannot tell whether a model tracks that state, because matching the shared stimulus response already scores high—even for models that never read the brain.</p>
-    <p>We cast naturalistic fMRI as a world-modeling loop—where the <span class="sm">movie</span> is the action, <span class="ob">fMRI</span> is the observation, and the latent <span class="st">state</span> tracks individual dynamics—and introduce <b>BrainStateBench</b> alongside <b>Spectator</b>, a two-timescale linear world model trained with a JEPA objective.</p>
-  </div>
-  <div class="wide">
-    <figure class="img-frame"><img src="../assets/fig1.webp" alt="Figure 1 of the paper: existing approaches versus Spectator and BrainStateBench" width="1600" height="461"></figure>
-    <p class="caption"><b>Figure 1.</b> Prior encoders keep no brain state or skip updates (left). Spectator infers, predicts, and updates a two-timescale state, which BrainStateBench probes directly (right).</p>
-  </div>
-</section>
-
 <section id="bench" class="reveal">
   <div class="col">
-    <div class="sec-label">Benchmark</div>
+    <div class="sec-label">§3 Benchmark</div>
     <h2>One state. Three tests.</h2>
-    <p>A frozen linear probe maps each model's latent state to 1,000 cortical parcels, scoring variance explained (%) over 60 s rollouts on Algonauts 2025 (~66 h of movie fMRI across four viewers).</p>
+    <p>A frozen linear probe maps each model's latent state to 1,000 cortical parcels, scoring 60 s rollouts on Algonauts 2025 (~66 h across four viewers).</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -753,16 +627,15 @@ footer a:hover{color:var(--ink)}
         </div>
       </div>
     </div>
-    <p class="try">Switch tasks, models, and networks — every curve is real held-out fMRI and saved forecasts from the median-scoring query.</p>
+    <p class="try">Switch tasks, models, and networks — every curve is real held-out fMRI from the median-scoring query.</p>
   </div>
 </section>
 
-<!-- SUPERMIMIC-INSPIRED "HOW IT WORKS" ANIMATED CLOSED-LOOP DIAGRAM -->
 <section id="model" class="reveal">
   <div class="col">
-    <div class="sec-label">How it works</div>
+    <div class="sec-label">§4 How it works</div>
     <h2>Two timescales. One linear loop.</h2>
-    <p>The encoder turns the last 7.5 s of fMRI into a 1,024-d <span class="st">fast state</span> f<sub>t</sub> and pools 3 minutes of fast states into a 1,024-d <span class="st">slow state</span> u<sub>t</sub> via learned lag weights; a linear predictor advances s<sub>t</sub> = [f<sub>t</sub>; u<sub>t</sub>] under multimodal movie features.</p>
+    <p>Spectator encodes the last 7.5 s of fMRI into a <span class="st">fast state</span> f<sub>t</sub>, pools 3 minutes via learned lags into a <span class="st">slow state</span> u<sub>t</sub>, and rolls s<sub>t</sub> = [f<sub>t</sub>; u<sub>t</sub>] forward linearly under movie features.</p>
   </div>
   <div class="wide">
     <div class="frame" id="howLoop">
@@ -780,7 +653,7 @@ footer a:hover{color:var(--ink)}
       <div class="eq-row"><code>u<sub>t,i</sub> = Σ<sub>ℓ</sub> w<sub>iℓ</sub> f<sub>t−ℓ,i</sub></code><span>slow state · 180 s learned lags</span></div>
       <div class="eq-row"><code>ŝ<sub>t+1</sub> = ŝ<sub>t</sub> + W [ŝ<sub>t</sub>; ā<sub>t+1</sub>; 1]</code><span>linear latent rollout</span></div>
     </div>
-    <p>We pretrain the encoder on fMRI, train both components with a 40-step EMA-target JEPA loss, then freeze the encoder and solve W in closed form via ridge regression.</p>
+    <p>Trained with a 40-step EMA-target JEPA loss; once the encoder is frozen, W has a closed-form ridge solution.</p>
   </div>
   <div class="wide">
     <div class="grid2" style="align-items:stretch;margin-top:20px">
@@ -793,15 +666,15 @@ footer a:hover{color:var(--ink)}
         <div class="legend" style="margin-top:10px"><span><i style="background:var(--obs)"></i>measured</span><span><i style="background:var(--state)"></i>state term</span><span><i style="background:var(--stim)"></i>stimulus term</span><span><i style="background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 7px)"></i>sum = forecast</span></div>
       </div>
     </div>
-    <p class="caption"><b>Exact linear decomposition.</b> Every k-step forecast equals M<sup>k</sup>s<sub>t</sub> (carried-forward state) plus accumulated stimulus drive. Bar shares span all held-out Algonauts recordings.</p>
+    <p class="caption"><b>Exact linear decomposition.</b> Every k-step forecast equals M<sup>k</sup>s<sub>t</sub> (state) plus accumulated stimulus drive across held-out Algonauts recordings.</p>
   </div>
 </section>
 
 <section id="results" class="reveal">
   <div class="col">
-    <div class="sec-label">Results</div>
+    <div class="sec-label">§5 Results</div>
     <h2>More history, wider lead.</h2>
-    <p>Evaluated against six baselines across four families—stimulus-only encoders (TRIBE v2, MIRAGE), a per-lead linear forecaster, Kalman state-space modeling (IPSID), and prior brain world models (NeuroWorld, BrainVista)—on Algonauts 2025 and 184-viewer HCP 7T.</p>
+    <p>Benchmarked against six baselines—stimulus-only encoders (TRIBE v2, MIRAGE), a linear forecaster, Kalman modeling (IPSID), and prior brain world models (NeuroWorld, BrainVista)—on Algonauts 2025 and 184-viewer HCP 7T.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -823,10 +696,9 @@ footer a:hover{color:var(--ink)}
       <div class="chart pre" id="lbChart" aria-live="polite"></div>
       <p class="callout" id="lbNote"></p>
     </div>
-    <p class="caption"><b>Algonauts 2025 &amp; HCP 7T leaderboard.</b> Toggle dataset, metric, and history length (HCP 7T: 184 viewers on a different 7T scanner, 180 s history).</p>
+    <p class="caption"><b>Algonauts 2025 &amp; HCP 7T leaderboard.</b> Toggle dataset, metric, and history length (HCP 7T: 184 viewers on a 7T scanner, 180 s history).</p>
   </div>
 
-  <!-- UPGRADED: Scrubbable + scroll-drawn 5-minute stability & data efficiency -->
   <div class="wide">
     <div class="grid2" style="margin-top:20px">
       <div class="frame" style="margin:0">
@@ -842,15 +714,15 @@ footer a:hover{color:var(--ink)}
         <div class="scrub-hint">Hover any training fraction to compare exact scores.</div>
       </div>
     </div>
-    <p class="caption"><b>Long-horizon stability &amp; sample efficiency.</b> Left: Spectator stays above movie-only across a full 5-minute rollout while a Transformer counterpart diverges below 0% at 143 s. Right: with just 10% data (4.7 h), Spectator already beats the 100%-data linear forecaster on State and Updating.</p>
+    <p class="caption"><b>Long-horizon stability &amp; sample efficiency.</b> Left: Spectator stays above movie-only for 5 full minutes while a Transformer diverges below 0% at 143 s. Right: with 10% data (4.7 h), Spectator already beats the 100%-data linear forecaster on State and Updating.</p>
   </div>
 </section>
 
 <section id="lab" class="reveal">
   <div class="col">
-    <div class="sec-label">Beyond correlation</div>
+    <div class="sec-label">§6 Input Lab</div>
     <h2>Break one input. Watch what moves.</h2>
-    <p>Keeping Spectator fixed, we perturb one input at test time: drop the stimulus, zero the fMRI, or swap in another viewer's fMRI from the same scene. Each perturbation leaves a distinct signature on BrainStateBench while correlation r barely moves.</p>
+    <p>Perturbing one test-time input while keeping Spectator fixed leaves a clear signature on BrainStateBench, whereas correlation r barely changes.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -882,9 +754,9 @@ footer a:hover{color:var(--ink)}
 
 <section id="where" class="reveal">
   <div class="col">
-    <div class="sec-label">Cortical maps</div>
+    <div class="sec-label">§7 Cortical Maps</div>
     <h2>Where state lives across cortex.</h2>
-    <p>Linearity splits every forecast into stimulus and state contributions across cortex. The stimulus drives shared sensory and narrative regions; the inferred state helps everywhere, most in prefrontal and parietal association cortex where viewers diverge.</p>
+    <p>The movie drives shared sensory and narrative cortex; the inferred state helps everywhere, peaking in prefrontal and parietal association hubs where viewers diverge.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -912,7 +784,7 @@ footer a:hover{color:var(--ink)}
 
 <section id="cite" class="reveal">
   <div class="col">
-    <div class="sec-label">Citation</div>
+    <div class="sec-label">§8 Citation</div>
     <h2>BibTeX</h2>
     <div class="bib-wrap">
 <pre class="bib" id="bib">@inproceedings{stateofmind2026,
@@ -952,34 +824,31 @@ const NS='http://www.w3.org/2000/svg';
 function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
 function pathD(p){return p.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ');}
 
-/* ---------- scroll reveal & highlight bar entrance ---------- */
+/* ---------- scroll reveal ---------- */
 const reveals=[...document.querySelectorAll('.reveal')];
 if(reduce){reveals.forEach(r=>r.classList.add('in'));}
 else{
   const rio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rio.unobserve(e.target);}}),{threshold:.08,rootMargin:'0px 0px -40px 0px'});
   reveals.forEach(r=>rio.observe(r));
 }
-requestAnimationFrame(()=>requestAnimationFrame(()=>{
-  document.querySelectorAll('.ratio-fill[data-w]').forEach(f=>{f.style.width=f.dataset.w+'%';});
-}));
 
 /* ---------- contents bar & scroll progress ---------- */
 const toc=$('toc'),tt=$('tocToggle'),prog=$('tocProgress');
 tt.onclick=()=>{const o=toc.dataset.open!=='true';toc.dataset.open=o;tt.setAttribute('aria-expanded',o);};
 document.querySelectorAll('#tocList a').forEach(a=>a.addEventListener('click',()=>{toc.dataset.open='false';tt.setAttribute('aria-expanded','false');}));
-const secs=[$('highlights'),...document.querySelectorAll('main section[id]')];
-const names={highlights:'Highlights',live:'Web Demo',overview:'Overview',bench:'Benchmark',model:'How It Works',results:'Results',lab:'Input Lab',where:'Cortex',cite:'Citation'};
+const secs=[...document.querySelectorAll('main section[id]')];
+const names={overview:'Overview',live:'Live Demo',bench:'Benchmark',model:'How It Works',results:'Results',lab:'Input Lab',where:'Cortex',cite:'Citation'};
 const tocLinks=[...document.querySelectorAll('#tocInline a[data-sec]')];
 function onScroll(){
-  let cur='highlights';for(const s of secs){if(s&&s.getBoundingClientRect().top<130)cur=s.id;}
-  $('tocCur').textContent=names[cur]||'Highlights';
+  let cur='overview';for(const s of secs){if(s.getBoundingClientRect().top<130)cur=s.id;}
+  $('tocCur').textContent=names[cur]||'Overview';
   tocLinks.forEach(a=>a.setAttribute('aria-current',a.dataset.sec===cur?'true':'false'));
   const maxY=Math.max(1,document.documentElement.scrollHeight-innerHeight);
   if(prog)prog.style.width=Math.min(100,Math.max(0,scrollY/maxY*100)).toFixed(2)+'%';
 }
 addEventListener('scroll',onScroll,{passive:true});onScroll();
 
-/* ---------- SuperMimic-inspired animated "How it works" closed loop (§3) ---------- */
+/* ---------- animated "How it works" closed loop (§4) ---------- */
 const HSVG=$('howSvg');
 let howClosed=true;
 function buildHowLoop(){
@@ -989,22 +858,16 @@ function buildHowLoop(){
     el('path',{d:'M1,1.5 L8.5,5 L1,8.5',fill:'none',stroke:col,'stroke-width':1.8,'stroke-linecap':'round','stroke-linejoin':'round'},m);};
   mk('arrTeal',C.state);mk('arrStim',C.stim);mk('arrObs',C.obs);mk('arrInk',C.ink);mk('arrFaint','#c5c7c2');
 
-  // Connecting paths
   const pEnc=el('path',{id:'pEnc',d:'M196,112 L252,112',fill:'none',stroke:C.state,'stroke-width':2,'marker-end':'url(#arrTeal)'},HSVG);
   const pRoll=el('path',{id:'pRoll',d:'M432,112 L488,112',fill:'none',stroke:C.ink,'stroke-width':2,'marker-end':'url(#arrInk)'},HSVG);
   const pOut=el('path',{id:'pOut',d:'M676,112 L732,112',fill:'none',stroke:C.state,'stroke-width':2,'marker-end':'url(#arrTeal)'},HSVG);
-  // Movie drive entering top of Predictor
   const pMov=el('path',{id:'pMov',d:'M582,48 L582,72',fill:'none',stroke:C.stim,'stroke-width':2,'marker-end':'url(#arrStim)'},HSVG);
-  // Self-loop on Predictor (open-loop autoregressive rollout)
   const pSelf=el('path',{id:'pSelf',d:'M618,154 C644,192 520,192 546,154',fill:'none',stroke:C.state,'stroke-width':2,'stroke-dasharray':'5 4','marker-end':'url(#arrTeal)'},HSVG);
-  // Closed-loop feedback arc from new fMRI scan back to Encoder
   const pUpd=el('path',{id:'pUpd',d:'M822,154 C822,238 342,238 342,158',fill:'none',stroke:C.obs,'stroke-width':2.2,'marker-end':'url(#arrObs)'},HSVG);
 
-  // Movie pill above Predictor
   el('rect',{x:500,y:10,width:164,height:36,rx:18,fill:'#fbf0e2',stroke:'rgba(207,119,34,.45)','stroke-width':1.2},HSVG);
   el('text',{x:582,y:32,'text-anchor':'middle','font-size':13,'font-weight':600,fill:'#9e5310'},HSVG).textContent='Movie drive  āₜ₊₁';
 
-  // Helper to draw clean Apple-style cards
   function card(x,y,w,h,step,title,sub1,sub2,accent,fillBg){
     const g=el('g',{},HSVG);
     const r=el('rect',{x,y,width:w,height:h,rx:14,fill:fillBg||'#fff',stroke:accent,'stroke-width':1.5},g);
@@ -1021,11 +884,9 @@ function buildHowLoop(){
 
   el('text',{x:582,y:194,'text-anchor':'middle','font-size':11.5,'font-weight':600,fill:C.state},HSVG).textContent='↺ 40 open-loop steps (60 s)';
   const updPill=el('g',{},HSVG);
-  el('rect',{x:482,y:219,width:200,height:26,rx:13,fill:'#ebf2fb',stroke:'rgba(47,101,168,.38)','stroke-width':1.1},updPill);
+  el('rect',{x:468,y:219,width:228,height:26,rx:13,fill:'#ebf2fb',stroke:'rgba(47,101,168,.38)','stroke-width':1.1},updPill);
   const updLbl=el('text',{x:582,y:236,'text-anchor':'middle','font-size':12,'font-weight':600,fill:C.obs},updPill);
-  updLbl.textContent='New fMRI scan every ~12 s';
 
-  // Animated traveling pulses
   const dotEnc=el('circle',{r:4.5,fill:C.state},HSVG);
   const dotRoll=el('circle',{r:4.5,fill:C.ink},HSVG);
   const dotOut=el('circle',{r:4.5,fill:C.state},HSVG);
@@ -1048,43 +909,21 @@ function buildHowLoop(){
   syncHowStyle();
   seg($('howMode'),['Updating (closed-loop)','Forecast (open-loop)'],0,i=>{howClosed=(i===0);syncHowStyle();});
 
-  const paths=[
-    [pEnc,dotEnc,2200,0],
-    [pRoll,dotRoll,2200,.25],
-    [pOut,dotOut,2200,.5],
-    [pMov,dotMov,1800,.1],
-    [pSelf,dotSelf,1600,0],
-    [pUpd,dotUpd,3200,0]
-  ];
-  function place(path,dot,u){
-    const L=path.getTotalLength();
-    const pt=path.getPointAtLength(L*u);
-    dot.setAttribute('cx',pt.x.toFixed(1));
-    dot.setAttribute('cy',pt.y.toFixed(1));
-  }
-  if(reduce){
-    paths.forEach(([p,d])=>place(p,d,.5));
-  }else{
+  const paths=[[pEnc,dotEnc,2200,0],[pRoll,dotRoll,2200,.25],[pOut,dotOut,2200,.5],[pMov,dotMov,1800,.1],[pSelf,dotSelf,1600,0],[pUpd,dotUpd,3200,0]];
+  function place(path,dot,u){const L=path.getTotalLength(),pt=path.getPointAtLength(L*u);dot.setAttribute('cx',pt.x.toFixed(1));dot.setAttribute('cy',pt.y.toFixed(1));}
+  if(reduce){paths.forEach(([p,d])=>place(p,d,.5));}
+  else{
     let howVis=false;
-    const hio=new IntersectionObserver(es=>{howVis=es[0].isIntersecting;},{threshold:.05});
-    hio.observe($('howLoop'));
+    new IntersectionObserver(es=>{howVis=es[0].isIntersecting;},{threshold:.05}).observe($('howLoop'));
     function animHow(now){
       if(howVis){
-        paths.forEach(([p,d,dur,ph])=>{
-          const u=((now/dur)+ph)%1;
-          place(p,d,u);
-        });
+        paths.forEach(([p,d,dur,ph])=>place(p,d,((now/dur)+ph)%1));
         if(howClosed){
-          const uUp=((now/3200)%1);
-          const flash=uUp>.88?1:0;
+          const flash=((now/3200)%1)>.88;
           encCard.r.setAttribute('stroke-width',flash?2.8:1.5);
           encCard.r.setAttribute('fill',flash?'#e0f1f2':'#f2f9f9');
-        }else{
-          encCard.r.setAttribute('stroke-width',1.5);
-          encCard.r.setAttribute('fill','#f2f9f9');
-        }
-        const uSelf=(now/1600)%1;
-        rollCard.r.setAttribute('stroke-width',uSelf>.82?2.3:1.5);
+        }else{encCard.r.setAttribute('stroke-width',1.5);encCard.r.setAttribute('fill','#f2f9f9');}
+        rollCard.r.setAttribute('stroke-width',((now/1600)%1)>.82?2.3:1.5);
       }
       requestAnimationFrame(animHow);
     }
@@ -1093,7 +932,7 @@ function buildHowLoop(){
 }
 buildHowLoop();
 
-/* ---------- task explorer (§2) ---------- */
+/* ---------- task explorer (§3) ---------- */
 const FIG=window.FIG,EP=FIG.episode,ST=FIG.state;
 const NETNAME={Vis:'Visual',SomMot:'Somatomotor',DorsAttn:'Dorsal attention',SalVentAttn:'Salience',Limbic:'Limbic',Cont:'Control',Default:'Default mode'};
 const NETS=EP.networks;const colOf=(a,n)=>a.map(r=>r[n]);
@@ -1154,7 +993,7 @@ seg($('taskNet'),NETS.map(k=>NETNAME[k]),0,i=>{tNet=i;drawTask();});
 document.querySelectorAll('.taskbtn').forEach(b=>b.onclick=()=>{task=b.dataset.task;document.querySelectorAll('.taskbtn').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));drawTask();});
 drawTask();
 
-/* ---------- decomposition (§3) ---------- */
+/* ---------- decomposition (§4) ---------- */
 const LEADS=[1.5,7.5,15,30,60],SHARE=[95,71,56,24,13];let leadIdx=0,dNet=0;
 const cv=$('decompCanvas'),ctx=cv.getContext('2d');
 function drawDecomp(){const d=Math.min(2,devicePixelRatio||1),w=cv.clientWidth,h=cv.clientHeight;cv.width=w*d;cv.height=h*d;ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);
@@ -1173,7 +1012,7 @@ function setLead(i){leadIdx=i;const s=SHARE[i];$('shareS').style.flexBasis=s+'%'
 seg($('leadSeg'),LEADS.map(l=>'+'+l+' s'),0,setLead);setLead(0);
 seg($('decompNet'),NETS.map(k=>NETNAME[k]),0,i=>{dNet=i;drawDecomp();});
 
-/* ---------- leaderboard (§4) ---------- */
+/* ---------- leaderboard (§5) ---------- */
 function hbars(box,rows,opt){
   const w=Math.max(320,box.clientWidth),lw=Math.min(180,w*.32),rh=opt.rh||34,h=rows.length*rh+26;
   const vals=rows.map(r=>r.v),mn=Math.min(0,...vals,opt.min??0),mx=Math.max(...vals,opt.max??0),x0=lw+12,x1=w-56,sx=v=>x0+(x1-x0)*(v-mn)/(mx-mn||1);
@@ -1218,13 +1057,13 @@ function renderLB(anim){const box=$('lbChart');const isR=metric===3,isHcp=datase
 renderLB(false);$('lbReplay').onclick=()=>renderLB(true);
 const lbio=new IntersectionObserver(es=>{if(es[0].isIntersecting){renderLB(true);lbio.disconnect();}},{threshold:.3});lbio.observe($('lbChart'));
 
-/* ---------- UPGRADED: Scrubbable + scroll-drawn 5-minute rollout stability ---------- */
+/* ---------- scrubbable + scroll-drawn 5-minute stability ---------- */
 const HZ_S=[1.5,3.0,4.5,7.5,11.9,16.4,22.4,29.8,38.7,49.2,61.1,73.0,84.9,98.3,113.2,128.1,140.1,144.5,150.5,162.4,180.3,210.1,239.9,269.7,299.5];
 const HZ_SP=[43.49,32.35,26.98,24.69,22.45,18.97,14.83,12.16,11.54,11.71,11.48,10.85,10.37,10.16,10.15,10.15,9.96,9.94,9.87,9.85,9.82,9.7,9.72,9.63,9.56];
 const HZ_MO=[9.41,9.72,9.71,9.62,9.64,9.8,9.79,9.62,9.56,9.5,9.38,9.18,9.08,8.98,8.88,8.94,8.86,8.87,8.81,8.79,8.75,8.69,8.7,8.62,8.56];
 const HZ_TR=[39.56,28.64,21.89,18.08,16.81,15.03,12.72,10.8,10.11,10.05,9.69,8.61,7.14,5.43,3.78,2.1,0.28,-0.47,-1.61,-4.58,-11.18,-31.58,-78.03,-190.19,-473.4];
 const HZ_TB=[4.28,4.28,4.34,4.41,4.41,4.48,4.47,4.35,4.32,4.33,4.34,4.32,4.33,4.26,4.19,4.22,4.22,4.25,4.23,4.27,4.26,4.18,4.2,4.15,4.16];
-let hzIdx=17,hzDrawn=false; // starts at 144.5 s (right where Transformer crosses 0%)
+let hzIdx=17,hzDrawn=false;
 function renderHorizon(animateDraw){
   const box=$('horizonChart'),w=Math.max(300,box.clientWidth),h=215,pl=36,pr=14,pt=14,pb=28;
   const ymin=-10,ymax=46,sx=t=>pl+(w-pl-pr)*t/300,sy=v=>pt+(h-pt-pb)*(ymax-v)/(ymax-ymin);
@@ -1245,11 +1084,10 @@ function renderHorizon(animateDraw){
   box.innerHTML=s+'</svg>';
   if(animateDraw&&!reduce){
     box.querySelectorAll('.hz-draw').forEach(p=>{
-      const L=p.getTotalLength();
-      const origDash=p.getAttribute('stroke-dasharray');
+      const L=p.getTotalLength(),orig=p.getAttribute('stroke-dasharray');
       p.style.strokeDasharray=L;p.style.strokeDashoffset=L;p.style.transition='stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1)';
       requestAnimationFrame(()=>requestAnimationFrame(()=>{p.style.strokeDashoffset='0';}));
-      if(origDash)setTimeout(()=>{p.style.strokeDasharray=origDash;},1150);
+      if(orig)setTimeout(()=>{p.style.strokeDasharray=orig;},1150);
     });
   }
   function setHz(idx){
@@ -1269,23 +1107,16 @@ function renderHorizon(animateDraw){
   const hit=$('hzHit');
   if(hit){
     const pick=clientX=>{
-      const r=hit.getBoundingClientRect();
-      const frac=Math.max(0,Math.min(1,(clientX-r.left)/r.width));
-      const target=frac*300;
-      let best=0,bd=1e9;
-      HZ_S.forEach((v,i)=>{const d=Math.abs(v-target);if(d<bd){bd=d;best=i;}});
-      setHz(best);
+      const r=hit.getBoundingClientRect(),target=Math.max(0,Math.min(1,(clientX-r.left)/r.width))*300;
+      let best=0,bd=1e9;HZ_S.forEach((v,i)=>{const d=Math.abs(v-target);if(d<bd){bd=d;best=i;}});setHz(best);
     };
     hit.addEventListener('pointermove',e=>pick(e.clientX));
     hit.addEventListener('pointerdown',e=>pick(e.clientX));
   }
-  box.onkeydown=e=>{
-    if(e.key==='ArrowLeft'){e.preventDefault();setHz(hzIdx-1);}
-    else if(e.key==='ArrowRight'){e.preventDefault();setHz(hzIdx+1);}
-  };
+  box.onkeydown=e=>{if(e.key==='ArrowLeft'){e.preventDefault();setHz(hzIdx-1);}else if(e.key==='ArrowRight'){e.preventDefault();setHz(hzIdx+1);}};
 }
 
-/* ---------- UPGRADED: Data efficiency with hover readout ---------- */
+/* ---------- data efficiency with hover readout ---------- */
 const DS_X=['10%','25%','50%','100%'],DS_H=['4.7 h','11.7 h','23.3 h','46.6 h'];
 const DS_DATA=[
   {n:'Forecast',ticks:[6,10,14,18],min:6,max:18,sp:[11.47,13.78,15.19,15.95],ls:[9.05,11.32,12.53,13.59],lr:[8.34,9.59,10.35,11.62]},
@@ -1337,7 +1168,7 @@ renderHorizon(false);renderDatasize(false);
 const hzio=new IntersectionObserver(es=>{if(es[0].isIntersecting&&!hzDrawn){hzDrawn=true;renderHorizon(true);renderDatasize(true);hzio.disconnect();}},{threshold:.25});
 hzio.observe($('horizonChart'));
 
-/* ---------- input lab (§5) ---------- */
+/* ---------- input lab (§6) ---------- */
 const LAB={'orig|own':[16.0,5.5,20.3,.349],'none|own':[7.5,5.5,13.7,.224],'orig|zero':[9.4,0.0,8.4,.253],'orig|other':[6.7,-5.1,1.2,.236],'time|own':[-1.4,null,null,null],'orig|time':[2.4,null,null,null]};
 const VERD={'orig|own':'Full inputs: the reference point, shown as the thin vertical mark on each bar.',
  'none|own':'Forecast halves (16.0 → 7.5) while State is untouched: trial-specific signal comes from the brain, not the movie. Updating still gains over Forecast (13.7 vs 7.5).',
@@ -1358,7 +1189,7 @@ function renderLab(){const st=document.querySelector('input[name=stim]:checked')
   $('verdict').textContent=VERD[key];}
 document.querySelectorAll('.lab input').forEach(x=>x.addEventListener('change',renderLab));renderLab();
 
-/* ---------- brain maps & tertiles (§6) ---------- */
+/* ---------- brain maps & tertiles (§7) ---------- */
 const BR={a:{s:'a',grad:'linear-gradient(90deg,#fdf3e3,#f2a447,#b85a07)',lbl:['0','10','20','30 pts'],text:'Stimulus helps most in auditory, story, and visual-motion regions of temporal and occipital cortex (up to ~30 points), and little elsewhere.'},
           b:{s:'b',grad:'linear-gradient(90deg,#e6f3f4,#7fc0c6,#14747a)',lbl:['4','6','8','10 pts'],text:'Latent state helps in every parcel, peaking in prefrontal and parietal association cortex (default-mode and control hubs).'}};
 function setBrain(k){const b=BR[k];$('brainLat').src=`../assets/brain_${k}_lat.webp`;$('brainMed').src=`../assets/brain_${k}_med.webp`;$('cbar').style.background=b.grad;$('cbarLbl').innerHTML=b.lbl.map(x=>`<span>${x}</span>`).join('');$('brainText').textContent=b.text;}
@@ -1383,7 +1214,7 @@ $('copyBib').onclick=async e=>{try{await navigator.clipboard.writeText($('bib').
 /* ---------- resize ---------- */
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{drawDecomp();renderLB(false);renderHorizon(false);renderDatasize(false);renderTert(false);drawTask();},150);});
 
-/* ---------- click-to-launch visual poster gate (SuperMimic-inspired) ---------- */
+/* ---------- click-to-launch visual poster gate ---------- */
 let simStarted=false;
 function startSim(){
   if(simStarted)return;

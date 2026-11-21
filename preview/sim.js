@@ -262,23 +262,16 @@ function setMode(isAuto){
     :'No incoming scans — open-loop rollout from movie + initial state';
   updateReadouts();
 }
-function markStory(id){
-  document.querySelectorAll('.story-card[data-story]').forEach(c=>c.setAttribute('aria-pressed',c.dataset.story===id?'true':'false'));
-  const rst=$('storyRestore');if(rst)rst.hidden=!id;
-}
-$('simMovie').onclick=()=>{movie=!movie;setTog('simMovie',!movie);markStory(movie?'':'cut');updateReadouts();requestForecast();};
+$('simMovie').onclick=()=>{movie=!movie;setTog('simMovie',!movie);updateReadouts();requestForecast();};
 $('simScan').onclick=()=>scan(true);
-$('simSwap').onclick=()=>{swapMind();markStory('swap');};
-seg($('simMode'),['Updating (4/min)','Forecast (open)'],0,i=>{
-  setMode(i===0);
-  markStory(i===1?'open':'');
-});
+$('simSwap').onclick=swapMind;
+seg($('simMode'),['Updating (4/min)','Forecast (open)'],0,i=>setMode(i===0));
 let speed=1,paused=false,visible=true;
 const speedSeg=$('simSpeed');
 seg(speedSeg,['1× real time','4×','10×'],0,i=>{speed=[1,4,10][i];});
 function togglePause(){paused=!paused;setTog('simPause',paused);$('simPause').textContent=paused?'Resume':'Pause';}
 $('simPause').onclick=togglePause;
-$('simReset').onclick=()=>{reset();setMode(true);markStory('');};
+$('simReset').onclick=()=>{reset();setMode(true);};
 let region='Visual';
 const regSeg=$('simRegion');
 function selectRegion(t,idx){
@@ -287,26 +280,6 @@ function selectRegion(t,idx){
   regionReadout();hist.forEach(h=>{h.meas=NaN;h.pred=NaN;});fcast=null;requestForecast();
 }
 seg(regSeg,REG_KEYS,0,(i,t)=>selectRegion(t));
-document.querySelectorAll('.story-card[data-story]').forEach(btn=>{
-  btn.onclick=()=>{
-    const kind=btn.dataset.story;
-    if(paused)togglePause();
-    if(kind==='cut'){
-      movie=false;setTog('simMovie',true);setMode(false);setRowMode(0);
-      if(region!=='Visual')selectRegion('Visual',0);
-      markStory('cut');updateReadouts();requestForecast();
-    }else if(kind==='open'){
-      movie=true;setTog('simMovie',false);setMode(false);setRowMode(0);
-      markStory('open');requestForecast();
-    }else if(kind==='swap'){
-      movie=true;setTog('simMovie',false);setMode(false);setRowMode(0);
-      if(region!=='Default mode')selectRegion('Default mode',5);
-      swapMind();markStory('swap');
-    }
-  };
-});
-const storyRst=$('storyRestore');
-if(storyRst)storyRst.onclick=()=>{movie=true;setTog('simMovie',false);setMode(true);setRowMode(0);reset();markStory('');};
 let rowB='pred';
 const rowSeg=$('simRow');
 function setRowMode(i){
