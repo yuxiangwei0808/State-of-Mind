@@ -491,8 +491,8 @@ footer a:hover{color:var(--ink)}
       <li><a href="#model" data-sec="model">Spectator</a></li>
       <li><a href="#live" data-sec="live">Live Demo</a></li>
       <li><a href="#results" data-sec="results">Results</a></li>
-      <li><a href="#lab" data-sec="lab">Input Lab</a></li>
-      <li><a href="#where" data-sec="where">Cortex</a></li>
+      <li><a href="#lab" data-sec="lab">Perturbations</a></li>
+      <li><a href="#where" data-sec="where">Brain Maps</a></li>
       <li><a href="#cite" data-sec="cite">Cite</a></li>
     </ul>
     <button class="toggle" id="tocToggle" aria-expanded="false" aria-controls="tocList">
@@ -507,8 +507,8 @@ footer a:hover{color:var(--ink)}
     <li><a href="#model"><span>§3</span>Spectator</a></li>
     <li><a href="#live"><span>§4</span>Live Simulator</a></li>
     <li><a href="#results"><span>§5</span>Results</a></li>
-    <li><a href="#lab"><span>§6</span>Input Lab</a></li>
-    <li><a href="#where"><span>§7</span>Cortical Maps</a></li>
+    <li><a href="#lab"><span>§6</span>Perturbations</a></li>
+    <li><a href="#where"><span>§7</span>Brain Maps</a></li>
     <li><a href="#cite"><span>§8</span>Citation</a></li>
   </ol>
   <div class="toc-progress" id="tocProgress" aria-hidden="true"></div>
@@ -525,10 +525,10 @@ footer a:hover{color:var(--ink)}
       <button data-phase="2" aria-current="false"><span class="n">3</span>Update</button>
       <button class="replay" id="loopReplay" style="margin-left:auto" aria-label="Replay animation"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9M2.5 2.5v3h3"/></svg>Replay</button>
     </div>
-    <svg id="loop" viewBox="0 0 940 300" role="img" aria-label="Animated diagram: fMRI history is encoded into a fast and slow state, rolled forward under the movie, and corrected by new scans"></svg>
+    <svg id="loop" viewBox="0 0 940 268" role="img" aria-label="Animated diagram: fMRI history is encoded into a fast and slow state, rolled forward under the movie, and corrected by new scans"></svg>
     <p class="loopnote" id="loopNote"></p>
   </div>
-  <p class="caption"><b>A world model of one person's brain.</b> Spectator infers a two-timescale state from 3 minutes of fMRI, rolls it forward under the movie, and updates it when new scans arrive. <span id="heroData"></span></p>
+  <p class="caption"><b>A world model of one person's brain.</b> Spectator infers a two-timescale state from 3 minutes of fMRI, rolls it forward under the movie, and updates it when new scans arrive.</p>
 </div>
 
 <section id="overview">
@@ -540,9 +540,9 @@ footer a:hover{color:var(--ink)}
     <div class="findings" aria-label="Main findings">
       <div class="findings-title">Key Findings</div>
       <ol>
-        <li><span class="fn">01</span><span><b>Correlation hides state blindness.</b> Stimulus-only encoders rank near the top on standard correlation while scoring <b>0%</b> on trial-specific brain state.</span></li>
-        <li><span class="fn">02</span><span><b>Linear dynamics beat nonlinear baselines.</b> Spectator doubles the best baseline on State (<b>5.5%</b> vs. 2.6%), leads on Updating (<b>20.3%</b> vs. 13.4%) and 184-viewer HCP 7T, and remains stable over 5-minute open-loop rollouts where a Transformer diverges.</span></li>
-        <li><span class="fn">03</span><span><b>State dominates association cortex.</b> Movie features predict shared sensory regions (<i>r</i> = 0.92 with inter-subject agreement), while inferred brain state adds forecast gain everywhere and exceeds stimulus gain in <b>59%</b> of cortex.</span></li>
+        <li><span class="fn">01</span><span><b>Standard correlation misses brain state.</b> Models that never read the brain still score high on correlation while scoring <b>0%</b> on trial-specific brain state.</span></li>
+        <li><span class="fn">02</span><span><b>A linear world model beats nonlinear baselines.</b> Spectator doubles the best baseline on State (<b>5.5%</b> vs. 2.6%), leads on Updating (<b>20.3%</b> vs. 13.4%), and stays stable over 5-minute rollouts where a Transformer diverges.</span></li>
+        <li><span class="fn">03</span><span><b>Stimulus and state map to different brain systems.</b> The movie drives shared sensory regions, while the inferred brain state improves forecasts everywhere—especially in higher-order association cortex (<b>59%</b> of regions).</span></li>
       </ol>
     </div>
   </div>
@@ -556,7 +556,7 @@ footer a:hover{color:var(--ink)}
   <div class="col">
     <div class="sec-label">§2 Benchmark</div>
     <h2>BrainStateBench evaluates State, Forecast, and Updating directly</h2>
-    <p>A frozen linear probe maps each model's latent state to 1,000 cortical parcels, scoring 60 s rollouts on Algonauts 2025 (~66 h across four viewers).</p>
+    <p>A frozen linear probe maps each model's latent state to whole-brain fMRI, scoring 60 s rollouts across three tasks.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -578,7 +578,7 @@ footer a:hover{color:var(--ink)}
         </div>
       </div>
     </div>
-    <p class="try">Switch tasks, models, and networks — every curve is real held-out fMRI from the median-scoring query.</p>
+    <p class="try">Switch tasks, models, and networks — all curves show real held-out fMRI.</p>
   </div>
 </section>
 
@@ -596,7 +596,7 @@ footer a:hover{color:var(--ink)}
   </div>
   <div class="wide">
     <figure class="img-frame"><img src="assets/fig2.webp" alt="Figure 2 of the paper: Spectator architecture and training" width="990" height="590" style="max-width:780px;margin:0 auto"></figure>
-    <p class="caption"><b>Figure 2.</b> Spectator architecture and JEPA training: sliding 7.5 s windows produce fast states aggregated over 180 s into a slow state; the linear predictor rolls forward in latent space against a stop-gradient EMA target encoder.</p>
+    <p class="caption"><b>Figure 2.</b> Spectator architecture and JEPA training: 7.5 s fast states are pooled over 3 minutes into a slow state, and the linear predictor rolls forward in latent space against a stop-gradient target encoder.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -606,7 +606,7 @@ footer a:hover{color:var(--ink)}
       <div class="sharebar" aria-live="polite"><span class="s" id="shareS"></span><span class="a" id="shareA"></span></div>
       <div class="legend" style="margin-top:10px"><span><i style="background:var(--obs)"></i>measured</span><span><i style="background:var(--state)"></i>state term</span><span><i style="background:var(--stim)"></i>stimulus term</span><span><i style="background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 7px)"></i>sum = forecast</span></div>
     </div>
-    <p class="caption"><b>Exact linear decomposition.</b> Every k-step forecast equals M<sup>k</sup>s<sub>t</sub> (carried-forward state) plus accumulated stimulus drive across held-out Algonauts recordings.</p>
+    <p class="caption"><b>Exact linear decomposition.</b> Because the dynamics are linear, every forecast splits exactly into carried-forward brain state plus accumulated movie drive.</p>
   </div>
 </section>
 
@@ -627,7 +627,7 @@ footer a:hover{color:var(--ink)}
           </div>
           <h3>Interactive 3D Cortical Simulator</h3>
           <p>Recorded fMRI alongside Spectator's live rollout on held-out clips from <em>Friends</em> and <em>The Wolf of Wall Street</em>.</p>
-          <button type="button" class="sim-launch" id="simLaunchBtn">▶ Launch simulator (24.5 MB)</button>
+          <button type="button" class="sim-launch" id="simLaunchBtn">▶ Launch simulator</button>
         </div>
       </div>
 
@@ -659,9 +659,9 @@ footer a:hover{color:var(--ink)}
             <div class="brainwrap">
               <canvas id="simBrain" aria-label="Recorded fMRI (top) and Spectator's prediction (bottom) on left and right hemispheres; drag to rotate, hover to inspect, click to select network"></canvas>
               <div class="simbar"><div class="seg" id="simView" role="group" aria-label="View"></div><div class="seg" id="simRow" role="group" aria-label="Bottom row"></div></div>
-              <div class="rowlbl" style="top:52px"><b>Measured</b> · sub-01, recorded</div>
+              <div class="rowlbl" style="top:52px"><b>Measured</b> · recorded fMRI</div>
               <div class="sim-status" id="simStatus" hidden></div>
-              <div class="rowlbl" id="simLblB" style="top:256px"><b id="simRowName">Prediction</b> · <span id="simRowSub">Spectator, since the last scan</span></div>
+              <div class="rowlbl" id="simLblB" style="top:256px"><b id="simRowName">Prediction</b> · <span id="simRowSub">Spectator rollout</span></div>
               <div class="sim-tip" id="simTip" hidden></div>
               <div class="brain-hint">Drag to rotate · hover parcel · click to plot · dbl-click reset</div>
               <div class="cmap"><span>−</span><span class="g"></span><span>+ BOLD, <span id="simCmapLbl"></span></span></div>
@@ -682,7 +682,7 @@ footer a:hover{color:var(--ink)}
         </div>
       </div>
     </div>
-    <p class="caption"><b>Live simulator.</b> fsaverage5 inflated cortex (Schaefer 1,000 parcels); drag to rotate, hover to inspect parcels, click to plot that network. Video frames omitted for copyright. Data: CNeuroMod / Algonauts 2025 (CC0); features: TRIBE v2 (CC BY-NC 4.0).</p>
+    <p class="caption"><b>Live simulator.</b> Drag to rotate the brain, hover to inspect regions, or click to plot a network. Video frames are omitted for copyright.</p>
   </div>
 </section>
 
@@ -690,7 +690,7 @@ footer a:hover{color:var(--ink)}
   <div class="col">
     <div class="sec-label">§5 Results</div>
     <h2>Spectator outperforms nonlinear baselines and scales with brain history</h2>
-    <p>Evaluated against six baselines—stimulus-only encoders (TRIBE v2, MIRAGE), a linear forecaster, Kalman modeling (IPSID), and prior brain world models (NeuroWorld, BrainVista)—on Algonauts 2025 and 184-viewer HCP 7T.</p>
+    <p>Evaluated against six baselines—stimulus-only encoders (TRIBE v2, MIRAGE), a linear forecaster, Kalman modeling (IPSID), and prior brain world models (NeuroWorld, BrainVista)—on Algonauts 2025 and HCP 7T.</p>
   </div>
   <div class="wide">
     <div class="frame">
@@ -712,31 +712,31 @@ footer a:hover{color:var(--ink)}
       <div class="chart pre" id="lbChart" aria-live="polite"></div>
       <p class="callout" id="lbNote"></p>
     </div>
-    <p class="caption"><b>Algonauts 2025 &amp; HCP 7T leaderboard.</b> Toggle dataset, metric, and history length (HCP 7T: 184 viewers on a 7T scanner, 180 s history).</p>
+    <p class="caption"><b>Leaderboard.</b> Switch between Algonauts 2025 and HCP 7T, metric, and fMRI history length.</p>
   </div>
 
   <div class="wide">
     <div class="grid2" style="margin-top:20px">
       <div class="frame" style="margin:0">
-        <div class="fighead" style="margin-bottom:8px"><p class="figtitle">5-minute open-loop stability</p><span class="num" style="color:var(--muted);font-size:12px">201 steps · no scans</span></div>
+        <div class="fighead" style="margin-bottom:8px"><p class="figtitle">5-minute open-loop stability</p><span class="num" style="color:var(--muted);font-size:12px">no incoming scans</span></div>
         <div class="scrub-bar" id="hzReadout" aria-live="polite"></div>
         <div class="chart" id="horizonChart" tabindex="0" role="region" aria-label="Interactive 5-minute open-loop stability chart; move pointer or press left and right arrow keys to inspect each lead time"></div>
-        <div class="scrub-hint">Move across the chart—or focus and press ← / →—to read any horizon.</div>
+        <div class="scrub-hint">Move across the chart (or press ← / →) to inspect any horizon.</div>
       </div>
       <div class="frame" style="margin:0">
         <div class="fighead" style="margin-bottom:8px"><p class="figtitle">Data efficiency (10% → 100%)</p><div class="seg" id="dsMetricSeg" role="group" aria-label="Data efficiency metric"></div></div>
         <div class="scrub-bar" id="dsReadout" aria-live="polite"></div>
         <div class="chart" id="datasizeChart"></div>
-        <div class="scrub-hint">Hover any training fraction to compare exact scores.</div>
+        <div class="scrub-hint">Hover any training fraction to inspect scores.</div>
       </div>
     </div>
-    <p class="caption"><b>Long-horizon stability &amp; sample efficiency.</b> Left: Spectator stays above movie-only for 5 full minutes while a Transformer diverges below 0% at 143 s. Right: with 10% data (4.7 h), Spectator already beats the 100%-data linear forecaster on State and Updating.</p>
+    <p class="caption"><b>Long-horizon stability &amp; sample efficiency.</b> Left: Spectator stays above movie-only for 5 full minutes while a Transformer diverges below 0% at 143 s. Right: with 10% of the data, Spectator already beats the 100%-data linear forecaster on State and Updating.</p>
   </div>
 </section>
 
 <section id="lab" class="reveal">
   <div class="col">
-    <div class="sec-label">§6 Input Lab</div>
+    <div class="sec-label">§6 Perturbations</div>
     <h2>Input perturbations reveal failures that correlation misses</h2>
     <p>Altering a single test-time input while keeping Spectator fixed leaves a distinct signature on BrainStateBench, whereas correlation r barely moves.</p>
   </div>
@@ -764,13 +764,13 @@ footer a:hover{color:var(--ink)}
         </div>
       </div>
     </div>
-    <p class="caption"><b>Input perturbation lab (Table 3).</b> One input altered at a time; vertical marks show full-input scores.</p>
+    <p class="caption"><b>Test-time input perturbations.</b> One input is altered at a time; vertical marks show full-input scores.</p>
   </div>
 </section>
 
 <section id="where" class="reveal">
   <div class="col">
-    <div class="sec-label">§7 Cortical Maps</div>
+    <div class="sec-label">§7 Brain Maps</div>
     <h2>Stimulus drives sensory cortex; latent state dominates association hubs</h2>
     <p>Movie features explain shared sensory and narrative cortex; inferred brain state improves forecasts across the entire cortex and peaks in prefrontal and parietal hubs where viewers diverge.</p>
   </div>
@@ -794,7 +794,7 @@ footer a:hover{color:var(--ink)}
         </div>
       </div>
     </div>
-    <p class="caption"><b>Figure 4.</b> Forecast gain from adding stimulus vs. latent state across Schaefer parcels (left) and inter-subject correlation tertiles (right).</p>
+    <p class="caption"><b>Forecast gain across the brain.</b> Adding movie features vs. latent state across cortical regions (left) and grouped by how much viewers agree (right).</p>
   </div>
 </section>
 
@@ -853,7 +853,7 @@ const toc=$('toc'),tt=$('tocToggle'),prog=$('tocProgress');
 tt.onclick=()=>{const o=toc.dataset.open!=='true';toc.dataset.open=o;tt.setAttribute('aria-expanded',o);};
 document.querySelectorAll('#tocList a').forEach(a=>a.addEventListener('click',()=>{toc.dataset.open='false';tt.setAttribute('aria-expanded','false');}));
 const secs=[...document.querySelectorAll('main section[id]')];
-const names={overview:'Overview',bench:'Benchmark',model:'Spectator',live:'Live Demo',results:'Results',lab:'Input Lab',where:'Cortex',cite:'Citation'};
+const names={overview:'Overview',bench:'Benchmark',model:'Spectator',live:'Live Demo',results:'Results',lab:'Perturbations',where:'Brain Maps',cite:'Citation'};
 const tocLinks=[...document.querySelectorAll('#tocInline a[data-sec]')];
 function onScroll(){
   let cur='overview';for(const s of secs){if(s.getBoundingClientRect().top<130)cur=s.id;}
@@ -882,7 +882,6 @@ const cells=[];
  for(let c=0;c<24;c++)for(let r=0;r<7;r++){const v=(blocks[c][r]-lo)/(hi-lo||1);const rc=el('rect',{x:20+c*11,y:48+r*11,width:10,height:10,rx:2,fill:`rgba(47,101,168,${0.08+0.84*v})`,opacity:.25},histG);cells.push({rc,c});}}
 el('rect',{x:20+23*11-1.5,y:46.5,width:1*11+2,height:7*11+2,rx:3,fill:'none',stroke:C.obs,'stroke-width':1.5},L);
 el('text',{x:20+23*11+5,y:142,'font-size':12,fill:C.muted,'text-anchor':'middle'},L).textContent='7.5 s';
-el('text',{x:20,y:142,'font-size':11.5,fill:C.faint},L).textContent='7 networks × 5-frame means';
 function arrow(x1,y1,x2,y2,id){const g=el('g',{id},L);el('line',{x1,y1,x2,y2,stroke:C.faint,'stroke-width':1.5},g);el('path',{d:`M${x2-6},${y2-4} L${x2},${y2} L${x2-6},${y2+4}`,fill:'none',stroke:C.faint,'stroke-width':1.5},g);return g;}
 arrow(290,86,322,86,'a1');
 const enc=el('rect',{x:324,y:64,width:96,height:44,rx:9,fill:'#e6f2f2',stroke:C.state,'stroke-width':1.2},L);
@@ -926,7 +925,6 @@ el('circle',{cx:PX0+184,cy:206,r:4,fill:C.obs},L);el('text',{x:PX0+192,y:210,'fo
 const stages=[{x:20,w:400,label:'1  Infer: observations → state'},{x:440,w:230,label:'2  Predict under the movie'},{x:690,w:235,label:'3  Update with new scans'}];
 const stBars=stages.map(s=>{const g=el('g',{},L);el('rect',{x:s.x,y:226,width:s.w,height:4,rx:2,fill:C.rule},g);const f=el('rect',{x:s.x,y:226,width:0,height:4,rx:2,fill:C.state},g);
   const t=el('text',{x:s.x,y:252,'font-size':13.5,'font-weight':500,fill:C.faint},g);t.textContent=s.label;return {f,t,w:s.w};});
-el('text',{x:20,y:286,'font-size':11.5,fill:C.faint},L).textContent=`Real data · sub-01, ${shortPart(EP.run)}, ${mmss(EP.origin_seconds)} (held out) · Spectator's forecast, open loop and with 4 scans`;
 const lenFc=fcP.getTotalLength(),lenUp=upP.getTotalLength(),lenTr=futTruthP.getTotalLength();
 const DUR=[3200,3600,4200],TOT=DUR[0]+DUR[1]+DUR[2];
 let tStart=performance.now(),offset=0,raf=null;
@@ -955,8 +953,6 @@ tabs.forEach((b,i)=>b.onclick=()=>{const starts=[0,DUR[0],DUR[0]+DUR[1]];playLoo
 $('loopReplay').onclick=()=>playLoop(0);
 renderLoop(TOT);
 const lio=new IntersectionObserver(es=>{if(es[0].isIntersecting){playLoop(0);lio.disconnect();}},{threshold:.4});lio.observe($('loopFig'));
-{const lead=EP.selection.replace(/^the median episode of (\d+).*/,'$1');
- $('heroData').innerHTML=`Real held-out sub-01 episode (median of ${lead}): ${EP.scores_whole_cortex_percent.spectator_forecast}% open loop, ${EP.scores_whole_cortex_percent.spectator_updating}% with four scans.`;}
 
 /* ---------- task explorer (§2) ---------- */
 const TS=$('taskSvg');
@@ -989,7 +985,7 @@ function drawTask(){
     el('line',{x1:ax,y1:yD(0),x2:x1,y2:yD(0),stroke:C.rule},TS);
     line(dy.map((v,i)=>[X(anchor+i),yD(v)]),{stroke:C.ink,'stroke-width':1.6});line(dp.map((v,i)=>[X(anchor+i),yD(v)]),{stroke:m===2?C.stim:C.state,'stroke-width':2.2,'stroke-dasharray':'6 4'});
     lbl(x0,170,'Δ = view 1 − view 2 (solid), predicted Δ (dashed)',{fill:C.ink,'font-size':12,'font-weight':500});
-    lbl(x0,22,`sub-01 watching ${shortPart('task-movie10/'+ST.part+'/run-01')} twice, at ${mmss(ST.origin_seconds)}`,{fill:C.ink,'font-weight':500});
+    lbl(x0,22,'Same viewer watching the same movie clip twice',{fill:C.ink,'font-weight':500});
     qs=ST.query_scores_percent[key];
   } else {
     const past=colOf(EP.history,n).slice(-40),meas=colOf(EP.measured,n),fut=key?colOf(EP[key],n):null;
@@ -999,14 +995,14 @@ function drawTask(){
     if(fut)line([[X(anchor-1),yv(past[39])]].concat(fut.map((v,i)=>[X(anchor+i),yv(v)])),{stroke:m===2?C.stim:C.state,'stroke-width':2.4,'stroke-dasharray':'6 4'});
     else lbl((ax+x1)/2,108,'per-query Updating forecasts of this model were not saved',{'text-anchor':'middle','font-style':'italic'});
     if(T==='updating'&&m!==1)EP.reveal_steps.forEach(k=>el('circle',{cx:X(anchor+k),cy:yv(meas[k]),r:5,fill:C.obs},TS));
-    lbl(x0,22,(T==='updating'?'forecast, with four new frames revealed':'forecast, no new observations')+` · sub-01, ${shortPart(EP.run)}`,{fill:C.ink,'font-weight':500});
+    lbl(x0,22,T==='updating'?'60 s forecast, four new scans revealed':'60 s forecast, no new scans',{fill:C.ink,'font-weight':500});
     lbl(x0,H-10,'fMRI up to t₀',{});
     qs=key?EP.scores_whole_cortex_percent[key]:null;
     if(T==='updating'&&m===2)extra=' Stimulus-only ignores new scans, so this is its Forecast unchanged.';
   }
-  $('taskScore').innerHTML=`${name}: <b>${score.toFixed(1)}%</b> <span style="color:var(--muted);font-size:12px">benchmark${qs===null?'':' · query '+qs.toFixed(1)+'%'}</span>`;
+  $('taskScore').innerHTML=`${name}: <b>${score.toFixed(1)}%</b> <span style="color:var(--muted);font-size:12px">benchmark</span>`;
   $('taskEq').innerHTML=TASKS[T].eq;
-  $('taskText').textContent=TASKS[T].text+(T==='state'&&m===2?' A stimulus-only model predicts identical responses for both viewings, so predicted Δ is identically zero.':'')+extra+` Curves: ${NETNAME[NETS[n]]} network mean (z); scores pool all 1,000 parcels.`;
+  $('taskText').textContent=TASKS[T].text+(T==='state'&&m===2?' A stimulus-only model predicts identical responses for both viewings, so predicted Δ is identically zero.':'')+extra;
 }
 seg($('taskModel'),['Spectator','Linear forecaster','Stimulus-only'],0,i=>{tModel=i;drawTask();});
 seg($('taskNet'),NETS.map(k=>NETNAME[k]),0,i=>{tNet=i;drawTask();});
@@ -1055,7 +1051,7 @@ const MODELS_HCP=[{n:'TRIBE v2',f:'so',s:[null,null,[2.6,0,2.5]],r:.094},{n:'MIR
 const MET=['Forecast','State','Updating','Correlation r'];let dataset=0,metric=1,hist=2;
 const datasetSeg=$('datasetSeg'),metricSeg=$('metricSeg'),histSeg=$('histSeg');
 function syncHistLock(){const lock=dataset===1||metric===3;[...histSeg.children].forEach((b,j)=>b.disabled=(lock&&j!==2));if(lock){hist=2;press(histSeg,2);}}
-seg(datasetSeg,['Algonauts 2025','HCP 7T (184)'],0,i=>{dataset=i;syncHistLock();renderLB(true);});
+seg(datasetSeg,['Algonauts 2025','HCP 7T'],0,i=>{dataset=i;syncHistLock();renderLB(true);});
 seg(metricSeg,MET,metric,i=>{metric=i;syncHistLock();renderLB(true);});
 seg(histSeg,['7.5 s','120 s','180 s'],hist,i=>{hist=i;renderLB(true);});
 function renderLB(anim){const box=$('lbChart');const isR=metric===3,isHcp=dataset===1,M=isHcp?MODELS_HCP:MODELS_ALG;
@@ -1069,10 +1065,10 @@ function renderLB(anim){const box=$('lbChart');const isR=metric===3,isHcp=datase
    1:'Spectator rises fivefold from 1.1% at 7.5 s to 5.5% at 180 s—more than double the best baseline (2.6%). Stimulus-only encoders score exactly 0.',
    2:'With four new frames per minute, Spectator reaches 20.3% at 180 s, 6.9 points ahead of the next-best model (NeuroWorld, 13.4%).',
    3:'By correlation alone, stimulus-only MIRAGE ranks second (0.320) and beats every prior brain world model while scoring 0% on State.'};
-  const T_HCP={0:'On HCP 7T (184 viewers, different scanner, zero TRIBE v2 exposure), Spectator leads at 6.6% Forecast—and reaches 7.3% zero-shot on 36 unseen individuals.',
-   1:'Scored on a clip viewed twice by 27 held-out HCP viewers, Spectator leads at 6.2% State while stimulus-only encoders score 0.',
-   2:'With four scans per minute on HCP 7T, Spectator reaches 15.7% Updating (+2.6 points over NeuroWorld, 13.1%) and 16.7% zero-shot on unseen viewers.',
-   3:'On 60-step parcel-averaged Pearson r on HCP 7T (Table 12), Spectator ranks first at 0.163 (0.217 over steps 1–30; 94.9% Cls@Top10).'};
+  const T_HCP={0:'On HCP 7T (a separate scanner and cohort), Spectator leads at 6.6% Forecast and transfers zero-shot to unseen viewers (7.3%).',
+   1:'On a repeated HCP 7T clip, Spectator leads at 6.2% State while stimulus-only encoders score 0.',
+   2:'With four scans per minute on HCP 7T, Spectator reaches 15.7% Updating (+2.6 points over NeuroWorld) and 16.7% on unseen viewers.',
+   3:'On HCP 7T, Spectator also ranks first on correlation (r = 0.163).'};
   $('lbNote').textContent=(isHcp?T_HCP:T_ALG)[metric];}
 renderLB(false);$('lbReplay').onclick=()=>renderLB(true);
 const lbio=new IntersectionObserver(es=>{if(es[0].isIntersecting){renderLB(true);lbio.disconnect();}},{threshold:.3});lbio.observe($('lbChart'));

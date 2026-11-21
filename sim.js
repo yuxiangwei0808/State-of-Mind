@@ -287,9 +287,9 @@ function setRowMode(i){
   pressSeg(rowSeg,i);
   $('simRowName').textContent=['Prediction','State term','Stimulus term'][i];
   $('simRowSub').textContent=[
-    'Spectator, since the last scan',
-    'inferred state carried forward, no movie',
-    'movie drive since the last scan (probe offset removed)'
+    'Spectator rollout',
+    'inferred brain state carried forward (no movie)',
+    'movie-driven component since the last scan'
   ][i];
 }
 seg(rowSeg,['Prediction','State','Stimulus'],0,setRowMode);
