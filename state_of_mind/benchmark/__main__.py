@@ -1,19 +1,17 @@
 """Benchmark command line (README.md, BrainStateBench).
 
-    python -m state_of_mind.benchmark forecast --dataset algonauts --split val dev --model run:<dir> --device cuda
+    python -m state_of_mind.benchmark forecast --dataset algonauts --split val dev --model py:my_model.py:MyModel
     python -m state_of_mind.benchmark report --dataset algonauts --split dev
-    python -m state_of_mind.benchmark state --model run:<dir> --device cuda              (Movie10 repeats; HCP repeated clip)
-    python -m state_of_mind.benchmark updating --model run:<dir> --device cuda
-    python -m state_of_mind.benchmark nonanticipation --model run:<dir> --device cuda
-    python -m state_of_mind.benchmark suite --dataset hcp_movies --model run:<dir> --device cuda   (every task, one fit)
+    python -m state_of_mind.benchmark state --model py:my_model.py:MyModel                (Movie10 repeats; HCP repeated clip)
+    python -m state_of_mind.benchmark updating --model py:my_model.py:MyModel
+    python -m state_of_mind.benchmark nonanticipation --model py:my_model.py:MyModel
+    python -m state_of_mind.benchmark suite --dataset algonauts --model py:my_model.py:MyModel  (every task)
     python -m state_of_mind.benchmark profile [--reference <row>]                         (the card: every scored model)
 
 Models: ``py:<file.py>:<Class>`` (an external model: any class with ``name`` and ``predict(QueryBatch)``, built as
-``Class(dataset=..., device=...)``; examples/persistence.py), ``run:<dir>`` (a trained run),
-``direct-linear`` (the Forecast and State baseline), ``ipsid`` (the Updating baseline), ``tribev2``, ``persistence``,
-``latent:<model>`` (a latent model's two readouts: its own decoder, and its predicted states through a frozen linear
-probe, named "<name>" and "<name> (latent)"; benchmark/latent.py).
-``--features`` chooses the stimulus rows of the fitted references (raw, projections or context).
+``Class(dataset=..., device=...)``; examples/persistence.py), ``run:<dir>`` (a trained run), ``persistence``,
+``latent:<model>`` (a latent model's predicted states scored through a frozen linear probe, named "<name> (latent)";
+benchmark/latent.py).
 Results go to <output>/<dataset>/<split>/<model>/ (Forecast) or <output>/<dataset>/<task>/ (the others).
 """
 import argparse
@@ -31,20 +29,15 @@ EVALUATION = {"algonauts": ["train", "val", "dev", "test"],
 NONANTICIPATION = {"algonauts": "val", "hcp_movies": "heldout-adapt"}  # one held-out set suffices for the check
 
 
-def _rows_cache(data, kind, output=OUTPUT):
-    """Stimulus-row cache of a dataset, under the run's output directory."""
-    return Path(output) / data.dataset / f"stimulus-rows-{kind}.npz"
-
-
 def _log(text):
     print(text, flush=True)
 
 
-def _models(name, data, device="cpu", output=OUTPUT, features=None):
+def _models(name, data, device="cpu", output=OUTPUT):
     from state_of_mind.benchmark.interface import Persistence
-    if name.startswith("latent:"):  # both readouts of a latent model: its own decoder, and its frozen probe
+    if name.startswith("latent:"):  # score a latent model's predicted states through a frozen linear probe
         from state_of_mind.benchmark.latent import LatentProbe, Probe
-        model = _models(name.split(":", 1)[1], data, device, output, features)[0]
+        model = _models(name.split(":", 1)[1], data, device, output)[0]
         if getattr(model, "fills_with_probe", False):  # no decoder: the first probe fills the rollouts the final probe is fitted on
             model.use_probe(Probe(data, model, output, log=_log, open_loop_only=True))
             probe = Probe(data, model, output, log=_log)
@@ -54,9 +47,6 @@ def _models(name, data, device="cpu", output=OUTPUT, features=None):
         return own + [LatentProbe(model, Probe(data, model, output, log=_log), f"{model.name} (latent)")]
     if name == "persistence":
         return [Persistence()]
-    if name == "tribev2":
-        from state_of_mind.benchmark.references import SavedEncoder
-        return [SavedEncoder(data)]
     if name.startswith("py:"):  # an external model: py:<file.py>:<Class>, built as Class(dataset=..., device=...)
         import importlib.util
         path, cls = name[3:].rsplit(":", 1)
@@ -64,22 +54,15 @@ def _models(name, data, device="cpu", output=OUTPUT, features=None):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         return [getattr(module, cls)(dataset=data.dataset, device=device)]
-    if name == "ipsid":
-        from state_of_mind.benchmark.baselines import IPSIDBaseline
-        return [IPSIDBaseline(data, features, log=_log, output=output)]
     if name.startswith("run:"):
         from state_of_mind.benchmark.adapters import load_run
         return [load_run(name.split(":", 1)[1], device)]
-    if name == "direct-linear":
-        from state_of_mind.benchmark.references import FEATURES, direct_linear
-        kind = features or FEATURES[data.dataset]
-        return [direct_linear(data, kind, cache=_rows_cache(data, kind, output), log=_log)]
     raise ValueError(f"Unknown model {name!r}")
 
 
 def _each_model(args, data):
     from state_of_mind.benchmark.latent import LatentProbe
-    for model in _models(args.model, data, args.device, args.output, getattr(args, "features", None)):
+    for model in _models(args.model, data, args.device, args.output):
         if args.name:
             model.name = f"{args.name} (latent)" if isinstance(model, LatentProbe) else args.name
         yield model
@@ -95,8 +78,6 @@ def forecast(args):
     data = BenchmarkData(args.config or CONFIGS[args.dataset])
     for model in _each_model(args, data):
         for split in _splits(args, data):
-            from state_of_mind.benchmark.adapt import calibrate
-            calibrate(model, data, split, log=_log)
             F.run(data, model, split, output=args.output, workers=args.workers, log=_log)
 
 
@@ -107,9 +88,8 @@ def report(args):
     if args.task in ("state", "updating"):
         from importlib import import_module
         module = import_module(f"state_of_mind.benchmark.{args.task}")
-        reference = args.reference or ("direct linear" if args.dataset == "hcp_movies" else "direct linear [projections]")
         folder = Path(args.output) / args.dataset / args.task
-        text = module.table(folder, reference)
+        text = module.table(folder, args.reference)
         (folder / "table.md").write_text(text + "\n")
         print(text)
         return
@@ -120,13 +100,12 @@ def report(args):
     if not results:
         raise FileNotFoundError(f"No scored models under {folder}")
     summaries = {name: R.summarize(r) for name, r in results.items()}
-    reference = args.reference or ("direct linear" if args.dataset == "hcp_movies" else "direct linear [projections]")
     unit = "participants" if args.dataset == "hcp_movies" else "content parts"
     lines = [f"# Forecast: {args.dataset} {args.split}", "",
              f"Drift-robust r and nMSE; 95% bootstrap intervals over {unit}.", "", R.scorecard(summaries)]
-    if reference in results:
-        lines += ["", f"Paired differences versus {reference}:", ""]
-        diffs = {name: R.paired(r, results[reference]) for name, r in results.items() if name != reference}
+    if args.reference and args.reference in results:
+        lines += ["", f"Paired differences versus {args.reference}:", ""]
+        diffs = {name: R.paired(r, results[args.reference]) for name, r in results.items() if name != args.reference}
         lines.append(R.scorecard(diffs))
     (folder / "scorecard.md").write_text("\n".join(lines) + "\n")
     encode = lambda s: {" / ".join(map(str, k)): v for k, v in s.items()}
@@ -167,10 +146,8 @@ def profile(args):
 
 
 def suite(args):
-    """Every real-data task, in one process (a fitted reference is fitted once). The models of one spec (a latent
-    model's two readouts) are scored together, so they share its rollouts."""
+    """Every real-data task, in one process."""
     from state_of_mind.benchmark import forecast as F, nonanticipation as N, state as S, updating as U
-    from state_of_mind.benchmark.adapt import calibrate
     from state_of_mind.benchmark.data import BenchmarkData
     data = BenchmarkData(args.config or CONFIGS[args.dataset])
     splits = args.split or EVALUATION[data.dataset]
@@ -179,8 +156,6 @@ def suite(args):
         _log(f"suite {', '.join(m.name for m in models)}: {task}")
         if task == "forecast":
             for split in splits:
-                for model in models:
-                    calibrate(model, data, split, log=_log)
                 F.run(data, models, split, output=args.output, workers=args.workers, log=_log)
         elif task == "state":
             S.run(data, models, output=args.output, log=_log)
@@ -212,8 +187,6 @@ def main():
         p.add_argument("--device", default="cpu", help="cuda for trained models on a GPU")
         p.add_argument("--output", default=OUTPUT)
         p.add_argument("--dataset", choices=sorted(CONFIGS), default="algonauts")
-        p.add_argument("--features", choices=("raw", "projections", "context"),
-                       help="Stimulus rows of the fitted references (default: raw on Algonauts, projections on HCP)")
         p.add_argument("--config", help="Dataset config overriding the default")
         if splits:
             p.add_argument("--split", nargs="+", help="Default: every evaluation set of the dataset (EVALUATION)")
@@ -239,8 +212,7 @@ def main():
     r.add_argument("--split", choices=("train", "val", "dev", "test", "heldout-fit", "heldout-adapt", "heldout-test"),
                    help="Forecast split")
     r.add_argument("--task", choices=("forecast", "state", "updating"), default="forecast")
-    r.add_argument("--reference", help="Model for paired differences (default: the direct linear forecaster on "
-                                       "TRIBEv2 projections)")
+    r.add_argument("--reference", help="Model for paired differences (default: none)")
     r.add_argument("--output", default=OUTPUT)
     args = parser.parse_args()
     {"forecast": forecast, "report": report, "state": state, "updating": updating,

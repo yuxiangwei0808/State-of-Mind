@@ -216,4 +216,4 @@ wandb:
   entity: null
   mode: offline
   name: null
-  project: neuralworld
+  project: state_of_mind

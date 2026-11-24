@@ -14,7 +14,6 @@ from accelerate.utils import broadcast_object_list, set_seed
 from state_of_mind.eval.probe import fit_ridge_probe, probe_subset
 from state_of_mind.eval.rollout import evaluate
 from state_of_mind.models import build_model
-from state_of_mind.models.collapse import SIGReg
 from state_of_mind.train.checkpoint import (read_checkpoint, restore_model,
     restore_optimizer_and_rng, save_checkpoint)
 from state_of_mind.train.losses import LatentObjective
@@ -51,7 +50,7 @@ def build_scheduler(optimizer, *, warmup_steps, total_steps, schedule):
 
 def train_one_epoch(objective, loader, optimizer, scheduler, cfg, accelerator, *, epoch=0, global_step=0):
     objective.train()
-    total = {"loss": 0.0, "prediction_loss": 0.0, "rollout_loss": 0.0, "sigreg": 0.0,
+    total = {"loss": 0.0, "prediction_loss": 0.0, "rollout_loss": 0.0,
              "latent_spread": 0.0, "grad_norm": 0.0}
     count, steps, micro = 0, 0, 0
     started = time.perf_counter()
@@ -77,7 +76,7 @@ def train_one_epoch(objective, loader, optimizer, scheduler, cfg, accelerator, *
         count += size
         total["loss"] += float(loss.detach()) * size
         for key, value in metrics.items():
-            total[key] = total.get(key, 0.0) + float(value) * size  # optional terms (parcel_loss) appear here
+            total[key] = total.get(key, 0.0) + float(value) * size
         if not update:
             continue
         grad_norm = accelerator.clip_grad_norm_(trainable, clip)
@@ -198,18 +197,15 @@ def fit(cfg, *, resume=None):
                                           for record in train_data.records])
         model.to(device)
         optimizer = build_optimizer(model, cfg["train"]["lr"], cfg["train"]["weight_decay"], cfg["train"]["encoder_lr_factor"])
-        # As in LeWM, drop the final partial batch so every SIGReg call sees a full batch.
         accumulation = cfg["train"]["accumulation_steps"]
         batch_per_rank = local_batch_size(cfg["data"]["batch_size"], accelerator.num_processes * accumulation)
         train_loader = accelerator.prepare_data_loader(
             build_loader(train_data, cfg, shuffle=True, drop_last=True, batch_size=batch_per_rank))
         total_steps = cfg["train"]["epochs"] * (len(train_loader) // accumulation)
-        # As in LeWM, warm up over a fraction of all optimizer steps.
         warmup_steps = round(cfg["train"]["warmup_fraction"] * total_steps)
         lr_scheduler = build_scheduler(optimizer, warmup_steps=warmup_steps,
                                        total_steps=total_steps, schedule=cfg["train"]["schedule"])
-        regularizer = SIGReg(cfg["train"]["sigreg_knots"], cfg["train"]["sigreg_projections"]).to(device)
-        objective = LatentObjective(model, regularizer, cfg["train"])
+        objective = LatentObjective(model, cfg["train"])
         objective, optimizer, scheduler = accelerator.prepare(objective, optimizer, lr_scheduler)
         if accelerator.num_processes > 1:
             set_seed(cfg["seed"], device_specific=True)
@@ -338,8 +334,8 @@ def main():
     args = parser.parse_args()
     cfg = load_config(args.config, args.set)
     if cfg["design"] is None and not args.resume:
-        raise SystemExit(f"{args.config} declares no design; launch a design YAML such as "
-                         "state_of_mind/configs/algonauts/transformer_world_model.yaml")
+        raise SystemExit(f"{args.config} declares no design; launch a Spectator config such as "
+                         "state_of_mind/configs/spectator/algonauts-jepa.yaml")
     for key in ("epochs", "lr", "output_dir", "precision", "run_tag"):
         value = getattr(args, key)
         if value is not None:

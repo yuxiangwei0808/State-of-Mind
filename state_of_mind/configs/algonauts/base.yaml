@@ -3,7 +3,7 @@
 # (train.objective, train.mode, train.encoder_checkpoint, train.freeze_encoder).
 seed: 0
 wandb:
-  project: neuralworld
+  project: state_of_mind
   entity: null
   name: null
   mode: online

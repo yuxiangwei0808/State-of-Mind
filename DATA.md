@@ -59,14 +59,12 @@ Install [`state_of_mind/requirements-data.txt`](state_of_mind/requirements-data.
        --checkpoint $DATA/hub/models--facebook--tribev2/snapshots/f894e783020944dcd96e5568550afe2aa9743f9f/best.ckpt \
        --output $DATA/algonauts/derivatives/neuroworld-schaefer1000-v2-tribev2-context --threads 12
    ```
-5. **TRIBE v2's zero-shot predictions**, the stimulus-only reference, cached in `<bundle>-tribev2-predictions/`: `python -m state_of_mind.eval.tribev2_reference --help`.
 
 The result:
 
 ```text
 $DATA/algonauts/derivatives/neuroworld-schaefer1000-v2/                        fMRI, masks, pooled features, run records
 $DATA/algonauts/derivatives/neuroworld-schaefer1000-v2-tribev2-context/        contextual rows, one array per stimulus
-$DATA/algonauts/derivatives/neuroworld-schaefer1000-v2-tribev2-predictions/    TRIBE v2's predictions
 $DATA/hcp_movies/derivatives/...                                               the same for HCP
 ```
 

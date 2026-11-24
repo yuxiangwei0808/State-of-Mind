@@ -192,15 +192,12 @@ def load(folder, name):
 
 def run(data, model, splits=("val", "dev"), output="artifacts/benchmark", log=print, own_fill=False):
     """Score `model` (or a list of models, on the same episodes); returns the results (a list for a list)."""
-    from state_of_mind.benchmark.adapt import calibrate
     from state_of_mind.benchmark.grid import stamp
     models = model if isinstance(model, list) else [model]
     results = {m.name: {"model": m.name, "dataset": data.dataset, "hidden_seconds": HIDDEN_SECONDS, "stamp": stamp(m),
                         "splits": {}, **({"own fill": True} if own_fill else {})} for m in models}
     sums = {m.name: {} for m in models}
     for split in splits:
-        for m in models:
-            calibrate(m, data, split, log=log)
         runs = data.runs(split)
         by_model = collect(data, models, runs, log, own_fill)
         for m in models:

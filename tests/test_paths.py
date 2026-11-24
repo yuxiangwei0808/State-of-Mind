@@ -1,6 +1,4 @@
 """Environment-variable roots and legacy ${NEUROWORLD_*} placeholder compatibility."""
-from pathlib import Path
-
 from state_of_mind import paths
 
 
@@ -21,9 +19,9 @@ def test_root_prefers_state_of_mind_and_falls_back_to_legacy(monkeypatch, tmp_pa
 
 def test_expand_supports_canonical_and_legacy_placeholders():
     payload = {
-        "new": ["${STATE_OF_MIND_DATA}/a", "${STATE_OF_MIND_OUTPUT}/b", "${STATE_OF_MIND_EXTERNAL}/c"],
-        "legacy": ["${NEUROWORLD_DATA}/a", "${NEUROWORLD_OUTPUT}/b", "${NEUROWORLD_EXTERNAL}/c"],
+        "new": ["${STATE_OF_MIND_DATA}/a", "${STATE_OF_MIND_OUTPUT}/b"],
+        "legacy": ["${NEUROWORLD_DATA}/a", "${NEUROWORLD_OUTPUT}/b"],
     }
     expanded = paths.expand(payload)
-    assert expanded["new"] == [f"{paths.DATA}/a", f"{paths.OUTPUT}/b", f"{paths.EXTERNAL}/c"]
+    assert expanded["new"] == [f"{paths.DATA}/a", f"{paths.OUTPUT}/b"]
     assert expanded["legacy"] == expanded["new"]

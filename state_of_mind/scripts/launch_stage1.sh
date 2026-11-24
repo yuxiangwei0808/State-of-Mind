@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Stage 1 for one model design:
-#   ./state_of_mind/scripts/launch_stage1.sh state_of_mind/configs/algonauts/transformer_world_model.yaml [--set section.key=value ...]
+# Gradient training stage (stage 0 or JEPA phase):
+#   ./state_of_mind/scripts/launch_stage1.sh state_of_mind/configs/spectator/algonauts-stage0.yaml [--set section.key=value ...]
 # The design YAML fixes the objective, stimulus mode and encoder; --set overrides
 # any other setting. The variables below override epochs, batch size, lr and precision when set.
 set -euo pipefail
@@ -8,13 +8,13 @@ project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$project_dir"
 
 python="${PYTHON:-python}"
-config="${1:?Usage: launch_stage1.sh <design YAML, e.g. state_of_mind/configs/algonauts/transformer_world_model.yaml> [--set ...]}"
+config="${1:?Usage: launch_stage1.sh <YAML, e.g. state_of_mind/configs/spectator/algonauts-stage0.yaml> [--set ...]}"
 shift
 # The run directory is named automatically, checkpoints/<dataset>/<run name from the settings>,
 # and printed at startup. RUN_TAG appends a suffix; RUN_DIR chooses the directory instead.
 # Optional overrides: EPOCHS, BATCH_SIZE (global; split evenly across GPUs), LR, PRECISION.
 # W&B uses the YAML settings; optional overrides:
-# export WANDB_PROJECT=neuralworld
+# export WANDB_PROJECT=state_of_mind
 # export WANDB_MODE=offline  # online / offline / disabled
 # export WANDB_NAME=my-run
 # To resume: launch_stage1.sh <run directory>/config.yaml --resume <run directory>/latest.pt

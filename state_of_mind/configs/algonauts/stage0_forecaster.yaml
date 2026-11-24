@@ -1,4 +1,0 @@
-# The Transformer world model, stage 0: the brain-only fMRI forecaster (the fMRI forecaster without the stimulus).
-# Only its encoder is used, by transformer_world_model.yaml. Train this once before the Transformer world model.
-base: base.yaml
-design: stage0_forecaster

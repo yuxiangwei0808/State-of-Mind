@@ -2,8 +2,7 @@
 
 Only tensors and plain Python values are stored; loading uses weights_only=True.
 World-model and fMRI-forecaster checkpoints use format neuroworld-latent-v2
-(forecasters also store their subjects); readout checkpoints use
-neuroworld-readout-v1. Earlier formats are not supported.
+(forecasters also store their subjects). Earlier formats are not supported.
 """
 from pathlib import Path
 import hashlib
@@ -15,7 +14,6 @@ from accelerate.utils import gather_object
 from state_of_mind.utils.config import DEFAULTS
 
 FORMAT = "neuroworld-latent-v2"
-READOUT_FORMAT = "neuroworld-readout-v1"
 
 MODEL_KEYS = ("state_window_trs", "context_states", "state_dim", "predictor_depth",
               "attention_heads", "predictor_dropout")
@@ -120,23 +118,6 @@ def save_checkpoint(path, model, optimizer, scheduler, cfg, *, accelerator, epoc
         "data_summary": data_summary, "world_size": accelerator.num_processes, "wandb_run": wandb_run,
         "subjects": list(model.readout.subjects) if hasattr(model, "readout") else None,
         "rng": rng_by_rank[0], "rng_by_rank": rng_by_rank}, accelerator)
-
-
-def save_readout_checkpoint(path, readout, optimizer, scheduler, cfg, *, accelerator, world_model_path, epoch,
-                            global_step, total_steps, best_loss, history, data_summary, world_model_sha256,
-                            wandb_run=None):
-    rng_by_rank = gather_object([rng_state()])
-    if not accelerator.is_main_process:
-        return
-    readout = accelerator.unwrap_model(readout)
-    write_atomic(path, {
-        "format": READOUT_FORMAT, "config": cfg, "readout": accelerator.get_state_dict(readout),
-        "subjects": list(readout.subjects), "world_model_path": str(world_model_path),
-        "world_model_sha256": world_model_sha256, "wandb_run": wandb_run,
-        "optimizer": optimizer.state_dict(), "scheduler": scheduler.state_dict(),
-        "epoch": epoch, "global_step": global_step, "total_steps": total_steps,
-        "best_loss": best_loss, "history": history, "data_summary": data_summary,
-        "world_size": accelerator.num_processes, "rng": rng_by_rank[0], "rng_by_rank": rng_by_rank}, accelerator)
 
 
 def restore_rng(rng):

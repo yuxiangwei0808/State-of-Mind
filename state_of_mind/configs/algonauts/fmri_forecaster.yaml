@@ -1,4 +1,0 @@
-# The fMRI forecaster: fMRI forecaster. Encoder, predictor and readout trained together on
-# future-fMRI error (one stage; evaluate directly, no stage 2).
-base: base.yaml
-design: fmri_forecaster

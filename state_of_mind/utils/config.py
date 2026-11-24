@@ -1,9 +1,7 @@
-"""YAML settings: one file per model design on top of a shared per-dataset base.
+"""YAML settings: Spectator configs on top of a shared per-dataset base.
 
-A design YAML (e.g. configs/algonauts/transformer_world_model.yaml) names its base and declares
-``design``; the design fixes the objective, stimulus mode and encoder source,
-and every other setting comes from the base or may be overridden. Saved run
-configurations are fully resolved and load the same way.
+A config YAML (e.g. configs/spectator/algonauts-jepa.yaml) declares ``design`` and either
+names a ``base`` or holds a fully resolved run configuration.
 """
 from copy import deepcopy
 from pathlib import Path
@@ -18,7 +16,7 @@ from state_of_mind.paths import expand
 DEFAULTS = {
     "design": None,
     "seed": 0,
-    "wandb": {"project": "neuralworld", "entity": None, "name": None, "mode": "online"},
+    "wandb": {"project": "state_of_mind", "entity": None, "name": None, "mode": "online"},
     "data": {"bundle_path": None, "tr_seconds": 1.49, "hrf_delay_seconds": 5.0,
              "sequence_states": 4, "window_stride_trs": 1, "train_runs": [], "val_runs": [],
              "dev_runs": [], "test_runs": [], "heldout_subjects": [], "split_frames": {},

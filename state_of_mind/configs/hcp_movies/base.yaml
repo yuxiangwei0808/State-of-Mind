@@ -2,7 +2,7 @@
 # YAML that names this file as its base (see configs/algonauts/ for the designs).
 seed: 0
 wandb:
-  project: neuralworld
+  project: state_of_mind
   entity: null
   name: null
   mode: online

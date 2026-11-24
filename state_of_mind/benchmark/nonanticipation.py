@@ -49,9 +49,7 @@ def check(data, model, split="val", seed=0):
 
 
 def run(data, model, output="artifacts/benchmark", split="val", log=print):
-    from state_of_mind.benchmark.adapt import calibrate
     from state_of_mind.benchmark.grid import stamp
-    calibrate(model, data, split, log=log)
     result = {**check(data, model, split), "stamp": stamp(model)}
     folder = Path(output) / data.dataset / "nonanticipation"
     folder.mkdir(parents=True, exist_ok=True)

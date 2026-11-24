@@ -9,11 +9,11 @@ Yuxiang Wei<sup>1,2,&#42;</sup>, Zundong Wu<sup>1,2,&#42;</sup>, Weiyu Sun<sup>1
 
 **[Paper (arXiv)](https://arxiv.org/abs/2611.28508)** | **[PDF](https://arxiv.org/pdf/2611.28508)** | **[Project page](https://yuxiangwei0808.github.io/State-of-Mind/)** | **[Weights and stored scores](https://huggingface.co/stanjsx/Spectator)** | **[Data](DATA.md)**
 
-A brain world model keeps an internal state built from a person's measured fMRI and simulates how that state evolves while they watch a movie. This repository contains:
+This repository contains:
 
-- **BrainStateBench**, a benchmark that scores such models on three tasks over the next minute;
+- **BrainStateBench**, a benchmark that scores brain world models on three tasks over the next minute;
 - **Spectator**, the paper's model: a linear encoder that turns the last minutes of fMRI into a 2,048-number state, and one matrix that rolls the state forward under the movie;
-- the paper's baselines and analyses.
+- the data preparation and loading pipeline for Algonauts 2025 and HCP 7T movies.
 
 ## Results
 
@@ -38,7 +38,7 @@ python -m pip install -r state_of_mind/requirements-dev.txt
 WANDB_MODE=offline CUDA_VISIBLE_DEVICES='' python -m pytest -q tests
 ```
 
-The tests use synthetic inputs and need no data, weights or GPU. The paper's analyses and IPSID also need [`requirements-analysis.txt`](state_of_mind/requirements-analysis.txt), and data preparation needs [`requirements-data.txt`](state_of_mind/requirements-data.txt).
+The tests use synthetic inputs and need no data, weights or GPU. Data preparation also needs [`requirements-data.txt`](state_of_mind/requirements-data.txt).
 
 The code finds data and outputs through two roots ([`state_of_mind/paths.py`](state_of_mind/paths.py)). Each is an environment variable or, if unset, a folder or link in the repository root:
 
@@ -143,32 +143,23 @@ python -m state_of_mind.benchmark suite --dataset algonauts --model py:my_model.
 python -m state_of_mind.benchmark profile --output outputs/benchmark-results --reference "my model"
 ```
 
-`profile` prints the benchmark card: every row of the store, with paired 95% intervals against the reference row. Scoring into the downloaded store puts a model next to the paper's rows. Built-in models: `direct-linear` (the linear forecaster), `ipsid`, `tribev2` and `persistence`. A trained run is `run:<dir>` or `latent:run:<dir>`. Each command takes `--help`.
+`profile` prints the benchmark card: every row of the store, with paired 95% intervals against the reference row. Scoring into the downloaded store puts a model next to the paper's stored rows. Built-in model specs: `py:<file.py>:<Class>`, `run:<dir>`, `latent:run:<dir>`, and `persistence`. Each command takes `--help`.
 
 TRIBE v2 was trained on CNeuroMod, which includes every Algonauts recording, so models that read its features inherit that exposure. The fMRI is preprocessed over whole runs, so the scores are for offline forecasting, not real time.
-
-## Paper tables
-
-```bash
-python -m state_of_mind.paper.history_table    # Table 2: 7.5, 120 and 180 s of history
-```
-
-It reads only the downloaded `outputs/benchmark-results/`, and writes the paired differences to Spectator to `outputs/paper-analysis/results-history-table.json`. The other analyses (Table 3, the Sec. 5.5 figures and the appendix) run the model on the prepared data; [`state_of_mind/paper/__init__.py`](state_of_mind/paper/__init__.py) lists their commands. BrainVista's and MIRAGE's rows were scored by a collaborator and are not included.
 
 ## Repository layout
 
 | Path | Contents |
 |---|---|
-| [`state_of_mind/benchmark/`](state_of_mind/benchmark) | BrainStateBench: tasks, scoring, reference models, latent probes |
-| [`state_of_mind/spectator/`](state_of_mind/spectator) | Spectator's closed-form steps and scoring |
-| [`state_of_mind/models/`](state_of_mind/models), [`state_of_mind/train/`](state_of_mind/train) | encoders, predictors and gradient training |
-| [`state_of_mind/configs/`](state_of_mind/configs) | dataset configs and Spectator's frozen configs |
+| [`state_of_mind/spectator/`](state_of_mind/spectator) | Spectator's closed-form steps, assembly, and scoring |
+| [`state_of_mind/models/`](state_of_mind/models), [`state_of_mind/train/`](state_of_mind/train) | encoders, predictors, and gradient training |
+| [`state_of_mind/benchmark/`](state_of_mind/benchmark) | BrainStateBench: tasks, scoring, latent probes, and benchmark card |
+| [`state_of_mind/configs/`](state_of_mind/configs), [`state_of_mind/scripts/`](state_of_mind/scripts) | dataset/Spectator configs and training scripts |
 | [`state_of_mind/nbs_data/`](state_of_mind/nbs_data), [`state_of_mind/data/`](state_of_mind/data) | data preparation and loading |
-| [`state_of_mind/paper/`](state_of_mind/paper) | the paper's analyses |
 
 ## License
 
-Parts of the code are adapted from [LeWM](https://github.com/lucas-maes/le-wm) (SIGReg and conditional Transformer blocks; MIT) and [TRIBE v2](https://github.com/facebookresearch/tribev2) (stimulus projections and the network that makes the contextual rows; CC BY-NC 4.0). Each adapted file says what it took and what changed, and the licenses are in [`state_of_mind/licenses/`](state_of_mind/licenses). The code and the weights are released under CC BY-NC 4.0 ([LICENSE](LICENSE)).
+Parts of the code are adapted from [LeWM](https://github.com/lucas-maes/le-wm) (conditional Transformer blocks; MIT) and [TRIBE v2](https://github.com/facebookresearch/tribev2) (stimulus projections and the network that makes the contextual rows; CC BY-NC 4.0). Each adapted file says what it took and what changed, and the licenses are in [`state_of_mind/licenses/`](state_of_mind/licenses). The code and the weights are released under CC BY-NC 4.0 ([LICENSE](LICENSE)).
 
 ## Citation
 

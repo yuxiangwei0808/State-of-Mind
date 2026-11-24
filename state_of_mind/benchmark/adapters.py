@@ -234,20 +234,13 @@ class ProbeFillAdapter(RolloutAdapter):
 
 
 def load_run(run_dir, device="cpu", name=None):
-    from state_of_mind.train.readout import load_readout, load_world_model
+    from state_of_mind.train.readout import load_world_model
     from state_of_mind.utils.config import load_config
     run = Path(run_dir)
     cfg = load_config(run / "config.yaml")
     model, _ = load_world_model(cfg, run / "best.pt", device)
-    readout = None
+    states = getattr(model, "read_states", cfg["model"]["context_states"]) * getattr(model, "state_step", 1)
     if not getattr(model, "forecasts_fmri", False):
-        if not (run / "readout" / "readout_best.pt").is_file():
-            return ProbeFillAdapter(name or run.name, model, ProbeHead(), cfg, device, getattr(model, "read_states", cfg["model"]["context_states"])
-                                    * getattr(model, "state_step", 1))
-        readout, _ = load_readout(run / "readout" / "readout_best.pt", device, world_model_path=run / "best.pt")
-    # Give every model the initial states it was trained to use (its context), as for the aligned references; with a
-    # state step s, each of its s chains reads that many states s frames apart, so it gets s times as many.
-    return RolloutAdapter(name or run.name, model, readout, cfg, device,
-                          getattr(model, "read_states", cfg["model"]["context_states"])
-                          * getattr(model, "state_step", 1))
+        return ProbeFillAdapter(name or run.name, model, ProbeHead(), cfg, device, states)
+    return RolloutAdapter(name or run.name, model, None, cfg, device, states)
 

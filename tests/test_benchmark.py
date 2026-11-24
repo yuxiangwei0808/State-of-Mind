@@ -148,38 +148,6 @@ def test_stimulus_source_switches_at_origin():
     assert timelines.tolist() == ["t"] and frames.tolist() == [55]
 
 
-def test_spliced_stimulus_rows_for_the_ridge():
-    from state_of_mind.benchmark.references import StimulusRows
-    rows = StimulusRows.__new__(StimulusRows)
-    rows.delays, rows.pad = [0, 2], 2
-    rows.rows = {"a": np.concatenate([np.zeros((2, 1)), np.arange(10)[:, None] + 100.0]).astype(np.float32),
-                 "b": np.concatenate([np.zeros((2, 1)), np.arange(10)[:, None] + 200.0]).astype(np.float32)}
-    run = make_run(n=10)
-    run.timeline_id = "a"
-    batch = Q.batch("toy", 1.0, run, [5], 1, 3, splices=[("b", 1)])
-    x = rows.lagged("a", np.array([5, 6, 7]), lambda f, m: stimulus_source(batch, 0, f, m))
-    # Delay 0 reads b from frame 1 on; delay 2 still reads a before the splice (frames 3, 4).
-    assert x[:, 0].tolist() == [201, 202, 203] and x[:, 1].tolist() == [103, 104, 201]
-
-
-def test_per_modality_history_replaces_only_that_block_before_the_origin():
-    from state_of_mind.benchmark.references import StimulusRows
-    rows = StimulusRows.__new__(StimulusRows)
-    rows.delays, rows.pad = [2], 2
-    a = np.stack([np.arange(10) + 100.0, np.arange(10) + 110.0, np.arange(10) + 120.0], 1)
-    b = a + 100.0
-    rows.rows = {k: np.concatenate([np.zeros((2, 3)), v]).astype(np.float32) for k, v in (("a", a), ("b", b))}
-    rows.blocks = {"audio": slice(0, 1), "text": slice(1, 2), "video": slice(2, 3)}
-    run = make_run(n=10)
-    run.timeline_id = "a"
-    batch = Q.batch("toy", 1.0, run, [5], 1, 3, histories=[{"text": ("b", 5)}])
-    x = rows.lagged("a", np.array([5, 6, 7]), lambda f, m: stimulus_source(batch, 0, f, m))
-    # Frames 3, 4 lie before the origin: only the text column comes from b; frame 5 is the query's own.
-    assert x[:, 0].tolist() == [103, 104, 105]
-    assert x[:, 1].tolist() == [213, 214, 115]
-    assert x[:, 2].tolist() == [123, 124, 125]
-
-
 def test_test_splits_are_scored_like_any_other(monkeypatch):
     """No split is locked: the test split and new participants' test runs (heldout-test) are ordinary test data."""
     data = BenchmarkData.__new__(BenchmarkData)
@@ -210,40 +178,6 @@ def test_parallel_map_matches_serial():
     assert _map(square, items, (1,), workers=3) == _map(square, items, (1,), workers=1) == [1, 2, 5, 10, 17, 26]
 
 
-
-
-def test_ipsid_filter_and_roll_matches_the_state_space_recursion():
-    from state_of_mind.benchmark.baselines import IPSIDBaseline
-    rng = np.random.default_rng(0)
-    nx, ny, nu = 3, 4, 2
-    p = {"A": 0.5 * np.eye(nx), "B": rng.normal(size=(nx, nu)), "C": rng.normal(size=(ny, nx)), "D": np.zeros((ny, nu)),
-         "K": 0.1 * rng.normal(size=(nx, ny)), "y_mean": np.zeros(ny), "u_mean": np.zeros(nu)}
-    y_pre, u_pre, u_fut = rng.normal(size=(1, 5, ny)), rng.normal(size=(1, 5, nu)), rng.normal(size=(1, 3, nu))
-    out, states, origin = IPSIDBaseline._filter_and_roll(p, y_pre, u_pre, u_fut)
-    x = np.zeros(nx)
-    for t in range(5):
-        x = p["A"] @ x + p["B"] @ u_pre[0, t] + p["K"] @ (y_pre[0, t] - p["C"] @ x)
-    assert np.allclose(origin[0], x)
-    for k in range(3):
-        assert np.allclose(out[0, k], p["C"] @ x) and np.allclose(states[0, k], x)
-        x = p["A"] @ x + p["B"] @ u_fut[0, k]
-
-
-def test_gain_is_the_slope_on_the_detrended_reference():
-    from state_of_mind.benchmark.gain import window_gains
-    rng = np.random.default_rng(0)
-    ref = rng.normal(size=(3, 20, 1000)).astype(np.float32)
-    trend = np.linspace(0, 5, 20)[None, :, None]
-    ok = np.ones((3, 20), dtype=bool)
-    sets = [np.arange(100), np.arange(500, 600)]
-    g = window_gains(2.0 * ref + 7.0 + trend, ref, ok, sets)
-    assert np.allclose(window_gains(2.0 * ref, ref, ok, sets), 2.0 * np.ones((3, 2)), atol=0.05)
-    assert np.all(np.isfinite(g))
-    assert np.allclose(window_gains(np.ones_like(ref) * 3.0 + trend, ref, ok, sets), 0.0, atol=1e-6)  # persistence-like
-    ok[0, :5] = False
-    assert np.isnan(window_gains(ref, ref, ok, sets)[0]).all()  # fewer than 80% valid frames
-    flat = np.ones_like(ref) + 1e-9 * ref  # no stimulus: a flat reference has no gain under a floor
-    assert np.isnan(window_gains(ref, flat, np.ones((3, 20), bool), sets, floor=np.array([1e-6, 1e-6]))).all()
 
 
 class _RepeatData:
@@ -364,102 +298,6 @@ def test_updating_own_fill_feeds_the_forecast_back_for_frames_not_shown():
     assert plain[0, -1, 0] > 0 and np.allclose(own[0, first + 1:], plain[0, 0, 0])  # own fill: no frame stays missing
 
 
-
-
-def test_ipsid_skips_the_update_at_missing_frames():
-    from state_of_mind.benchmark.baselines import IPSIDBaseline
-    rng = np.random.default_rng(1)
-    p = {"A": 0.9 * np.eye(3), "B": rng.normal(size=(3, 2)), "C": rng.normal(size=(4, 3)), "D": np.zeros((4, 2)),
-         "K": 0.3 * rng.normal(size=(3, 4)), "y_mean": np.zeros(4), "u_mean": np.zeros(2)}
-    y, u, fut = rng.normal(size=(2, 6, 4)), rng.normal(size=(2, 6, 2)), rng.normal(size=(2, 3, 2))
-    valid = np.ones((2, 6)); valid[:, 3:] = 0
-    masked = IPSIDBaseline._filter_and_roll(p, y, u, fut, valid=valid)[0]
-    y_other = y.copy(); y_other[:, 3:] += 100.0  # values at missing frames must not matter
-    assert np.allclose(masked, IPSIDBaseline._filter_and_roll(p, y_other, u, fut, valid=valid)[0])
-
-
-def test_state_gain_difference_compares_two_viewings():
-    from state_of_mind.benchmark import state as S
-    rng = np.random.default_rng(0)
-    ref = rng.normal(size=(4, 20, 1000)).astype(np.float32)
-
-    class Reference:
-        floor, sets = None, {"stimulus-driven": np.arange(200)}
-
-        def predict(self, subject, timeline, frames):
-            return ref.reshape(-1, 1000)[: len(frames)]
-
-    runs = [make_run(run_id="a"), make_run(run_id="b")]
-    o = np.arange(4) * 20
-    ok = np.ones((4, 20), dtype=bool)
-    d = S._gain_difference(Reference(), [np.arange(200)], runs, (o, o), (2.0 * ref, ref), (ok, ok))
-    assert np.allclose(d, 1.0, atol=1e-4)  # gain 2 in viewing a, 1 in viewing b
-
-
-def test_state_gain_reads_both_viewings_against_one_reference():
-    from state_of_mind.benchmark import state as S
-    ref = np.random.default_rng(1).normal(size=(4, 20, 1000)).astype(np.float32)
-
-    class Reference:  # the two runs' features differ slightly in scale over the same clip
-        floor = None
-
-        def predict(self, subject, timeline, frames):
-            return (1.1 if timeline.endswith("a") else 1.0) * ref.reshape(-1, 1000)[: len(frames)]
-
-    from dataclasses import replace
-    runs = [replace(make_run(run_id=r), timeline_id=f"t-{r}") for r in ("a", "b")]
-    o, ok = np.arange(4) * 20, np.ones((4, 20), dtype=bool)
-    args = (Reference(), [np.arange(200)], runs, (o, o), (ref, ref), (ok, ok))
-    assert np.abs(S._gain_difference(*args)).min() > 0.05  # own references: the same response looks different
-    assert np.allclose(S._gain_difference(*args, common=True), 0.0, atol=1e-6)
-
-
-def test_state_gain_centering_removes_what_participants_share():
-    from state_of_mind.benchmark import state as S
-    keys = [("run-2", "run-3", 0), ("run-2", "run-3", 10)]
-    records = [{"unit": u, "keys": keys, "p": np.array([np.nan, np.nan]),
-                **{f"d {w}": np.array([d, d + 1.0]) for w in S.GAIN_WINDOWS},
-                **{f"q {w}": np.array([0.5, -0.2]) for w in S.GAIN_WINDOWS}}  # a stimulus-only model: the same q
-               for u, d in (("p1", 0.1), ("p2", 0.4), ("p3", -0.2))]
-    S._center_by_origin(records)
-    assert all(np.allclose(r["q 30-60 s"], 0.0) for r in records)
-    assert np.allclose(sum(r["d 30-60 s"] for r in records), 0.0)
-    assert all(np.isnan(r["p"]).all() for r in records)
-
-
-def test_state_gain_correlation_of_a_constant_prediction_is_marked():
-    from state_of_mind.benchmark import state as S
-    from state_of_mind.benchmark.report import Units
-    sums = lambda a, y: np.array([a.size, a.sum(), y.sum(), (a * y).sum(), (a * a).sum(), (y * y).sum()])
-    y = np.random.default_rng(2).normal(size=(3, 10))
-    units = Units(["u0", "u1", "u2"])
-    flat = S._correlation(np.stack([sums(np.zeros(10), y[i]) for i in range(3)]), units)
-    assert flat["value"] is None and flat.get("constant")
-    moving = S._correlation(np.stack([sums(y[i] + 0.1, y[i]) for i in range(3)]), units)
-    assert moving["value"] > 0.99 and not moving.get("constant")
-    empty = S._correlation(np.zeros((3, 6)), units)  # nothing scored: n/a, not constant
-    assert empty["value"] is None and not empty.get("constant")
-
-
-def test_state_paired_gain_is_zero_for_a_model_against_itself():
-    from state_of_mind.benchmark import state as S
-    rng = np.random.default_rng(3)
-    tr, horizon = 1.49, 40
-
-    def unit():
-        s = {"se_own": rng.random(horizon), "se_other": rng.random(horizon), "count": np.full(horizon, 5.0)}
-        for b in S.BANDS:
-            s.update({f"{b}|err": rng.random(1), f"{b}|energy": rng.random(1) + 1, f"{b}|corr": rng.random(6)})
-        for w in S.GAIN_WINDOWS:
-            a, y = rng.normal(size=8), rng.normal(size=8)
-            s.update({f"gain {w}|corr": np.array([8, a.sum(), y.sum(), (a * y).sum(), (a * a).sum(), (y * y).sum()]),
-                      f"gain {w}|prefix corr": np.zeros(6), f"gain {w}|err": rng.random(1), f"gain {w}|energy": rng.random(1) + 1})
-        return s
-
-    sums = {f"u{i}": unit() for i in range(4)}
-    d = S.paired(sums, sums, tr)
-    for w in S.GAIN_WINDOWS:
-        assert abs(d[f"gain {w}"]["correlation"]["value"]) < 1e-12 and abs(d[f"gain {w}"]["skill"]["value"]) < 1e-12
 
 
 def test_state_centering_removes_differences_every_participant_shares():
@@ -638,46 +476,6 @@ def test_queries_hide_the_run_and_share_a_stimulus_handle_across_viewings():
     assert "run" not in b.run_ids[0] and "figures" not in b.run_ids[0]
 
 
-def test_linear_forecaster_solves_each_steps_own_ridge_when_targets_are_missing():
-    from state_of_mind.benchmark.references import _accumulate, _moments, _solve
-    rng = np.random.default_rng(9)
-    h = rng.normal(size=(60, 5))
-    r = rng.normal(size=(60, 3, 2))
-    ok = np.ones((60, 3), dtype=bool)
-    ok[50:, 2] = False  # the last anchors miss the step-3 target
-    ok[[3, 17], 1] = False
-    r = r * ok[..., None]
-    g = _moments(5, 3, 2)
-    _accumulate(g, h[:25], r[:25], ok[:25])  # two runs
-    _accumulate(g, h[25:], r[25:], ok[25:])
-    lam, V, VC, mean_h, mean_r = _solve(g)
-    beta = 0.5
-    for k in range(3):
-        W = V[k] @ (VC[k] / (lam[k] + beta)[:, None])
-        x, y = h[ok[:, k]], r[ok[:, k], k]
-        xc, yc = x - x.mean(0), y - y.mean(0)
-        direct = np.linalg.solve(xc.T @ xc + beta * np.eye(5), xc.T @ yc)
-        assert np.allclose(W, direct, atol=1e-8)
-        assert np.allclose(mean_h[k], x.mean(0)) and np.allclose(mean_r[k], y.mean(0))
-
-
-
-
-
-
-def test_ipsid_fit_settings_change_with_the_stimulus_timing():
-    from types import SimpleNamespace
-    from state_of_mind.benchmark.baselines import IPSIDBaseline
-    model = IPSIDBaseline.__new__(IPSIDBaseline)
-    model.features = "projections"
-    settings = []
-    for delay in (3.0, 6.0):
-        cfg = {"data": {"bundle_path": "/b", "hrf_delay_seconds": delay, "train_runs": ["r"], "split_frames": {}}}
-        model.data = SimpleNamespace(cfg=cfg, dataset="hcp_movies", grid=SimpleNamespace(tr=1.0))
-        settings.append(model._settings())
-    assert settings[0] != settings[1] and '"lag": 3' in settings[0] and '"lag": 6' in settings[1]
-
-
 def test_latent_probe_moments_match_a_direct_ridge():
     from state_of_mind.benchmark import latent as L
     rng = np.random.default_rng(0)
@@ -720,20 +518,6 @@ def test_card_flags_a_row_that_mixes_probes(tmp_path, monkeypatch):
     assert P._probe_mix("algonauts", "plain") is None
 
 
-def test_calibration_reaches_the_model_behind_a_latent_row(monkeypatch):
-    from types import SimpleNamespace
-    from state_of_mind.benchmark import adapt as A
-    from state_of_mind.benchmark.latent import LatentProbe
-    calibrated = []
-    monkeypatch.setattr(A, "adapt", lambda model, data, runs, log=None: calibrated.append(model))
-    adapter = SimpleNamespace(state_frames=3)  # a model with participant heads
-    row = LatentProbe(adapter, SimpleNamespace(provenance=None), "toy (latent)")
-    data = SimpleNamespace(runs=lambda split: [])
-    A.calibrate(row, data, "heldout-adapt", log=None)
-    A.calibrate(row, data, "val", log=None)  # not a held-out split: nothing to calibrate
-    assert calibrated == [adapter]
-
-
 def test_latent_probe_ignores_coordinate_scales_and_constant_coordinates():
     from state_of_mind.benchmark import latent as L
     rng = np.random.default_rng(1)
@@ -759,34 +543,3 @@ def test_latent_probe_ignores_coordinate_scales_and_constant_coordinates():
     np.testing.assert_allclose(scaled, plain, rtol=1e-6, atol=1e-8)
 
 
-def test_kalman_batch_of_viewers_with_different_state_widths():
-    """IPSID identifies one model per viewer, with its own state width: a batch mixing viewers pads latent outputs to the widest."""
-    from state_of_mind.benchmark.baselines import IPSIDBaseline
-
-    class Batch:
-        def __init__(self, subjects):
-            self.subject_ids = list(subjects)
-
-        def take(self, rows):
-            return Batch([self.subject_ids[i] for i in rows])
-
-        def __len__(self):
-            return len(self.subject_ids)
-
-    class Fake(IPSIDBaseline):
-        def __init__(self):
-            pass
-
-        def _group(self, subject):
-            return subject
-
-        def _run(self, batch, use_input=True):
-            if len(set(batch.subject_ids)) > 1:
-                return IPSIDBaseline._run(self, batch, use_input)
-            n, width = len(batch.subject_ids), 16 if batch.subject_ids[0] == "a" else 32
-            return np.full((n, 3, 5), 1.0 if width == 16 else 2.0), np.full((n, 3, width), float(width))
-
-    fmri, states = Fake()._run(Batch(["a", "b", "a"]))
-    assert fmri.shape == (3, 3, 5) and states.shape == (3, 3, 32)
-    assert (fmri[[0, 2]] == 1).all() and (fmri[1] == 2).all()
-    assert (states[0, :, :16] == 16).all() and (states[0, :, 16:] == 0).all() and (states[1] == 32).all()

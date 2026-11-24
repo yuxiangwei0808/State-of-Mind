@@ -1,16 +1,14 @@
 """Where the code reads data and writes results: roots set by environment variables.
 
     STATE_OF_MIND_DATA      prepared datasets and assets: <dataset>/derivatives/neuroworld-schaefer1000-v2* (the fMRI
-                            bundles, TRIBE v2 feature rows and predictions), atlases/, the TRIBE v2 checkpoint, and
-                            cached baseline fits (neuralworld-checkpoints/baselines)
-    STATE_OF_MIND_OUTPUT    released weights and outputs: spectator-v1/, benchmark-results/, paper-analysis/, and
-                            training runs (checkpoints/)
-    STATE_OF_MIND_EXTERNAL  optional read-only root for external baseline outputs
+                            bundles and TRIBE v2 contextual feature rows), atlases/, and the TRIBE v2 checkpoint
+    STATE_OF_MIND_OUTPUT    released weights and outputs: spectator-v1/, benchmark-results/, and training runs
+                            (checkpoints/)
 
 Unset, each falls back to the legacy NEUROWORLD_* variable if set, and otherwise defaults to a folder (or a symbolic
-link) in the repository root: data/, outputs/ and external/. Paths are resolved, so a link and its target give the
-same strings (some cached fits record the paths they were made from).
-YAML configs refer to the roots as ${STATE_OF_MIND_DATA}, ${STATE_OF_MIND_OUTPUT} and ${STATE_OF_MIND_EXTERNAL};
+link) in the repository root: data/ and outputs/. Paths are resolved, so a link and its target give the same strings
+(some cached fits record the paths they were made from).
+YAML configs refer to the roots as ${STATE_OF_MIND_DATA} and ${STATE_OF_MIND_OUTPUT};
 legacy ${NEUROWORLD_*} placeholders (as in the released Hugging Face configs) expand to the same roots.
 """
 import os
@@ -25,14 +23,11 @@ def _root(variable, legacy, default):
 
 DATA = _root("STATE_OF_MIND_DATA", "NEUROWORLD_DATA", "data")
 OUTPUT = _root("STATE_OF_MIND_OUTPUT", "NEUROWORLD_OUTPUT", "outputs")
-EXTERNAL = _root("STATE_OF_MIND_EXTERNAL", "NEUROWORLD_EXTERNAL", "external")
 ROOTS = {
     "STATE_OF_MIND_DATA": DATA,
     "STATE_OF_MIND_OUTPUT": OUTPUT,
-    "STATE_OF_MIND_EXTERNAL": EXTERNAL,
     "NEUROWORLD_DATA": DATA,
     "NEUROWORLD_OUTPUT": OUTPUT,
-    "NEUROWORLD_EXTERNAL": EXTERNAL,
 }
 
 

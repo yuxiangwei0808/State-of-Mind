@@ -32,7 +32,7 @@ def test_standardize_without_blocks_is_unchanged():
 
 
 def test_config_accepts_concat_standardize_and_checks_zero_brain():
-    config = "state_of_mind/configs/algonauts/joint_world_model.yaml"  # a stimulus design that needs no trained stage-0 run
+    config = "state_of_mind/configs/spectator/algonauts-jepa.yaml"
     settings = ("model.stimulus_features=tribev2_context", "model.stimulus_context=concat", "model.stimulus_context_trs=5",
                 "model.stimulus_scaling=standardize")
     cfg = load_config(config, settings)
