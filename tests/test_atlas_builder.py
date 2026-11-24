@@ -7,7 +7,7 @@ import nibabel as nib
 import numpy as np
 import pytest
 
-import neuroworld.nbs_data.fmri.atlas as atlas
+import state_of_mind.nbs_data.fmri.atlas as atlas
 
 
 PARCELS = 4

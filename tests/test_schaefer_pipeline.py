@@ -6,10 +6,10 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from neuroworld.nbs_data import pipeline
-from neuroworld.nbs_data.bundle import BundleWriter
-from neuroworld.nbs_data.fmri._sources import NativeRunSource
-from neuroworld.nbs_data.stimuli.raw_cache import (
+from state_of_mind.nbs_data import pipeline
+from state_of_mind.nbs_data.bundle import BundleWriter
+from state_of_mind.nbs_data.fmri._sources import NativeRunSource
+from state_of_mind.nbs_data.stimuli.raw_cache import (
     RawCacheChunk,
     RawCacheIntegrityError,
     export_raw_chunks,

@@ -1,5 +1,5 @@
 import pytest
-from neuroworld.data.algonauts_contract import AlgonautsContractError, canonical_algonauts_stimulus_id
+from state_of_mind.data.algonauts_contract import AlgonautsContractError, canonical_algonauts_stimulus_id
 
 def test_canonical_ids_drop_subject_session_and_repeat_run() -> None:
     assert canonical_algonauts_stimulus_id(
@@ -14,7 +14,7 @@ def test_canonical_ids_drop_subject_session_and_repeat_run() -> None:
 
 def test_event_grouping_deduplicates_subject_and_repeat_run() -> None:
     pd = pytest.importorskip("pandas")
-    from neuroworld.nbs_data.stimuli.common import iter_canonical_event_groups
+    from state_of_mind.nbs_data.stimuli.common import iter_canonical_event_groups
 
     rows = []
     for subject in ("sub-01", "sub-02"):
@@ -41,7 +41,7 @@ def test_event_grouping_deduplicates_subject_and_repeat_run() -> None:
 
 def test_timeline_grouping_preserves_repeated_contexts_and_general_ids() -> None:
     pd = pytest.importorskip("pandas")
-    from neuroworld.nbs_data.stimuli.common import iter_timeline_event_groups
+    from state_of_mind.nbs_data.stimuli.common import iter_timeline_event_groups
 
     rows = []
     for subject in ("sub-01", "sub-02"):

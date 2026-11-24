@@ -2,9 +2,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from neuroworld.nbs_data import pipeline
-from neuroworld.nbs_data.stimuli import algonauts, hcp_movies
-from neuroworld.nbs_data.stimuli.raw_cache import NativeTimelineSpec
+from state_of_mind.nbs_data import pipeline
+from state_of_mind.nbs_data.stimuli import algonauts, hcp_movies
+from state_of_mind.nbs_data.stimuli.raw_cache import NativeTimelineSpec
 
 
 @pytest.mark.parametrize(

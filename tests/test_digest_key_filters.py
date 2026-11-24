@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import neuroworld.nbs_data.bundle as bundle
-import neuroworld.nbs_data.fmri.atlas as atlas
-import neuroworld.nbs_data.pipeline as pipeline
-import neuroworld.nbs_data.stimuli.timing as timing
+import state_of_mind.nbs_data.bundle as bundle
+import state_of_mind.nbs_data.fmri.atlas as atlas
+import state_of_mind.nbs_data.pipeline as pipeline
+import state_of_mind.nbs_data.stimuli.timing as timing
 
 
 _RETIRED_KEYS = (

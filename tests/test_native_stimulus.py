@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from neuroworld.nbs_data.stimuli.timing import (
+from state_of_mind.nbs_data.stimuli.timing import (
     ALGONAUTS_MODALITIES,
     MODALITY_DIMS,
     ModalityChunk,

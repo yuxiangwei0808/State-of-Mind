@@ -5,9 +5,9 @@ import json
 import numpy as np
 import pytest
 
-from neuroworld.data.schaefer_v2_dataset import build_schaefer_v2_smoke_loader
-from neuroworld.data.bundle import BundleValidationError
-from neuroworld.nbs_data.bundle import (
+from state_of_mind.data.schaefer_v2_dataset import build_schaefer_v2_smoke_loader
+from state_of_mind.data.bundle import BundleValidationError
+from state_of_mind.nbs_data.bundle import (
     BundlePaths,
     BundleWriter,
     select_valid_time,

@@ -9,14 +9,14 @@ import nibabel as nib
 import numpy as np
 import pytest
 
-from neuroworld.nbs_data.fmri._adapters import (
+from state_of_mind.nbs_data.fmri._adapters import (
     AdapterError,
     MissingSourceAssetError,
     SourceShapeError,
     prepare_run,
 )
-from neuroworld.nbs_data.fmri._adapters import _result_from_fmri
-from neuroworld.nbs_data.fmri._sources import NativeRunSource
+from state_of_mind.nbs_data.fmri._adapters import _result_from_fmri
+from state_of_mind.nbs_data.fmri._sources import NativeRunSource
 
 
 AFFINE = np.eye(4, dtype=np.float64)
@@ -262,7 +262,7 @@ def test_public_adapters_reject_wrong_declared_dataset_clock(
 
 
 def test_atlas_resampling_preserves_original_path_and_records_decision(tmp_path: Path) -> None:
-    from neuroworld.nbs_data.fmri._adapters import _atlas_resampling_record, _resolve_atlas
+    from state_of_mind.nbs_data.fmri._adapters import _atlas_resampling_record, _resolve_atlas
 
     reference = nib.Nifti1Image(np.zeros((1, 1, 1000, 4), dtype=np.float32), AFFINE)
     atlas_path = tmp_path / "atlas_different_grid.nii.gz"

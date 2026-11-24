@@ -4,8 +4,8 @@ import json
 import numpy as np
 import pytest
 
-from neuroworld.data.schaefer_v2_dataset import SchaeferWindowDataset
-from neuroworld.utils.config import DEFAULTS, validate_config
+from state_of_mind.data.schaefer_v2_dataset import SchaeferWindowDataset
+from state_of_mind.utils.config import DEFAULTS, validate_config
 from copy import deepcopy
 
 

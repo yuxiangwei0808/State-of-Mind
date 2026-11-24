@@ -1,0 +1,84 @@
+# Shared Algonauts settings. Not launchable on its own: launch a design YAML in this
+# directory, which names this base and fixes the design settings
+# (train.objective, train.mode, train.encoder_checkpoint, train.freeze_encoder).
+seed: 0
+wandb:
+  project: neuralworld
+  entity: null
+  name: null
+  mode: online
+data:
+  bundle_path: ${STATE_OF_MIND_DATA}/algonauts/derivatives/neuroworld-schaefer1000-v2
+  tr_seconds: 1.49
+  hrf_delay_seconds: 5.0
+  sequence_states: 19  # context_states (3) + train.rollout_steps (16)
+  window_stride_trs: 3
+  # Splits (data/splits.py). Training: Friends seasons 1-5. Validation (selection and the
+  # in-distribution report): season 6. Development (new content): Movie10's Hidden Figures and Life,
+  # both seen twice. Test: Bourne and Wolf. Every split but training is test data in the paper.
+  # TRIBEv2's stimulus projections were trained on all of these brain responses (Friends 1-6 and
+  # Movie10), so Movie10 scores measure generalization of the components trained here, not of
+  # the complete pipeline; HCP (configs/hcp_movies) is outside TRIBEv2's training.
+  train_runs: ['Algonauts2025/*/task-friends/s0[1-5]*/run-*']
+  val_runs: ['Algonauts2025/*/task-friends/s06*/run-*']
+  dev_runs: ['Algonauts2025/*/task-movie10/figures*/run-*', 'Algonauts2025/*/task-movie10/life*/run-*']
+  test_runs: ['Algonauts2025/*/task-movie10/bourne*/run-*', 'Algonauts2025/*/task-movie10/wolf*/run-*']
+  batch_size: 1024  # global; 8 GPUs x 128, so each GPU's SIGReg sees LeWM's 128 windows
+  num_workers: 4
+  preload: true  # read the selected arrays into RAM once; NFS reads per window throttle the GPU
+  # Rows for model.stimulus_features: tribev2_context, prepared by
+  # python -m state_of_mind.nbs_data.stimuli.tribev2_context (see DATA.md).
+  context_features: ${STATE_OF_MIND_DATA}/algonauts/derivatives/neuroworld-schaefer1000-v2-tribev2-context
+model:
+  state_window_trs: 3
+  context_states: 3
+  state_dim: 1024
+  predictor_depth: 6
+  attention_heads: 16
+  predictor_mlp_dim: 2048
+  predictor_dropout: 0.1
+  # Stimulus context (models/stimulus_context.py): none = one movie row per transition, delayed
+  # by data.hrf_delay_seconds; concat = stimulus_context_trs rows side by side (no new module);
+  # linear = one layer downsampling those rows to 1152. The newest row sits at that delay.
+  stimulus_context: none
+  stimulus_context_trs: 1
+  # projections = TRIBEv2's frozen per-TR projections (1152 per row); tribev2_context = TRIBEv2's
+  # frozen temporal Transformer with causal attention, precomputed (2048 per row, data.context_features).
+  stimulus_features: projections
+  tribev2_checkpoint: ${STATE_OF_MIND_DATA}/hub/models--facebook--tribev2/snapshots/f894e783020944dcd96e5568550afe2aa9743f9f/best.ckpt
+train:
+  epochs: 100
+  lr: 0.00005
+  warmup_fraction: 0.01  # LeWM: linear warmup over 1% of all optimizer steps
+  schedule: cosine
+  weight_decay: 0.001
+  grad_clip: 1.0
+  precision: bf16
+  sigreg_weight: 0.09  # SIGReg on the encoded states, applied whenever the encoder trains (0 turns it off)
+  sigreg_knots: 17
+  sigreg_projections: 1024
+  rollout_steps: 16  # 16-step rollout loss, used by every design
+  rollout_weight: 1.0
+  modality_dropout: 0.0  # TRIBEv2 uses 0.3: drop each modality (with tribev2_context, the whole row) per training sample
+  device: auto
+  log_every_steps: 100
+  output_dir: null  # null: checkpoints/<dataset>/<run name built from the settings>
+eval:
+  prefix_trs: 1
+  horizon_trs: 20
+  window_stride_trs: 20
+  probe_windows: 4096  # training windows for the checkpoint-selection ridge probe
+  probe_ridge: 0.1
+readout:
+  hidden_dim: 1024  # 0: no shared trunk, one linear map per subject
+  epochs: 200
+  lr: 0.00001  # 1e-3 overfits within a few epochs; 1e-5 reaches a stable plateau
+  warmup_steps: 500
+  schedule: cosine
+  weight_decay: 0.001
+  batch_size: 16  # global, as in NeuroWorld
+  train_horizon_trs: 20
+  window_stride_trs: 20
+  train_on: rollout  # validation always decodes rollouts
+  cache_rollouts: true
+  select_by: parcel_pearson  # or fmri_mse; both are logged every epoch

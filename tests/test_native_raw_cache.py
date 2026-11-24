@@ -9,8 +9,8 @@ from types import ModuleType, SimpleNamespace
 import numpy as np
 import pytest
 
-import neuroworld.nbs_data.stimuli.raw_cache as raw_cache_module
-from neuroworld.nbs_data.stimuli.raw_cache import (
+import state_of_mind.nbs_data.stimuli.raw_cache as raw_cache_module
+from state_of_mind.nbs_data.stimuli.raw_cache import (
     NativeTimelineSpec,
     RawCacheError,
     RawCacheIntegrityError,
@@ -23,7 +23,7 @@ from neuroworld.nbs_data.stimuli.raw_cache import (
     sample_center_timestamps,
     support_mask_from_events,
 )
-from neuroworld.nbs_data.stimuli.timing import MODALITY_DIMS
+from state_of_mind.nbs_data.stimuli.timing import MODALITY_DIMS
 
 
 def _values(modality: str, n: int, value: float = 0.0) -> np.ndarray:

@@ -34,18 +34,20 @@ All Algonauts 2025 test data (*Friends* S6 and the four Movie10 films), skill in
 Python 3.11. From the repository root:
 
 ```bash
-python -m pip install -r neuroworld/requirements-dev.txt
+python -m pip install -r state_of_mind/requirements-dev.txt
 WANDB_MODE=offline CUDA_VISIBLE_DEVICES='' python -m pytest -q tests
 ```
 
-The tests use synthetic inputs and need no data, weights or GPU. The paper's analyses and IPSID also need [`requirements-analysis.txt`](neuroworld/requirements-analysis.txt), and data preparation needs [`requirements-data.txt`](neuroworld/requirements-data.txt).
+The tests use synthetic inputs and need no data, weights or GPU. The paper's analyses and IPSID also need [`requirements-analysis.txt`](state_of_mind/requirements-analysis.txt), and data preparation needs [`requirements-data.txt`](state_of_mind/requirements-data.txt).
 
-The code finds data and outputs through two roots ([`neuroworld/paths.py`](neuroworld/paths.py)). Each is an environment variable or, if unset, a folder or link in the repository root:
+The code finds data and outputs through two roots ([`state_of_mind/paths.py`](state_of_mind/paths.py)). Each is an environment variable or, if unset, a folder or link in the repository root:
 
 | Variable | Default | Holds |
 |---|---|---|
-| `NEUROWORLD_DATA` | `data/` | prepared datasets, the atlas, the TRIBE v2 checkpoint ([DATA.md](DATA.md)) |
-| `NEUROWORLD_OUTPUT` | `outputs/` | Spectator's weights, training runs, benchmark results |
+| `STATE_OF_MIND_DATA` | `data/` | prepared datasets, the atlas, the TRIBE v2 checkpoint ([DATA.md](DATA.md)) |
+| `STATE_OF_MIND_OUTPUT` | `outputs/` | Spectator's weights, training runs, benchmark results |
+
+Legacy `NEUROWORLD_DATA` / `NEUROWORLD_OUTPUT` variables and `${NEUROWORLD_*}` placeholders in released configs are still accepted as fallbacks.
 
 ## Pretrained model
 
@@ -64,8 +66,8 @@ With the weights in place, `tests/test_spectator.py` also checks the code agains
 import json
 import numpy as np
 import torch
-from neuroworld.train.readout import load_world_model
-from neuroworld.utils.config import load_config
+from state_of_mind.train.readout import load_world_model
+from state_of_mind.utils.config import load_config
 
 folder = "outputs/spectator-v1/algonauts/model"
 model, _ = load_world_model(load_config(f"{folder}/config.yaml"), f"{folder}/best.pt", "cpu")
@@ -86,7 +88,7 @@ Two fMRI datasets of people watching movies, neither included here:
 - **Algonauts 2025** ([CNeuroMod](https://github.com/courtois-neuromod/algonauts_2025.competitors)): 4 participants watching *Friends* seasons 1–6 and four films, as released in Schaefer-1000 parcels (TR 1.49 s). *Friends* S1–5 are used for training.
 - **HCP 7T movies** ([Human Connectome Project](https://www.humanconnectome.org/)): 184 participants, which we average into the same parcels (TR 1 s).
 
-The movies enter as TRIBE v2's stimulus features. [`neuroworld/nbs_data/download.sh`](neuroworld/nbs_data/download.sh) downloads both datasets, and [DATA.md](DATA.md) covers preparing them as for the paper and which recordings each split holds.
+The movies enter as TRIBE v2's stimulus features. [`state_of_mind/nbs_data/download.sh`](state_of_mind/nbs_data/download.sh) downloads both datasets, and [DATA.md](DATA.md) covers preparing them as for the paper and which recordings each split holds.
 
 ## Spectator
 
@@ -102,17 +104,17 @@ Training uses Algonauts' *Friends* S1–5 and has four steps:
 
 ```bash
 # Train every step and score the result on every task (HISTORY: seconds of fMRI history, default 180; 7.5 and 120 in the main table)
-OUT=outputs/my-spectator neuroworld/scripts/spectator.sh algonauts
-HISTORY=120 OUT=outputs/my-spectator-120s neuroworld/scripts/spectator.sh algonauts
+OUT=outputs/my-spectator state_of_mind/scripts/spectator.sh algonauts
+HISTORY=120 OUT=outputs/my-spectator-120s state_of_mind/scripts/spectator.sh algonauts
 # On HCP: keep the Algonauts encoder (yours, or the downloaded one) and refit the closed-form steps
-OUT=outputs/my-spectator neuroworld/scripts/spectator.sh hcp
+OUT=outputs/my-spectator state_of_mind/scripts/spectator.sh hcp
 
 # Score the downloaded model
-python -m neuroworld.spectator score outputs/spectator-v1/algonauts/model --seconds 180 --dataset algonauts \
+python -m state_of_mind.spectator score outputs/spectator-v1/algonauts/model --seconds 180 --dataset algonauts \
     --store outputs/my-results --name spectator-180s
 ```
 
-The frozen configs are in [`neuroworld/configs/spectator/`](neuroworld/configs/spectator). Each step's command is listed in [`neuroworld/spectator/__init__.py`](neuroworld/spectator/__init__.py).
+The frozen configs are in [`state_of_mind/configs/spectator/`](state_of_mind/configs/spectator). Each step's command is listed in [`state_of_mind/spectator/__init__.py`](state_of_mind/spectator/__init__.py).
 
 ## BrainStateBench
 
@@ -137,8 +139,8 @@ class MyModel:
 ```
 
 ```bash
-python -m neuroworld.benchmark suite --dataset algonauts --model py:my_model.py:MyModel --output outputs/benchmark-results
-python -m neuroworld.benchmark profile --output outputs/benchmark-results --reference "my model"
+python -m state_of_mind.benchmark suite --dataset algonauts --model py:my_model.py:MyModel --output outputs/benchmark-results
+python -m state_of_mind.benchmark profile --output outputs/benchmark-results --reference "my model"
 ```
 
 `profile` prints the benchmark card: every row of the store, with paired 95% intervals against the reference row. Scoring into the downloaded store puts a model next to the paper's rows. Built-in models: `direct-linear` (the linear forecaster), `ipsid`, `tribev2` and `persistence`. A trained run is `run:<dir>` or `latent:run:<dir>`. Each command takes `--help`.
@@ -148,27 +150,25 @@ TRIBE v2 was trained on CNeuroMod, which includes every Algonauts recording, so 
 ## Paper tables
 
 ```bash
-python -m neuroworld.paper.history_table    # Table 2: 7.5, 120 and 180 s of history
+python -m state_of_mind.paper.history_table    # Table 2: 7.5, 120 and 180 s of history
 ```
 
-It reads only the downloaded `outputs/benchmark-results/`, and writes the paired differences to Spectator to `outputs/paper-analysis/results-history-table.json`. The other analyses (Table 3, the Sec. 5.5 figures and the appendix) run the model on the prepared data; [`neuroworld/paper/__init__.py`](neuroworld/paper/__init__.py) lists their commands. BrainVista's and MIRAGE's rows were scored by a collaborator and are not included.
+It reads only the downloaded `outputs/benchmark-results/`, and writes the paired differences to Spectator to `outputs/paper-analysis/results-history-table.json`. The other analyses (Table 3, the Sec. 5.5 figures and the appendix) run the model on the prepared data; [`state_of_mind/paper/__init__.py`](state_of_mind/paper/__init__.py) lists their commands. BrainVista's and MIRAGE's rows were scored by a collaborator and are not included.
 
 ## Repository layout
 
 | Path | Contents |
 |---|---|
-| [`neuroworld/benchmark/`](neuroworld/benchmark) | BrainStateBench: tasks, scoring, reference models, latent probes |
-| [`neuroworld/spectator/`](neuroworld/spectator) | Spectator's closed-form steps and scoring |
-| [`neuroworld/models/`](neuroworld/models), [`neuroworld/train/`](neuroworld/train) | encoders, predictors and gradient training |
-| [`neuroworld/configs/`](neuroworld/configs) | dataset configs and Spectator's frozen configs |
-| [`neuroworld/nbs_data/`](neuroworld/nbs_data), [`neuroworld/data/`](neuroworld/data) | data preparation and loading |
-| [`neuroworld/paper/`](neuroworld/paper) | the paper's analyses |
-
-The Python package is named `neuroworld`; it is not the NeuroWorld baseline of the results table.
+| [`state_of_mind/benchmark/`](state_of_mind/benchmark) | BrainStateBench: tasks, scoring, reference models, latent probes |
+| [`state_of_mind/spectator/`](state_of_mind/spectator) | Spectator's closed-form steps and scoring |
+| [`state_of_mind/models/`](state_of_mind/models), [`state_of_mind/train/`](state_of_mind/train) | encoders, predictors and gradient training |
+| [`state_of_mind/configs/`](state_of_mind/configs) | dataset configs and Spectator's frozen configs |
+| [`state_of_mind/nbs_data/`](state_of_mind/nbs_data), [`state_of_mind/data/`](state_of_mind/data) | data preparation and loading |
+| [`state_of_mind/paper/`](state_of_mind/paper) | the paper's analyses |
 
 ## License
 
-Parts of the code are adapted from [LeWM](https://github.com/lucas-maes/le-wm) (SIGReg and conditional Transformer blocks; MIT) and [TRIBE v2](https://github.com/facebookresearch/tribev2) (stimulus projections and the network that makes the contextual rows; CC BY-NC 4.0). Each adapted file says what it took and what changed, and the licenses are in [`neuroworld/licenses/`](neuroworld/licenses). The code and the weights are released under CC BY-NC 4.0 ([LICENSE](LICENSE)).
+Parts of the code are adapted from [LeWM](https://github.com/lucas-maes/le-wm) (SIGReg and conditional Transformer blocks; MIT) and [TRIBE v2](https://github.com/facebookresearch/tribev2) (stimulus projections and the network that makes the contextual rows; CC BY-NC 4.0). Each adapted file says what it took and what changed, and the licenses are in [`state_of_mind/licenses/`](state_of_mind/licenses). The code and the weights are released under CC BY-NC 4.0 ([LICENSE](LICENSE)).
 
 ## Citation
 

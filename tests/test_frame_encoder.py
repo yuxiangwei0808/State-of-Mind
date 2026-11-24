@@ -5,8 +5,8 @@ import pytest
 import torch
 from torch import nn
 
-from neuroworld.models.encoder import BrainEncoder, FrameTransformerEncoder, frame_encoder
-from neuroworld.utils.config import DEFAULTS, validate_config
+from state_of_mind.models.encoder import BrainEncoder, FrameTransformerEncoder, frame_encoder
+from state_of_mind.utils.config import DEFAULTS, validate_config
 
 
 def _brain(frames=9):

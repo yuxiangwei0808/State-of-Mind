@@ -1,4 +1,4 @@
-"""Spectator, the reported model, is frozen (neuroworld/spectator/__init__.py): its configs keep their settings, and with the
+"""Spectator, the reported model, is frozen (state_of_mind/spectator/__init__.py): its configs keep their settings, and with the
 frozen weights the current code must reproduce the stored reference rollout. A failure here means a code change altered
 the reported model."""
 from pathlib import Path
@@ -6,10 +6,10 @@ from pathlib import Path
 import pytest
 import torch
 
-from neuroworld.utils.config import load_config
-from neuroworld.paths import OUTPUT
+from state_of_mind.utils.config import load_config
+from state_of_mind.paths import OUTPUT
 
-CONFIGS = Path(__file__).resolve().parents[1] / "neuroworld" / "configs" / "spectator"
+CONFIGS = Path(__file__).resolve().parents[1] / "state_of_mind" / "configs" / "spectator"
 RELEASE = OUTPUT / "spectator-v1"
 
 
@@ -41,7 +41,7 @@ def test_training_configs_describe_spectator():
 @pytest.mark.skipif(not RELEASE.is_dir(), reason="the frozen release is not on this machine")
 @pytest.mark.parametrize("dataset", ["algonauts", "hcp"])
 def test_frozen_model_reproduces_its_reference_rollout(dataset):
-    from neuroworld.train.readout import load_world_model
+    from state_of_mind.train.readout import load_world_model
     folder = RELEASE / dataset / "model"
     cfg = load_config(folder / "config.yaml")
     model, _ = load_world_model(cfg, folder / "best.pt", "cpu")

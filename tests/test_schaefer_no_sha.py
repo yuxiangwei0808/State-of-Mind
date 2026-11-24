@@ -7,14 +7,14 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from neuroworld.data import bundle as legacy_bundle
-from neuroworld.data.schaefer_v2_dataset import build_schaefer_v2_smoke_loader
-from neuroworld.nbs_data import pipeline
-from neuroworld.nbs_data.fmri import atlas
-from neuroworld.nbs_data.stimuli import raw_cache
-from neuroworld.nbs_data.stimuli import materialize as materializer
-from neuroworld.nbs_data.stimuli.raw_cache import RawCacheChunk
-from neuroworld.nbs_data.fmri._sources import NativeRunSource
+from state_of_mind.data import bundle as legacy_bundle
+from state_of_mind.data.schaefer_v2_dataset import build_schaefer_v2_smoke_loader
+from state_of_mind.nbs_data import pipeline
+from state_of_mind.nbs_data.fmri import atlas
+from state_of_mind.nbs_data.stimuli import raw_cache
+from state_of_mind.nbs_data.stimuli import materialize as materializer
+from state_of_mind.nbs_data.stimuli.raw_cache import RawCacheChunk
+from state_of_mind.nbs_data.fmri._sources import NativeRunSource
 
 
 def _chunks(timeline_id: str, n_time: int = 2):
@@ -208,7 +208,7 @@ def test_active_bundle_end_to_end_never_calls_digest_helpers(monkeypatch, tmp_pa
         atlas_manifest=atlas_manifest,
         output=output2,
     )
-    from neuroworld.nbs_data.bundle import BundlePaths
+    from state_of_mind.nbs_data.bundle import BundlePaths
 
     paths1 = BundlePaths.from_root(output)
     paths2 = BundlePaths.from_root(output2)
@@ -248,7 +248,7 @@ def test_raw_event_loader_never_calls_digest(monkeypatch, tmp_path: Path):
 
 def test_hcp_discovery_uses_run_local_mask_and_subject_wmparc(monkeypatch, tmp_path: Path):
     nib = pytest.importorskip("nibabel")
-    from neuroworld.nbs_data.fmri import hcp_movies
+    from state_of_mind.nbs_data.fmri import hcp_movies
 
     def boom(*_args, **_kwargs):
         raise AssertionError("active HCP discovery computed a digest")

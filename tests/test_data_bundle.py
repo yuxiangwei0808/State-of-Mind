@@ -1,7 +1,7 @@
 from pathlib import Path
 import numpy as np
 import pytest
-from neuroworld.data.bundle import (BundleValidationError, contained_path, atomic_write_npy,
+from state_of_mind.data.bundle import (BundleValidationError, contained_path, atomic_write_npy,
                                     atomic_write_json, atomic_write_jsonl, read_jsonl)
 
 def test_contained_path_rejects_traversal_absolute_and_symlink_escape(

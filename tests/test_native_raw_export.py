@@ -10,9 +10,9 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-import neuroworld.nbs_data.stimuli.raw_cache as raw_cache
-import neuroworld.nbs_data.fmri._sources as sources
-from neuroworld.nbs_data.stimuli import materialize as materializer
+import state_of_mind.nbs_data.stimuli.raw_cache as raw_cache
+import state_of_mind.nbs_data.fmri._sources as sources
+from state_of_mind.nbs_data.stimuli import materialize as materializer
 
 
 def _values(modality: str) -> np.ndarray:
@@ -72,7 +72,7 @@ def test_raw_only_cli_does_not_require_native_specs_or_output_dir() -> None:
             "--generated-index-dir",
             "/tmp/raw",
             "--extractor",
-            "neuroworld.nbs_data.stimuli.raw_cache:iter_tribev2_raw_chunks",
+            "state_of_mind.nbs_data.stimuli.raw_cache:iter_tribev2_raw_chunks",
             "--extractor-kwargs",
             "{}",
         ]

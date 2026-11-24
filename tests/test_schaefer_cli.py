@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-import neuroworld.nbs_data.schaefer as cli
+import state_of_mind.nbs_data.schaefer as cli
 
 
 def _inputs(command: str) -> list[str]:

@@ -3,11 +3,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from neuroworld.benchmark import grid as G, queries as Q
-from neuroworld.benchmark.data import BenchmarkData, Run, segments
-from neuroworld.benchmark.interface import Persistence, stimulus_source
-from neuroworld.benchmark.metrics import high_pass_basis, step_scores
-from neuroworld.benchmark.report import Units
+from state_of_mind.benchmark import grid as G, queries as Q
+from state_of_mind.benchmark.data import BenchmarkData, Run, segments
+from state_of_mind.benchmark.interface import Persistence, stimulus_source
+from state_of_mind.benchmark.metrics import high_pass_basis, step_scores
+from state_of_mind.benchmark.report import Units
 
 
 def make_run(n=200, invalid=(), gap=None, allowed=None, run_id="r1", subject="s1", parcels=1000):
@@ -149,7 +149,7 @@ def test_stimulus_source_switches_at_origin():
 
 
 def test_spliced_stimulus_rows_for_the_ridge():
-    from neuroworld.benchmark.references import StimulusRows
+    from state_of_mind.benchmark.references import StimulusRows
     rows = StimulusRows.__new__(StimulusRows)
     rows.delays, rows.pad = [0, 2], 2
     rows.rows = {"a": np.concatenate([np.zeros((2, 1)), np.arange(10)[:, None] + 100.0]).astype(np.float32),
@@ -163,7 +163,7 @@ def test_spliced_stimulus_rows_for_the_ridge():
 
 
 def test_per_modality_history_replaces_only_that_block_before_the_origin():
-    from neuroworld.benchmark.references import StimulusRows
+    from state_of_mind.benchmark.references import StimulusRows
     rows = StimulusRows.__new__(StimulusRows)
     rows.delays, rows.pad = [2], 2
     a = np.stack([np.arange(10) + 100.0, np.arange(10) + 110.0, np.arange(10) + 120.0], 1)
@@ -204,7 +204,7 @@ def test_targets_and_batches_accept_no_origins():
 
 
 def test_parallel_map_matches_serial():
-    from neuroworld.benchmark.forecast import _map
+    from state_of_mind.benchmark.forecast import _map
     items = list(range(6))
     square = lambda offset, x: offset + x * x
     assert _map(square, items, (1,), workers=3) == _map(square, items, (1,), workers=1) == [1, 2, 5, 10, 17, 26]
@@ -213,7 +213,7 @@ def test_parallel_map_matches_serial():
 
 
 def test_ipsid_filter_and_roll_matches_the_state_space_recursion():
-    from neuroworld.benchmark.baselines import IPSIDBaseline
+    from state_of_mind.benchmark.baselines import IPSIDBaseline
     rng = np.random.default_rng(0)
     nx, ny, nu = 3, 4, 2
     p = {"A": 0.5 * np.eye(nx), "B": rng.normal(size=(nx, nu)), "C": rng.normal(size=(ny, nx)), "D": np.zeros((ny, nu)),
@@ -230,7 +230,7 @@ def test_ipsid_filter_and_roll_matches_the_state_space_recursion():
 
 
 def test_gain_is_the_slope_on_the_detrended_reference():
-    from neuroworld.benchmark.gain import window_gains
+    from state_of_mind.benchmark.gain import window_gains
     rng = np.random.default_rng(0)
     ref = rng.normal(size=(3, 20, 1000)).astype(np.float32)
     trend = np.linspace(0, 5, 20)[None, :, None]
@@ -274,7 +274,7 @@ class _IgnoresPast:
 
 
 def test_state_pairs_and_scores():
-    from neuroworld.benchmark import state as S
+    from state_of_mind.benchmark import state as S
     data = _RepeatData()
 
     def viewings():  # fresh runs each time: scoring releases each run's brain array
@@ -307,7 +307,7 @@ def test_state_pairs_and_scores():
 
 
 def test_spliced_stimulus_can_start_after_the_origin():
-    from neuroworld.benchmark.interface import QueryBatch
+    from state_of_mind.benchmark.interface import QueryBatch
     batch = QueryBatch(dataset="toy", tr=1.0, run_ids=["r"], subject_ids=["s"], timeline_ids=["a"],
                        origins=np.array([10]), prefix=np.zeros((1, 0, 1000), np.float32),
                        prefix_valid=np.zeros((1, 0), bool), horizon=10, splices=[("b", 50, 3)])
@@ -316,7 +316,7 @@ def test_spliced_stimulus_can_start_after_the_origin():
 
 
 def test_updating_schedules_and_scoring_before_reveal():
-    from neuroworld.benchmark import updating as U
+    from state_of_mind.benchmark import updating as U
     assert U.schedule(40, 0) == [] and U.schedule(40, "all") == list(range(40))
     assert U.schedule(40, 4) == [7, 15, 23, 31] and len(U.schedule(40, 16)) == 16
 
@@ -341,7 +341,7 @@ def test_updating_schedules_and_scoring_before_reveal():
 
 
 def test_updating_own_fill_feeds_the_forecast_back_for_frames_not_shown():
-    from neuroworld.benchmark import updating as U
+    from state_of_mind.benchmark import updating as U
 
     class Data:
         dataset, grid = "toy", G.DatasetGrid("toy", 1.0)
@@ -367,7 +367,7 @@ def test_updating_own_fill_feeds_the_forecast_back_for_frames_not_shown():
 
 
 def test_ipsid_skips_the_update_at_missing_frames():
-    from neuroworld.benchmark.baselines import IPSIDBaseline
+    from state_of_mind.benchmark.baselines import IPSIDBaseline
     rng = np.random.default_rng(1)
     p = {"A": 0.9 * np.eye(3), "B": rng.normal(size=(3, 2)), "C": rng.normal(size=(4, 3)), "D": np.zeros((4, 2)),
          "K": 0.3 * rng.normal(size=(3, 4)), "y_mean": np.zeros(4), "u_mean": np.zeros(2)}
@@ -379,7 +379,7 @@ def test_ipsid_skips_the_update_at_missing_frames():
 
 
 def test_state_gain_difference_compares_two_viewings():
-    from neuroworld.benchmark import state as S
+    from state_of_mind.benchmark import state as S
     rng = np.random.default_rng(0)
     ref = rng.normal(size=(4, 20, 1000)).astype(np.float32)
 
@@ -397,7 +397,7 @@ def test_state_gain_difference_compares_two_viewings():
 
 
 def test_state_gain_reads_both_viewings_against_one_reference():
-    from neuroworld.benchmark import state as S
+    from state_of_mind.benchmark import state as S
     ref = np.random.default_rng(1).normal(size=(4, 20, 1000)).astype(np.float32)
 
     class Reference:  # the two runs' features differ slightly in scale over the same clip
@@ -415,7 +415,7 @@ def test_state_gain_reads_both_viewings_against_one_reference():
 
 
 def test_state_gain_centering_removes_what_participants_share():
-    from neuroworld.benchmark import state as S
+    from state_of_mind.benchmark import state as S
     keys = [("run-2", "run-3", 0), ("run-2", "run-3", 10)]
     records = [{"unit": u, "keys": keys, "p": np.array([np.nan, np.nan]),
                 **{f"d {w}": np.array([d, d + 1.0]) for w in S.GAIN_WINDOWS},
@@ -428,8 +428,8 @@ def test_state_gain_centering_removes_what_participants_share():
 
 
 def test_state_gain_correlation_of_a_constant_prediction_is_marked():
-    from neuroworld.benchmark import state as S
-    from neuroworld.benchmark.report import Units
+    from state_of_mind.benchmark import state as S
+    from state_of_mind.benchmark.report import Units
     sums = lambda a, y: np.array([a.size, a.sum(), y.sum(), (a * y).sum(), (a * a).sum(), (y * y).sum()])
     y = np.random.default_rng(2).normal(size=(3, 10))
     units = Units(["u0", "u1", "u2"])
@@ -442,7 +442,7 @@ def test_state_gain_correlation_of_a_constant_prediction_is_marked():
 
 
 def test_state_paired_gain_is_zero_for_a_model_against_itself():
-    from neuroworld.benchmark import state as S
+    from state_of_mind.benchmark import state as S
     rng = np.random.default_rng(3)
     tr, horizon = 1.49, 40
 
@@ -463,7 +463,7 @@ def test_state_paired_gain_is_zero_for_a_model_against_itself():
 
 
 def test_state_centering_removes_differences_every_participant_shares():
-    from neuroworld.benchmark import state as S
+    from state_of_mind.benchmark import state as S
     shared = np.random.default_rng(5).normal(size=(2, 4, 10)).astype(np.float32)
     records = [{"keys": [("run-1", "run-2", 0), ("run-1", "run-2", 3)], "dp": shared.copy(),
                 "dy": shared + np.float32(k)} for k in range(3)]
@@ -481,7 +481,7 @@ def test_queries_mark_history_before_the_run_start_invalid():
 
 
 def test_pareto_marks():
-    from neuroworld.benchmark import profile as P
+    from state_of_mind.benchmark import profile as P
     rows = {"a": {"forecast": {"value": 10}, "state": {"value": 55}, "updating": {"value": 20}},
             "b": {"forecast": {"value": 12}, "state": {"value": 55}, "updating": {"value": 21}},
             "c": {"forecast": {"value": 5}, "state": {"value": 60}, "updating": {"value": 10}},
@@ -492,7 +492,7 @@ def test_pareto_marks():
 def toy_adapter(rollout, frames=3):
     """A RolloutAdapter around a toy rollout(batch) -> (fMRI, states)."""
     from collections import OrderedDict
-    from neuroworld.benchmark.adapters import RolloutAdapter
+    from state_of_mind.benchmark.adapters import RolloutAdapter
     adapter = RolloutAdapter.__new__(RolloutAdapter)
     adapter.frames, adapter._memory, adapter._memory_bytes, adapter._rollout = frames, OrderedDict(), 0, rollout
     adapter.name = "toy"
@@ -501,7 +501,7 @@ def toy_adapter(rollout, frames=3):
 
 def test_world_model_gap_filling_does_not_depend_on_the_rest_of_the_batch():
     from dataclasses import replace
-    from neuroworld.benchmark.interface import QueryBatch
+    from state_of_mind.benchmark.interface import QueryBatch
     adapter = toy_adapter(lambda part: (np.repeat(part.prefix[:, -1:], part.horizon, axis=1), None))  # persistence
     prefix = np.arange(2 * 8 * 2, dtype=np.float32).reshape(2, 8, 2)
     valid = np.ones((2, 8), dtype=bool)
@@ -517,7 +517,7 @@ def test_world_model_gap_filling_does_not_depend_on_the_rest_of_the_batch():
 
 
 def test_world_model_gap_filling_handles_a_prefix_shorter_than_the_model_reads():
-    from neuroworld.benchmark.interface import QueryBatch
+    from state_of_mind.benchmark.interface import QueryBatch
     adapter = toy_adapter(lambda part: (np.repeat(part.prefix[:, -1:], part.horizon, axis=1), None), frames=12)
     prefix = np.arange(8 * 2, dtype=np.float32).reshape(1, 8, 2)
     valid = np.ones((1, 8), dtype=bool)
@@ -537,7 +537,7 @@ def test_world_model_gap_filling_handles_a_prefix_shorter_than_the_model_reads()
 
 
 def test_world_model_updating_reuses_rollouts_and_batches_runs_without_changing_forecasts(monkeypatch):
-    from neuroworld.benchmark import adapters as A, updating as U
+    from state_of_mind.benchmark import adapters as A, updating as U
 
     class Data:
         dataset, grid = "toy", G.DatasetGrid("toy", 1.0)
@@ -570,7 +570,7 @@ def test_world_model_updating_reuses_rollouts_and_batches_runs_without_changing_
 
 
 def test_card_curve_steps_and_paired_differences():
-    from neuroworld.benchmark import profile as P
+    from state_of_mind.benchmark import profile as P
     # The first curve point is the first step on both grids (1.49 s, 1 s), never a later one.
     assert P._steps("algonauts", (1.5, 6.0, 60.0)) == [0, 3, 39]
     assert P._steps("hcp_movies", (1.5, 6.0, 60.0)) == [0, 5, 59]
@@ -589,7 +589,7 @@ def test_card_curve_steps_and_paired_differences():
 
 
 def test_forecast_skill_is_relative_to_the_run_mean_on_the_same_targets():
-    from neuroworld.benchmark.metrics import step_scores
+    from state_of_mind.benchmark.metrics import step_scores
     rng = np.random.default_rng(7)
     y = rng.normal(size=(30, 4, 6)) + 2.0
     mean = np.full(6, 2.0)
@@ -604,7 +604,7 @@ def test_forecast_skill_is_relative_to_the_run_mean_on_the_same_targets():
 
 
 def test_state_difference_predicted_and_seconds_it_helps():
-    from neuroworld.benchmark import state as S
+    from state_of_mind.benchmark import state as S
     rng = np.random.default_rng(8)
     dy = rng.normal(size=(40, 6, 20))
     dp = np.zeros_like(dy)
@@ -620,7 +620,7 @@ def test_state_difference_predicted_and_seconds_it_helps():
 
 
 def test_updating_gap_schedule_keeps_the_budget_and_leaves_a_gap():
-    from neuroworld.benchmark import updating as U
+    from state_of_mind.benchmark import updating as U
     hidden = 40
     a, b = U.gap_window(hidden)
     gap = U.schedule(hidden, "gap")
@@ -639,7 +639,7 @@ def test_queries_hide_the_run_and_share_a_stimulus_handle_across_viewings():
 
 
 def test_linear_forecaster_solves_each_steps_own_ridge_when_targets_are_missing():
-    from neuroworld.benchmark.references import _accumulate, _moments, _solve
+    from state_of_mind.benchmark.references import _accumulate, _moments, _solve
     rng = np.random.default_rng(9)
     h = rng.normal(size=(60, 5))
     r = rng.normal(size=(60, 3, 2))
@@ -667,7 +667,7 @@ def test_linear_forecaster_solves_each_steps_own_ridge_when_targets_are_missing(
 
 def test_ipsid_fit_settings_change_with_the_stimulus_timing():
     from types import SimpleNamespace
-    from neuroworld.benchmark.baselines import IPSIDBaseline
+    from state_of_mind.benchmark.baselines import IPSIDBaseline
     model = IPSIDBaseline.__new__(IPSIDBaseline)
     model.features = "projections"
     settings = []
@@ -679,7 +679,7 @@ def test_ipsid_fit_settings_change_with_the_stimulus_timing():
 
 
 def test_latent_probe_moments_match_a_direct_ridge():
-    from neuroworld.benchmark import latent as L
+    from state_of_mind.benchmark import latent as L
     rng = np.random.default_rng(0)
     z = rng.normal(size=(300, 6)) * np.array([1, 10, 0.1, 3, 1, 5]) + 2.0
     y = z @ rng.normal(size=(6, 4)) + rng.normal(size=(300, 4))
@@ -702,7 +702,7 @@ def test_latent_probe_moments_match_a_direct_ridge():
 
 def test_card_flags_a_row_that_mixes_probes(tmp_path, monkeypatch):
     import json
-    from neuroworld.benchmark import profile as P
+    from state_of_mind.benchmark import profile as P
     monkeypatch.setattr(P, "ROOT", tmp_path)
 
     def result(path, probe):
@@ -722,8 +722,8 @@ def test_card_flags_a_row_that_mixes_probes(tmp_path, monkeypatch):
 
 def test_calibration_reaches_the_model_behind_a_latent_row(monkeypatch):
     from types import SimpleNamespace
-    from neuroworld.benchmark import adapt as A
-    from neuroworld.benchmark.latent import LatentProbe
+    from state_of_mind.benchmark import adapt as A
+    from state_of_mind.benchmark.latent import LatentProbe
     calibrated = []
     monkeypatch.setattr(A, "adapt", lambda model, data, runs, log=None: calibrated.append(model))
     adapter = SimpleNamespace(state_frames=3)  # a model with participant heads
@@ -735,7 +735,7 @@ def test_calibration_reaches_the_model_behind_a_latent_row(monkeypatch):
 
 
 def test_latent_probe_ignores_coordinate_scales_and_constant_coordinates():
-    from neuroworld.benchmark import latent as L
+    from state_of_mind.benchmark import latent as L
     rng = np.random.default_rng(1)
     z = rng.normal(size=(400, 5))
     y = z[:, :2] @ rng.normal(size=(2, 3)) + rng.normal(size=(400, 3))
@@ -761,7 +761,7 @@ def test_latent_probe_ignores_coordinate_scales_and_constant_coordinates():
 
 def test_kalman_batch_of_viewers_with_different_state_widths():
     """IPSID identifies one model per viewer, with its own state width: a batch mixing viewers pads latent outputs to the widest."""
-    from neuroworld.benchmark.baselines import IPSIDBaseline
+    from state_of_mind.benchmark.baselines import IPSIDBaseline
 
     class Batch:
         def __init__(self, subjects):

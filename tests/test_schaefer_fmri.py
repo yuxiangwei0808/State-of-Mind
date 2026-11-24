@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from neuroworld.nbs_data.fmri.common import (
+from state_of_mind.nbs_data.fmri.common import (
     AtlasValidationError,
     GridValidationError,
     build_valid_time_mask,

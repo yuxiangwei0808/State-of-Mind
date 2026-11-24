@@ -3,13 +3,13 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from neuroworld.nbs_data.fmri._sources import (
+from state_of_mind.nbs_data.fmri._sources import (
     SourceDiscoveryError,
     audit_run_sources,
 )
-from neuroworld.nbs_data.fmri.algonauts import discover_algonauts
-from neuroworld.nbs_data.fmri.hcp_movies import discover_hcp_movies
-from neuroworld.nbs_data.fmri import hcp_movies
+from state_of_mind.nbs_data.fmri.algonauts import discover_algonauts
+from state_of_mind.nbs_data.fmri.hcp_movies import discover_hcp_movies
+from state_of_mind.nbs_data.fmri import hcp_movies
 
 
 def _nifti(path, shape, tr: float = 1.0) -> None:

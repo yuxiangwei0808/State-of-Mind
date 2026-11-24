@@ -5,11 +5,11 @@ A model is any class with a ``name`` and ``predict(QueryBatch) -> [B, horizon, 1
 run's average (zero in the benchmark's z-scored units) with a fixed time constant. It reads only the query's fMRI
 history and its validity mask: frames before the run start and frames Updating hides are marked invalid.
 
-    python -m neuroworld.benchmark suite --dataset algonauts --model py:examples/persistence.py:DecayingPersistence
+    python -m state_of_mind.benchmark suite --dataset algonauts --model py:examples/persistence.py:DecayingPersistence
 """
 import numpy as np
 
-from neuroworld.benchmark.interface import last_valid
+from state_of_mind.benchmark.interface import last_valid
 
 
 class DecayingPersistence:
