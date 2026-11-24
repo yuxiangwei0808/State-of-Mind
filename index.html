@@ -94,8 +94,15 @@ h1{
   color:var(--ink);
   text-wrap:balance;
 }
-.authors{font-size:16.5px;font-weight:500;color:var(--ink-2);margin-bottom:4px}
-.affil{font-size:14px;color:var(--muted);margin-bottom:24px}
+.authors{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:16.5px;font-weight:500;color:var(--ink-2);margin-bottom:10px;line-height:1.5}
+.author-row{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 24px}
+.author-row span{white-space:nowrap}
+.authors sup,.affil sup,.author-note sup{font-size:.72em;line-height:0;vertical-align:super;font-weight:500}
+.authors sup{margin-left:1px;color:var(--state-d)}
+.affil{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:14px;color:var(--muted);margin-bottom:6px;line-height:1.5}
+.affil-row{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 20px}
+.affil sup,.author-note sup{margin-right:2px;color:var(--muted)}
+.author-note{font-size:13px;color:var(--muted);margin-bottom:24px}
 .pills{display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
 .pill{
   display:inline-flex;align-items:center;gap:7px;
@@ -108,8 +115,6 @@ h1{
 .pill:hover{border-color:var(--border-strong);box-shadow:0 4px 12px -4px rgba(24,34,38,.12);transform:translateY(-1px);color:var(--ink)}
 .pill.main{background:var(--state);border-color:var(--state);color:#fff;box-shadow:0 4px 14px -4px rgba(20,116,122,.45)}
 .pill.main:hover{background:var(--state-d);border-color:var(--state-d);color:#fff;box-shadow:0 6px 18px -4px rgba(20,116,122,.5)}
-.pill[aria-disabled="true"]{opacity:.68;cursor:default;pointer-events:none;box-shadow:none}
-.pill .soon{font-family:var(--mono);font-size:10.5px;font-weight:500;opacity:.8;background:var(--panel);padding:1px 6px;border-radius:999px}
 .pill svg{width:14px;height:14px;flex:none}
 
 /* sticky nav */
@@ -470,11 +475,32 @@ footer a:hover{color:var(--ink)}
 <header>
   <div class="wide">
     <h1>State of Mind: Learning and Evaluating World Models of Naturalistic Brain Dynamics</h1>
-    <div class="authors">Anonymous authors</div>
-    <div class="affil">Preprint · names and affiliations withheld during review</div>
+    <div class="authors">
+      <div class="author-row">
+        <span>Yuxiang Wei<sup>1,2,*</sup></span>
+        <span>Zundong Wu<sup>1,2,*</sup></span>
+        <span>Weiyu Sun<sup>1,*</sup></span>
+      </div>
+      <div class="author-row">
+        <span>Qizhen Lan<sup>3</sup></span>
+        <span>Yanteng Zhang<sup>2</sup></span>
+        <span>Vince D. Calhoun<sup>2</sup></span>
+      </div>
+    </div>
+    <div class="affil">
+      <div class="affil-row">
+        <span><sup>1</sup>Georgia Institute of Technology</span>
+        <span><sup>2</sup>Center for Translational Research in Neuroimaging and Data Science</span>
+      </div>
+      <div class="affil-row">
+        <span><sup>3</sup>University of Texas Health Science Center at Houston</span>
+      </div>
+    </div>
+    <div class="author-note"><sup>*</sup>Equal contribution</div>
     <div class="pills">
       <a class="pill main" href="#live"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 3.2 12.8 8l-8.3 4.8z"/></svg>Live Simulator</a>
-      <span class="pill" aria-disabled="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5l3 3v10H4z"/><path d="M9 1.5v3h3"/></svg>Paper <span class="soon">soon</span></span>
+      <a class="pill" href="https://arxiv.org/pdf/2611.28508" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5l3 3v10H4z"/><path d="M9 1.5v3h3"/></svg>Paper</a>
+      <a class="pill" href="https://arxiv.org/abs/2611.28508" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 3.5h4.2c1 0 1.3.6 1.3 1.3v8.2c0-.7-.5-1.2-1.3-1.2H2.5zm11 0H9.3c-1 0-1.3.6-1.3 1.3v8.2c0-.7.5-1.2 1.3-1.2h4.2z"/></svg>arXiv</a>
       <a class="pill" href="https://github.com/yuxiangwei0808/State-of-Mind" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/></svg>Code</a>
       <a class="pill" href="https://huggingface.co/stanjsx/Spectator" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="3" width="11" height="10" rx="2"/><path d="M5.5 7h5M5.5 10h3.5"/></svg>Weights &amp; Scores</a>
       <a class="pill" href="#cite"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 4h4v4H5c0 1.5.7 2.5 2 3l-.6 1.2C4 11.4 3 9.8 3 7.5zm6 0h4v4h-2c0 1.5.7 2.5 2 3l-.6 1.2C10 11.4 9 9.8 9 7.5z"/></svg>BibTeX</a>
@@ -801,12 +827,14 @@ footer a:hover{color:var(--ink)}
     <div class="sec-label">§8 Citation</div>
     <h2>BibTeX</h2>
     <div class="bib-wrap">
-<pre class="bib" id="bib">@inproceedings{stateofmind2026,
-  title     = {State of Mind: Learning and Evaluating World Models
-               of Naturalistic Brain Dynamics},
-  author    = {Anonymous},
-  booktitle = {Under review},
-  year      = {2026}
+<pre class="bib" id="bib">@article{wei2026stateofmind,
+  title   = {State of Mind: Learning and Evaluating World Models
+             of Naturalistic Brain Dynamics},
+  author  = {Yuxiang Wei and Zundong Wu and Weiyu Sun and
+             Qizhen Lan and Yanteng Zhang and Vince D. Calhoun},
+  journal = {arXiv preprint arXiv:2611.28508},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2611.28508}
 }</pre>
       <button class="copy" id="copyBib" type="button">Copy</button>
     </div>
@@ -816,7 +844,7 @@ footer a:hover{color:var(--ink)}
 
 <footer>
   <div class="wide">
-    <span>State of Mind · <a href="https://github.com/yuxiangwei0808/State-of-Mind" target="_blank" rel="noopener">GitHub</a> · <a href="https://huggingface.co/stanjsx/Spectator" target="_blank" rel="noopener">Hugging Face</a> · Data: CNeuroMod/Algonauts 2025 (CC0), HCP 7T; features: TRIBE v2 (CC BY-NC 4.0)</span>
+    <span>State of Mind · <a href="https://arxiv.org/abs/2611.28508" target="_blank" rel="noopener">arXiv</a> · <a href="https://github.com/yuxiangwei0808/State-of-Mind" target="_blank" rel="noopener">GitHub</a> · <a href="https://huggingface.co/stanjsx/Spectator" target="_blank" rel="noopener">Hugging Face</a> · Data: CNeuroMod/Algonauts 2025 (CC0), HCP 7T; features: TRIBE v2 (CC BY-NC 4.0)</span>
     <a href="#top">Back to top ↑</a>
   </div>
 </footer>
