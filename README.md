@@ -1,8 +1,13 @@
 # State of Mind
 
-Code for **State of Mind: Learning and Evaluating World Models of Naturalistic Brain Dynamics**.
+Code for **[State of Mind: Learning and Evaluating World Models of Naturalistic Brain Dynamics](https://arxiv.org/abs/2611.28508)**.
 
-**[Weights and stored scores](https://huggingface.co/stanjsx/Spectator)** | **[Data](DATA.md)**
+Yuxiang Wei<sup>1,2,&#42;</sup>, Zundong Wu<sup>1,2,&#42;</sup>, Weiyu Sun<sup>1,&#42;</sup>, Qizhen Lan<sup>3</sup>, Yanteng Zhang<sup>2</sup>, Vince D. Calhoun<sup>2</sup>
+
+<sup>1</sup>Georgia Institute of Technology · <sup>2</sup>Center for Translational Research in Neuroimaging and Data Science · <sup>3</sup>University of Texas Health Science Center at Houston  
+<sub><sup>&#42;</sup>Equal contribution</sub>
+
+**[Paper (arXiv)](https://arxiv.org/abs/2611.28508)** | **[PDF](https://arxiv.org/pdf/2611.28508)** | **[Project page](https://yuxiangwei0808.github.io/State-of-Mind/)** | **[Weights and stored scores](https://huggingface.co/stanjsx/Spectator)** | **[Data](DATA.md)**
 
 A brain world model keeps an internal state built from a person's measured fMRI and simulates how that state evolves while they watch a movie. This repository contains:
 
@@ -164,3 +169,17 @@ The Python package is named `neuroworld`; it is not the NeuroWorld baseline of t
 ## License
 
 Parts of the code are adapted from [LeWM](https://github.com/lucas-maes/le-wm) (SIGReg and conditional Transformer blocks; MIT) and [TRIBE v2](https://github.com/facebookresearch/tribev2) (stimulus projections and the network that makes the contextual rows; CC BY-NC 4.0). Each adapted file says what it took and what changed, and the licenses are in [`neuroworld/licenses/`](neuroworld/licenses). The code and the weights are released under CC BY-NC 4.0 ([LICENSE](LICENSE)).
+
+## Citation
+
+```bibtex
+@article{wei2026stateofmind,
+  title   = {State of Mind: Learning and Evaluating World Models
+             of Naturalistic Brain Dynamics},
+  author  = {Yuxiang Wei and Zundong Wu and Weiyu Sun and
+             Qizhen Lan and Yanteng Zhang and Vince D. Calhoun},
+  journal = {arXiv preprint arXiv:2611.28508},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2611.28508}
+}
+```
